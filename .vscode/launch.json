@@ -1,0 +1,56 @@
+{
+  // Utilisez IntelliSense pour en savoir plus sur les attributs possibles.
+  // Pointez pour afficher la description des attributs existants.
+  // Pour plus d'informations, visitez : https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Vestibule with Mock OAuth2",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "remotePath": "",
+      "port": 2345,
+      "host": "127.0.0.1",
+      "program": "${workspaceFolder}/main.go",
+      "env": {
+        "REDIRECT_URL": "https://vestibule.127.0.0.1.nip.io:1443/OAuth2Callback",
+        "CLIENT_ID": "foo",
+        "CLIENT_SECRET": "bar",
+        "AUTH_URL": "http://localhost:8090/auth",
+        "TOKEN_URL": "http://localhost:8090/token",
+        "USERINFO_URL": "http://localhost:8090/admininfo",
+        "LOGOUT_URL": "http://localhost:8090/logout",
+        "ADMIN_ROLE": "ADMINS",
+        "COMMON_ROLE": "OTHERS",
+        "HOSTNAME": "vestibule.127.0.0.1.nip.io"
+      },
+      "args": ["-debug", "-apps=./configs/apps.json", "-https_port=1443"],
+      "showLog": true
+    },
+    {
+      "name": "Debug Vestibule with Sign&Go",
+      "type": "go",
+      "request": "launch",
+      "mode": "debug",
+      "remotePath": "",
+      "port": 2345,
+      "host": "127.0.0.1",
+      "program": "${workspaceFolder}/main.go",
+      "env": {
+        "REDIRECT_URL": "https://vestibule.127.0.0.1.nip.io:1443/OAuth2Callback",
+        "CLIENT_ID": "<GET ONE FROM YOUR IDP>",
+        "CLIENT_SECRET": "<GET ONE FROM YOUR IDP>",
+        "AUTH_URL": "https://connexion-rec.grandlyon.fr/IdPOAuth2/authorize/oidc-rec",
+        "TOKEN_URL": "https://connexion-rec.grandlyon.fr/IdPOAuth2/token/oidc-rec",
+        "USERINFO_URL": "https://connexion-rec.grandlyon.fr/IdPOAuth2/userinfo/oidc-rec",
+        "LOGOUT_URL": "https://connexion-rec.grandlyon.fr/auth/logout.jsp",
+        "ADMIN_ROLE": "GGD_ORG_DG-DEES-DINSI-DAAG_TOUS",
+        "COMMON_ROLE": "OTHERS",
+        "HOSTNAME": "vestibule.127.0.0.1.nip.io"
+      },
+      "args": ["-debug", "-apps=./configs/apps.json", "-https_port=1443"],
+      "showLog": true
+    }
+  ]
+}

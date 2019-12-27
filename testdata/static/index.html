@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vestibule Test</title>
+</head>
+<script>
+
+    async function getData() {
+        data = await fetch("https://api.vestibule.127.0.0.1.nip.io:1443/", {
+            "credentials": "include",
+            "method": "GET",
+            "mode": "cors"
+        });
+        result = await data.json();
+        document.getElementById('api-result').innerHTML = JSON.stringify(result);
+    }
+
+</script>
+
+<body onload="getData()">
+    <h1>This is a test !</h1>
+    <h2>API fetch result :</h2>
+    <div id="api-result">NO RESULT (YET)</div>
+</body>
+
+</html>

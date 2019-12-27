@@ -1,0 +1,37 @@
+[
+	{
+		"id": 1,
+		"isProxy": true,
+		"host": "api.vestibule.io",
+		"forwardTo": "localhost:8091",
+		"serve": "",
+		"secured": true,
+		"login": "",
+		"password": "",
+		"roles": [
+			"USERS"
+		]
+	},
+	{
+		"id": 2,
+		"isProxy": true,
+		"host": "external.vestibule.io",
+		"forwardTo": "www.example.com",
+		"serve": "",
+		"secured": true,
+		"login": "",
+		"password": "",
+		"roles": null
+	},
+	{
+		"id": 3,
+		"isProxy": false,
+		"host": "static.vestibule.io",
+		"forwardTo": "",
+		"serve": "./testdata/static",
+		"secured": true,
+		"login": "",
+		"password": "",
+		"roles": null
+	}
+]

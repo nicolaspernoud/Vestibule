@@ -1,0 +1,19 @@
+.card-header {
+  background-color: #3f51b5;
+}
+
+.navbar-item img {
+  max-height: 3rem;
+  margin-right: 10px;
+}
+
+.has-reduced-padding {
+  padding: 0.5rem;
+}
+
+.notification {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  width: 25%;
+}

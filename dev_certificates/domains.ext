@@ -1,0 +1,9 @@
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost
+DNS.2 = *.127.0.0.1.nip.io
+DNS.3 = *.127.0.0.1.nip.io:1443
+DNS.4 = vestibule.127.0.0.1.nip.io:1443

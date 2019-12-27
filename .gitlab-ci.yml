@@ -1,0 +1,13 @@
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - docker-compose --project-name vestibule build
+
+deploy:
+  stage: deploy
+  script:
+    - docker-compose --project-name vestibule up -d

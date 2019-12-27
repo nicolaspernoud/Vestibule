@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" class="has-navbar-fixed-top">
+  <title>Vestibule</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="assets/bulmaswatch.min.css" />
+  <link rel="stylesheet" href="assets/animate.css" />
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <script defer type="module" src="main.js"></script>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar is-primary is-fixed-top" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a class="navbar-item title is-2" href="/"><img src="assets/logo.svg" />Vestibule</a>
+      </div>
+      <div class="navbar-menu is-active">
+        <div class="navbar-start">
+          <a class="navbar-item" id="goto-apps"> Apps </a>
+          <a class="navbar-item" id="goto-users"> Users </a>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <a class="button is-light" id="goto-login"> Log in </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content-->
+    <section class="section" id="main"></section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>Created by <a href="https://www.github.com/nicolaspernoud" target="_blank">Nicolas Pernoud</a></p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+version: "2.4"
+
+services:
+  vestibule-container:
+    image: vestibule
+    build: .
+    restart: unless-stopped
+    command: -apps=./configs/apps.json -letsencrypt_cache=./letsencrypt_cache
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/npernoud/apps.json:/app/configs/apps.json
+      - /home/npernoud/users.json:/app/configs/users.json
+      - /home/npernoud/letsencrypt_cache:/app/letsencrypt_cache
+    ports:
+      - 443:443
+      - 80:80
