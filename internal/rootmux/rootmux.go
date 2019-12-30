@@ -47,6 +47,7 @@ func CreateRootMux(port int, appsFile string, staticDir string) RootMux {
 		}
 		http.Error(w, "method not allowed", 405)
 	})
+	commonMux.HandleFunc("/WhoAmI", auth.WhoAmI)
 	mainMux.Handle("/api/common/", http.StripPrefix("/api/common", auth.ValidateJWTAndRolesMiddleware(commonMux, []string{os.Getenv("COMMON_ROLE")})))
 	// ADMIN API ENDPOINTS
 	adminMux := http.NewServeMux()

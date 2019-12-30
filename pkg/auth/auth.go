@@ -66,6 +66,16 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, os.Getenv("LOGOUT_URL"), http.StatusTemporaryRedirect)
 }
 
+// WhoAmI returns the user data
+func WhoAmI(w http.ResponseWriter, r *http.Request) {
+	user, err := GetUser(r)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	json.NewEncoder(w).Encode(user)
+}
+
 // checkUserHasRole checks if the user has the required role
 func checkUserHasRole(user User, allowedRoles []string) error {
 	for _, allowedRole := range allowedRoles {
@@ -84,7 +94,7 @@ func GetUser(r *http.Request) (User, error) {
 	data := r.Context().Value(jwt.ContextData)
 	dataStr, err := json.Marshal(data)
 	if err != nil {
-		return user, errors.New("data could not be got from context")
+		return user, errors.New("user could not be recovered from context")
 	}
 	err = json.Unmarshal([]byte(dataStr), &user)
 	if err != nil {

@@ -111,6 +111,8 @@ func createUnLoggedTests(t *testing.T) func(wg *sync.WaitGroup) {
 		do("GET", "api.vestibule.io", "", "", 401, "error extracting JWT: no token found")
 		// Try to access the main page (must pass)
 		do("GET", "/", "", "", 200, "<!DOCTYPE html>")
+		// Try to get the user informations (must fail)
+		do("GET", "/api/common/WhoAmI", "", "", 401, "error extracting JWT: no token found")
 		// Do a in memory login with an unknown user
 		do("POST", "/Login", "", `{"login": "unknownuser","password": "password"}`, http.StatusForbidden, `user not found`)
 		// Do a in memory login with a known user but bad password
@@ -148,6 +150,8 @@ func createUserTests(t *testing.T) func(wg *sync.WaitGroup) {
 			do("GET", "/", "", "", 200, "<!DOCTYPE html>")
 			// Try to access an authorized app (must pass)
 			do("GET", "api.vestibule.io", "", "", 200, "{")
+			// Try to get the user informations (must pass)
+			do("GET", "/api/common/WhoAmI", "", "", 200, `{"id":`)
 		}
 		// Try to login with OAuth2 (must pass)
 		do("GET", "/OAuth2Login", "", "", 200, "<!DOCTYPE html>")
@@ -190,6 +194,8 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 			do("POST", "/api/admin/users/", "", newUser, 200, "[{\"id\":1,")
 			// Try to delete an user (must pass)
 			do("DELETE", "/api/admin/users/3", "", "", 200, "[{\"id\":1,")
+			// Try to get the user informations (must pass)
+			do("GET", "/api/common/WhoAmI", "", "", 200, `{"id":`)
 		}
 		// Try to login (must pass)
 		do("GET", "/OAuth2Login", "", "", 200, "<!DOCTYPE html>")
