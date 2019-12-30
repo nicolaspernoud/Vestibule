@@ -155,7 +155,7 @@ async function firstShowApps() {
     apps = await response.json();
     displayApps(apps);
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
 }
@@ -171,7 +171,7 @@ async function deleteApp(app) {
     reloadAppsOnServer();
     document.getElementById(`apps-app-${app.id}`).remove();
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
 }
@@ -262,7 +262,7 @@ async function postApp() {
     await displayApps(apps);
     await reloadAppsOnServer(apps);
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
   toggleModal();
@@ -277,7 +277,7 @@ async function reloadAppsOnServer() {
       throw new Error(`App could not be reloaded (status ${response.status})`);
     }
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
 }

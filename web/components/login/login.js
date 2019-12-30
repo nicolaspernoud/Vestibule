@@ -68,7 +68,7 @@ async function doLogin() {
     }
     location.hash = "#apps";
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
 }

@@ -144,7 +144,7 @@ async function firstShowUsers() {
     displayUsers();
     document.getElementById("spinner").style.display = "none";
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
 }
@@ -159,7 +159,7 @@ async function deleteUser(user) {
     }
     document.getElementById(`users-user-${user.id}`).remove();
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
 }
@@ -235,7 +235,7 @@ async function postUser() {
     users = await response.json();
     displayUsers();
   } catch (e) {
-    Messages.Show("is-warning", e);
+    Messages.Show("is-warning", e.message);
     console.error(e);
   }
   toggleModal();

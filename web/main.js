@@ -15,7 +15,8 @@ document.addEventListener("DOMContentLoaded", function() {
   location.hash = "#apps";
 });
 
-function navigate() {
+async function navigate() {
+  await hideShowInterfaceElements();
   switch (location.hash) {
     case "#apps":
       Apps.mount("main");
@@ -30,7 +31,6 @@ function navigate() {
       Apps.mount("main");
       break;
   }
-  hideShowInterfaceElements();
 }
 
 async function hideShowInterfaceElements() {
