@@ -29,7 +29,7 @@ export async function mount(where) {
         <img src="assets/spinner.svg" />
       </div>
     </div>
-    <button id="apps-new" class="button is-primary is-rounded">+</button>
+    <button id="apps-new" class="button is-primary is-rounded is-hidden animated zoomIn">+</button>
 
     <div class="modal" id="apps-modal">
       <div class="modal-background"></div>
@@ -100,6 +100,9 @@ export async function mount(where) {
     </div>
   `;
   user = await Auth.GetUser();
+  if (user.isAdmin) {
+    document.getElementById("apps-new").classList.toggle("is-hidden");
+  }
   registerModalFields();
   firstShowApps();
 }

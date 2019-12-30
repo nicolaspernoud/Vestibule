@@ -18,13 +18,13 @@ export function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div class="table-container">
-      <table class="table">
+      <table class="table is-bordered is-narrow is-hoverable is-fullwidth">
         <thead>
           <tr>
             <th>Id</th>
             <th>Login</th>
             <th>Password</th>
-            <th>Password Hash</th>
+            <th>Hash</th>
             <th>Name</th>
             <th>Surname</th>
             <th>Roles</th>
@@ -107,7 +107,7 @@ function userTemplate(user) {
       <th>${user.id}</th>
       <td>${user.login}</td>
       <td>${user.password ? user.password : ""}</td>
-      <td>${user.passwordHash ? user.passwordHash : ""}</td>
+      <td>${user.passwordHash ? "..." : ""}</td>
       <td>${user.name ? user.name : ""}</td>
       <td>${user.surname ? user.surname : ""}</td>
       <td>${user.memberOf ? user.memberOf : ""}</td>
@@ -182,12 +182,15 @@ function registerModalFields() {
   document.getElementById(`users-new`).addEventListener("click", function() {
     newUser();
   });
+  password_field.addEventListener("click", function() {
+    password_field.value = randomString(48);
+  });
 }
 
 async function editUser(user) {
   id_field.value = user.id;
   login_field.value = user.login;
-  password_field.value = user.password ? user.password : "";
+  password_field.value = user.passwordHash ? "" : randomString(48);
   passwordhash_field.value = user.passwordHash ? user.passwordHash : "";
   name_field.value = user.name ? user.name : "";
   surname_field.value = user.surname ? user.surname : "";
@@ -202,7 +205,7 @@ async function newUser() {
   });
   id_field.value = maxid + 1;
   login_field.value = "";
-  password_field.value = "";
+  password_field.value = randomString(48);
   passwordhash_field.value = "";
   name_field.value = "";
   surname_field.value = "";
@@ -237,4 +240,13 @@ async function postUser() {
 
 function toggleModal() {
   document.getElementById("users-modal").classList.toggle("is-active");
+}
+
+function randomString(length) {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
 }

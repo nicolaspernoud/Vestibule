@@ -12,17 +12,21 @@
     <!-- Navbar -->
     <nav class="navbar is-primary is-fixed-top" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item title is-2" href="/"><img src="assets/logo.svg" />Vestibule</a>
+        <a class="navbar-item is-size-4" href="/"><img src="assets/logo.svg" />Vestibule</a>
+        <a role="button" id="navbar-burger" class="navbar-burger burger" aria-label="menu" aria-expanded="false">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
       </div>
-      <div class="navbar-menu is-active">
+      <div id="navbar-menu" class="navbar-menu animated fadeIn faster">
         <div class="navbar-start">
           <a class="navbar-item" id="goto-apps"> Apps </a>
-          <a class="navbar-item is-hidden animated fadeIn" id="goto-users"> Users </a>
+          <a class="navbar-item is-hidden" id="goto-users"> Users </a>
         </div>
         <div class="navbar-end">
-          <div class="navbar-item">
-            <a class="button is-light" id="goto-login"> Log in </a>
-          </div>
+          <a class="navbar-item animated fadeOut" id="goto-login"> Log in </a>
+          <a class="navbar-item is-hidden animated fadeIn" id="goto-logout"> Log out </a>
         </div>
       </div>
     </nav>
