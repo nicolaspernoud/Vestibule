@@ -14,10 +14,6 @@ const (
 	authTokenKey string = "auth_token"
 )
 
-var (
-	hostName string
-)
-
 // User represents a logged in user
 type User struct {
 	ID           int      `json:"id,omitempty"`
@@ -29,11 +25,6 @@ type User struct {
 	Surname      string   `json:"surname,omitempty"`
 	PasswordHash string   `json:"passwordHash,omitempty"`
 	Password     string   `json:"password,omitempty"`
-}
-
-// Init initialize the configuration
-func Init(hostname string) {
-	hostName = hostname
 }
 
 // ValidateJWTAndRolesMiddleware validates that the token is valid and that the user has the correct roles
@@ -54,12 +45,12 @@ func ValidateJWTAndRolesMiddleware(next http.Handler, allowedRoles []string) htt
 	return jwt.ValidateJWTMiddleware(http.HandlerFunc(roleChecker), authTokenKey)
 }
 
-// Logout remove the user from the cookie store
-func Logout(w http.ResponseWriter, r *http.Request) {
+// HandleLogout remove the user from the cookie store
+func (m Manager) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	// Delete the auth cookie
 	c := http.Cookie{
 		Name:   authTokenKey,
-		Domain: hostName,
+		Domain: m.Hostname,
 		MaxAge: -1,
 	}
 	http.SetCookie(w, &c)

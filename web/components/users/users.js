@@ -145,6 +145,7 @@ async function firstShowUsers() {
     document.getElementById("spinner").style.display = "none";
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
 }
 
@@ -159,6 +160,7 @@ async function deleteUser(user) {
     document.getElementById(`users-user-${user.id}`).remove();
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
 }
 
@@ -234,6 +236,7 @@ async function postUser() {
     displayUsers();
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
   toggleModal();
 }

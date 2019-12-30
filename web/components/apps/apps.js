@@ -100,7 +100,7 @@ export async function mount(where) {
     </div>
   `;
   user = await Auth.GetUser();
-  if (user.isAdmin) {
+  if (!(user === undefined) && user.isAdmin) {
     document.getElementById("apps-new").classList.toggle("is-hidden");
   }
   registerModalFields();
@@ -156,6 +156,7 @@ async function firstShowApps() {
     displayApps(apps);
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
 }
 
@@ -171,6 +172,7 @@ async function deleteApp(app) {
     document.getElementById(`apps-app-${app.id}`).remove();
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
 }
 
@@ -261,6 +263,7 @@ async function postApp() {
     await reloadAppsOnServer(apps);
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
   toggleModal();
 }
@@ -275,6 +278,7 @@ async function reloadAppsOnServer() {
     }
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
 }
 

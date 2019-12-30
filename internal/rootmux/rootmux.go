@@ -37,7 +37,7 @@ func CreateRootMux(port int, appsFile string, staticDir string) RootMux {
 	m := auth.NewManager()
 	mainMux.HandleFunc("/OAuth2Login", m.HandleOAuth2Login)
 	mainMux.Handle("/OAuth2Callback", m.HandleOAuth2Callback())
-	mainMux.HandleFunc("/Logout", auth.Logout)
+	mainMux.HandleFunc("/Logout", m.HandleLogout)
 	mainMux.HandleFunc("/Login", m.HandleInMemoryLogin)
 	commonMux := http.NewServeMux()
 	commonMux.HandleFunc("/apps", func(w http.ResponseWriter, req *http.Request) {

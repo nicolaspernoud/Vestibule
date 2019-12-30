@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -20,7 +19,6 @@ import (
 var (
 	//UsersFile is the file containing the users
 	UsersFile = "./configs/users.json"
-	hostname  = os.Getenv("HOSTNAME")
 )
 
 // HandleInMemoryLogin validate the username and password provided in the function body against a local file and return a token if the user is found

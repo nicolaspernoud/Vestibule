@@ -1,12 +1,12 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
+import * as Apps from "/components/apps/apps.js";
 
 // DOM elements
 let mountpoint;
 let login_field;
 let password_field;
 let login_inmemory;
-let login_oauth2;
 
 export function mount(where) {
   mountpoint = where;
@@ -32,7 +32,7 @@ export function mount(where) {
       </div>
       <footer class="card-footer">
         <a id="login-inmemory" class="card-footer-item">Login</a>
-        <a id="login-oauth2" class="card-footer-item">Login with OAuth2</a>
+        <a id="login-oauth2" class="card-footer-item" href="/OAuth2Login">Login with OAuth2</a>
       </footer>
     </div>
   `;
@@ -42,13 +42,15 @@ export function mount(where) {
 function registerModalFields() {
   login_field = document.getElementById("login-login");
   password_field = document.getElementById("login-password");
+  password_field.addEventListener("keyup", function(event) {
+    // Number 13 is the "Enter" key on the keyboard
+    if (event.keyCode === 13) {
+      doLogin();
+    }
+  });
   login_inmemory = document.getElementById("login-inmemory");
-  login_oauth2 = document.getElementById("login-oauth2");
   login_inmemory.addEventListener("click", function() {
     doLogin();
-  });
-  login_oauth2.addEventListener("click", function() {
-    window.location.href = "/OAuth2Login";
   });
 }
 
@@ -64,8 +66,9 @@ async function doLogin() {
     if (response.status !== 200) {
       throw new Error(`Login error (status ${response.status})`);
     }
-    window.location.href = "/";
+    location.hash = "#apps";
   } catch (e) {
     Messages.Show("is-warning", e);
+    console.error(e);
   }
 }

@@ -11,27 +11,39 @@ document.addEventListener("DOMContentLoaded", function() {
     burger.classList.toggle("is-active");
     menu.classList.toggle("is-active");
   });
-
-  document.getElementById("goto-apps").addEventListener("click", function() {
-    Apps.mount("main");
-  });
-  document.getElementById("goto-users").addEventListener("click", function() {
-    Users.mount("main");
-  });
-  document.getElementById("goto-login").addEventListener("click", function() {
-    Login.mount("main");
-  });
-  Apps.mount("main");
-  showToAdminsOnly();
+  window.addEventListener("hashchange", navigate);
+  location.hash = "#apps";
 });
 
-async function showToAdminsOnly() {
-  const user = await Auth.GetUser();
-  if (user.isAdmin) {
-    document.getElementById("goto-users").classList.toggle("is-hidden");
+function navigate() {
+  switch (location.hash) {
+    case "#apps":
+      Apps.mount("main");
+      break;
+    case "#users":
+      Users.mount("main");
+      break;
+    case "#login":
+      Login.mount("main");
+      break;
+    default:
+      Apps.mount("main");
+      break;
   }
-  if (user != undefined) {
-    document.getElementById("goto-logout").classList.toggle("is-hidden");
-    document.getElementById("goto-login").classList.toggle("is-hidden");
+  hideShowInterfaceElements();
+}
+
+async function hideShowInterfaceElements() {
+  const user = await Auth.GetUser();
+  if (user === undefined) {
+    document.getElementById("goto-users").classList.add("is-hidden");
+    document.getElementById("goto-logout").classList.add("is-hidden");
+    document.getElementById("goto-login").classList.remove("is-hidden");
+  } else {
+    document.getElementById("goto-logout").classList.remove("is-hidden");
+    document.getElementById("goto-login").classList.add("is-hidden");
+    if (user.isAdmin) {
+      document.getElementById("goto-users").classList.remove("is-hidden");
+    }
   }
 }
