@@ -1,5 +1,6 @@
 // Imports
-import * as Messages from "/messages/messages.js";
+import * as Messages from "/services/messages/messages.js";
+import * as Auth from "/services/auth/auth.js";
 
 // DOM elements
 let mountpoint;
@@ -18,8 +19,9 @@ let roles_container;
 
 // local variables
 let apps;
+let user;
 
-export function mount(where) {
+export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div id="apps" class="columns is-multiline is-centered">
@@ -97,6 +99,7 @@ export function mount(where) {
       </div>
     </div>
   `;
+  user = await Auth.GetUser();
   registerModalFields();
   firstShowApps();
 }
@@ -110,13 +113,13 @@ function appTemplate(app) {
         </header>
         <div class="card-content has-reduced-padding">
           <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
-          <p>${app.secured ? "Restricted access to user with roles <strong>" + app.roles + "</strong>" : "unrestricted access"}</p>
+          <p>${app.secured ? "Restricted access to user with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}</p>
           ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
         </div>
         <footer class="card-footer">
           <a class="card-footer-item" onclick="window.location.href = 'https://${app.host}:${location.port}'">Visit</a>
-          <a class="card-footer-item" id="apps-app-edit-${app.id}">Edit</a>
-          <a class="card-footer-item" id="apps-app-delete-${app.id}">Delete</a>
+          ${user.isAdmin ? '<a class="card-footer-item" id="apps-app-edit-' + app.id + '">Edit</a>' : ""}
+          ${user.isAdmin ? '<a class="card-footer-item" id="apps-app-delete-' + app.id + '">Delete</a>' : ""}
         </footer>
       </div>
     </div>
@@ -126,14 +129,16 @@ function appTemplate(app) {
 function displayApps(apps) {
   const markup = apps.map(app => appTemplate(app)).join("");
   document.getElementById("apps").innerHTML = markup;
-  apps.map(app => {
-    document.getElementById(`apps-app-edit-${app.id}`).addEventListener("click", function() {
-      editApp(app);
+  if (user.isAdmin) {
+    apps.map(app => {
+      document.getElementById(`apps-app-edit-${app.id}`).addEventListener("click", function() {
+        editApp(app);
+      });
+      document.getElementById(`apps-app-delete-${app.id}`).addEventListener("click", function() {
+        deleteApp(app);
+      });
     });
-    document.getElementById(`apps-app-delete-${app.id}`).addEventListener("click", function() {
-      deleteApp(app);
-    });
-  });
+  }
 }
 
 async function firstShowApps() {

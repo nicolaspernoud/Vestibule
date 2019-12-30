@@ -1,10 +1,9 @@
-import * as Apps from "/apps/apps.js";
-import * as Users from "/users/users.js";
-import * as Login from "/login/login.js";
+import * as Apps from "/components/apps/apps.js";
+import * as Users from "/components/users/users.js";
+import * as Login from "/components/login/login.js";
+import * as Auth from "/services/auth/auth.js";
 
-init();
-
-function init() {
+document.addEventListener("DOMContentLoaded", function() {
   document.getElementById("goto-apps").addEventListener("click", function() {
     Apps.mount("main");
   });
@@ -15,4 +14,12 @@ function init() {
     Login.mount("main");
   });
   Apps.mount("main");
+  showToAdminsOnly();
+});
+
+async function showToAdminsOnly() {
+  const user = await Auth.GetUser();
+  if (user.isAdmin) {
+    document.getElementById("goto-users").classList.toggle("is-hidden");
+  }
 }

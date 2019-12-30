@@ -1,5 +1,5 @@
 // Imports
-import * as Messages from "/messages/messages.js";
+import * as Messages from "/services/messages/messages.js";
 
 // DOM elements
 let mountpoint;
