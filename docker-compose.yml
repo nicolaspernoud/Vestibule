@@ -8,9 +8,19 @@ services:
     command: -apps=./configs/apps.json -letsencrypt_cache=./letsencrypt_cache
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /home/npernoud/apps.json:/app/configs/apps.json
-      - /home/npernoud/users.json:/app/configs/users.json
-      - /home/npernoud/letsencrypt_cache:/app/letsencrypt_cache
+      - ./configs:/app/configs
+      - ./letsencrypt_cache:/app/letsencrypt_cache
     ports:
       - 443:443
       - 80:80
+    environment:
+      - HOSTNAME=${HOSTNAME}
+      - ADMIN_ROLE=${ADMIN_ROLE}
+      - COMMON_ROLE=${COMMON_ROLE}
+      - REDIRECT_URL=${REDIRECT_URL}
+      - CLIENT_ID=${CLIENT_ID}
+      - CLIENT_SECRET=${CLIENT_SECRET}
+      - AUTH_URL=${AUTH_URL}
+      - TOKEN_URL=${TOKEN_URL}
+      - USERINFO_URL=${USERINFO_URL}
+      - LOGOUT_URL=${LOGOUT_URL}
