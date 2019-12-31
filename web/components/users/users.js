@@ -219,9 +219,10 @@ async function editUser(user) {
 async function newUser() {
   let maxid = 0;
   users.map(function(user) {
-    if (user.id > maxid) maxid = user.id;
+    if (parseInt(user.id) > maxid) maxid = user.id;
   });
-  id_field.value = maxid + 1;
+  maxid++;
+  id_field.value = maxid.toString();
   login_field.value = "";
   password_field.value = randomString(48);
   passwordhash_field.value = "";
@@ -236,7 +237,7 @@ async function postUser() {
     const response = await fetch("/api/admin/users/", {
       method: "POST",
       body: JSON.stringify({
-        id: parseInt(id_field.value),
+        id: id_field.value,
         login: login_field.value,
         password: password_field.value,
         passwordHash: passwordhash_field.value,

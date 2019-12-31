@@ -16,7 +16,7 @@ const (
 
 // User represents a logged in user
 type User struct {
-	ID           int      `json:"id,omitempty"`
+	ID           string   `json:"id,omitempty"`
 	Login        string   `json:"login"`
 	DisplayName  string   `json:"displayName,omitempty"`
 	Roles        []string `json:"memberOf"`

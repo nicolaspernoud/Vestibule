@@ -46,7 +46,7 @@
         "USERINFO_URL": "https://connexion-rec.grandlyon.fr/IdPOAuth2/userinfo/oidc-rec",
         "LOGOUT_URL": "https://connexion-rec.grandlyon.fr/auth/logout.jsp",
         "ADMIN_ROLE": "GGD_ORG_DG-DEES-DINSI-DAAG_TOUS",
-        "COMMON_ROLE": "OTHERS",
+        "COMMON_ROLE": "LDD_ORG_DG-DEES-DINSI_TOUS",
         "HOSTNAME": "vestibule.127.0.0.1.nip.io"
       },
       "args": ["-debug", "-apps=./configs/apps.json", "-https_port=1443"],

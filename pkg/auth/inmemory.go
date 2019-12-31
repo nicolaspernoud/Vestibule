@@ -150,7 +150,8 @@ func DeleteUser(w http.ResponseWriter, req *http.Request) {
 	// Add the user only if the name doesn't exists yet
 	newUsers := users[:0]
 	for _, user := range users {
-		if user.ID != idx {
+		id, err := strconv.Atoi(user.ID)
+		if err == nil && id != idx {
 			newUsers = append(newUsers, user)
 		}
 	}
