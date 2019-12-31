@@ -2,6 +2,7 @@
 import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
 import { Icons } from "./icons.js";
+import { AnimateCSS } from "/services/common/common.js";
 
 // DOM elements
 let mountpoint;
@@ -27,16 +28,12 @@ let user;
 export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
-    <div id="apps" class="columns is-multiline is-centered">
-      <div class="image is-128x128">
-        <img src="assets/spinner.svg" />
-      </div>
-    </div>
-    <button id="apps-new" class="button is-primary is-rounded is-hidden animated zoomIn">+</button>
+    <div id="apps-list" class="columns is-multiline is-centered"></div>
+    <button id="apps-new" class="button is-primary is-rounded is-hidden">+</button>
 
     <div class="modal" id="apps-modal">
       <div class="modal-background"></div>
-      <div class="modal-card animated zoomIn faster">
+      <div class="modal-card" id="apps-modal-card">
         <header class="modal-card-head">
           <p class="modal-card-title">Add/Edit app</p>
           <button class="delete" aria-label="close" id="apps-modal-close"></button>
@@ -117,8 +114,7 @@ export async function mount(where) {
       </div>
     </div>
 
-    <div class="modal" id="apps-icons-modal">
-      <div class="modal-background"></div>
+    <div class="modal animated zoomIn faster" id="apps-icons-modal">
       <div class="modal-card">
         <section id="apps-icons-modal-list" class="modal-card-body"></section>
       </div>
@@ -129,13 +125,13 @@ export async function mount(where) {
     document.getElementById("apps-new").classList.toggle("is-hidden");
   }
   registerModalFields();
-  firstShowApps();
+  await firstShowApps();
 }
 
 function appTemplate(app) {
   cleanApp(app);
   return /* HTML */ `
-    <div id="apps-app-${app.id}" class="column is-two-thirds animated zoomIn faster">
+    <div id="apps-app-${app.id}" class="column is-two-thirds">
       <div class="card">
         <header class="card-header">
           <p class="card-header-title has-text-white">
@@ -159,7 +155,7 @@ function appTemplate(app) {
 
 function displayApps(apps) {
   const markup = apps.map(app => appTemplate(app)).join("");
-  document.getElementById("apps").innerHTML = markup;
+  document.getElementById("apps-list").innerHTML = markup;
   if (user.isAdmin) {
     apps.map(app => {
       document.getElementById(`apps-app-edit-${app.id}`).addEventListener("click", function() {
@@ -334,7 +330,18 @@ function toggleModal() {
   toggleForwardServe();
   toggleRoles();
   updateIcon();
-  document.getElementById("apps-modal").classList.toggle("is-active");
+  const modal = document.getElementById("apps-modal");
+  const card = document.getElementById("apps-modal-card");
+  if (modal.classList.contains("is-active")) {
+    AnimateCSS(modal, "fadeOut");
+    AnimateCSS(card, "zoomOut", function() {
+      modal.classList.remove("is-active");
+    });
+  } else {
+    modal.classList.add("is-active");
+    AnimateCSS(modal, "fadeIn");
+    AnimateCSS(card, "zoomIn");
+  }
 }
 
 function toggleForwardServe() {

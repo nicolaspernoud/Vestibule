@@ -1,3 +1,6 @@
+// Imports
+import { AnimateCSS } from "/services/common/common.js";
+
 let offset = 0;
 let messages = [];
 
@@ -27,7 +30,9 @@ export function Show(bulmaClass, message) {
 }
 
 function removeMsg(msg, message, height) {
-  msg.parentNode.removeChild(msg);
+  AnimateCSS(msg, "fadeOutDown", function() {
+    msg.parentNode.removeChild(msg);
+  });
   offset = offset - height;
   const index = messages.indexOf(message);
   if (index > -1) {

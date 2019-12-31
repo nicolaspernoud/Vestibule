@@ -1,5 +1,6 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
+import { AnimateCSS } from "/services/common/common.js";
 
 // DOM elements
 let mountpoint;
@@ -14,7 +15,7 @@ let roles_field;
 // local variables
 let users;
 
-export function mount(where) {
+export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div class="table-container">
@@ -34,14 +35,11 @@ export function mount(where) {
         <tbody id="users"></tbody>
       </table>
     </div>
-    <div id="spinner" class="container image is-128x128">
-      <img src="assets/spinner.svg" />
-    </div>
     <button id="users-new" class="button is-primary is-rounded">+</button>
 
     <div class="modal" id="users-modal">
       <div class="modal-background"></div>
-      <div class="modal-card animated zoomIn faster">
+      <div class="modal-card" id="users-modal-card">
         <header class="modal-card-head">
           <p class="modal-card-title">Add/Edit user</p>
           <button class="delete" aria-label="close" id="users-modal-close"></button>
@@ -98,7 +96,7 @@ export function mount(where) {
     </div>
   `;
   registerModalFields();
-  firstShowUsers();
+  await firstShowUsers();
 }
 
 function cleanUser(user) {
@@ -151,7 +149,6 @@ async function firstShowUsers() {
     }
     users = await response.json();
     displayUsers();
-    document.getElementById("spinner").style.display = "none";
   } catch (e) {
     Messages.Show("is-warning", e.message);
     console.error(e);
@@ -252,7 +249,18 @@ async function postUser() {
 }
 
 function toggleModal() {
-  document.getElementById("users-modal").classList.toggle("is-active");
+  const modal = document.getElementById("users-modal");
+  const card = document.getElementById("users-modal-card");
+  if (modal.classList.contains("is-active")) {
+    AnimateCSS(modal, "fadeOut");
+    AnimateCSS(card, "zoomOut", function() {
+      modal.classList.remove("is-active");
+    });
+  } else {
+    modal.classList.add("is-active");
+    AnimateCSS(modal, "fadeIn");
+    AnimateCSS(card, "zoomIn");
+  }
 }
 
 function randomString(length) {
