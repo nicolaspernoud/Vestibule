@@ -101,16 +101,25 @@ export function mount(where) {
   firstShowUsers();
 }
 
+function cleanUser(user) {
+  let props = ["password", "name", "surname", "memberOf"];
+  for (const prop of props) {
+    user[prop] = user[prop] === undefined ? "" : user[prop];
+  }
+  user.passwordHash = user.passwordHash === undefined ? "" : "...";
+}
+
 function userTemplate(user) {
+  cleanUser(user);
   return /* HTML */ `
     <tr id="users-user-${user.id}">
       <th>${user.id}</th>
       <td>${user.login}</td>
-      <td>${user.password ? user.password : ""}</td>
-      <td>${user.passwordHash ? "..." : ""}</td>
-      <td>${user.name ? user.name : ""}</td>
-      <td>${user.surname ? user.surname : ""}</td>
-      <td>${user.memberOf ? user.memberOf : ""}</td>
+      <td>${user.password}</td>
+      <td>${user.passwordHash}</td>
+      <td>${user.name}</td>
+      <td>${user.surname}</td>
+      <td>${user.memberOf}</td>
       <td>
         <a id="users-user-edit-${user.id}">Edit</a>
         <a id="users-user-delete-${user.id}">Delete</a>
@@ -190,13 +199,14 @@ function registerModalFields() {
 }
 
 async function editUser(user) {
+  cleanUser(user);
   id_field.value = user.id;
   login_field.value = user.login;
-  password_field.value = user.passwordHash ? "" : randomString(48);
-  passwordhash_field.value = user.passwordHash ? user.passwordHash : "";
-  name_field.value = user.name ? user.name : "";
-  surname_field.value = user.surname ? user.surname : "";
-  roles_field.value = user.memberOf ? user.memberOf : "";
+  password_field.value = user.passwordHash !== "" ? "" : randomString(48);
+  passwordhash_field.value = user.passwordHash;
+  name_field.value = user.name;
+  surname_field.value = user.surname;
+  roles_field.value = user.memberOf;
   toggleModal();
 }
 
