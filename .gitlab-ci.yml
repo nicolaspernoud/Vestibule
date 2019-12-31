@@ -1,13 +1,52 @@
+#
+# Ce fichier doit être adapté en fonction du projet en renseignant les variables SONAR_PROJECT_KEY et SONAR_TOKEN dans la configuration graphique du projet (https://forge.grandlyon.com/<CHEMIN_DE_VOTRE_PROJET>/settings/ci_cd)
+# La variable SONAR_PROJET_KEY peut être trouvée sur https://sonarqube.forge.grandlyon.com/dashboard en ouvrant le projet et en copiant collant le champ en bas à droite (Project Key)
+#
+# La variable SONAR_TOKEN doit être générée par le responsable du projet depuis son interface sonar : https://sonarqube.forge.grandlyon.com/account/security/
+#
+
+image: docker:git
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  SONAR_URL: https://sonarqube.forge.grandlyon.com
+
 stages:
+  - sonar-analysis
   - build
-  - deploy
+
+sonarqube:
+  stage: sonar-analysis
+  image: skilldlabs/sonar-scanner:3.4.0
+  script:
+    - >
+      sonar-scanner
+      -Dsonar.projectName=${CI_PROJECT_NAME}
+      -Dsonar.projectVersion=1.0
+      -Dsonar.sourceEncoding=UTF-8
+      -Dsonar.projectBaseDir=.
+      -Dsonar.host.url=${SONAR_URL}
+      -Dsonar.projectKey=${SONAR_PROJECT_KEY}
+      -Dsonar.login=${SONAR_TOKEN}
+
+build-master:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_IMAGE" .
+    - docker push "$CI_REGISTRY_IMAGE"
+  only:
+    - master
 
 build:
   stage: build
   script:
-    - docker-compose --project-name vestibule build
-
-deploy:
-  stage: deploy
-  script:
-    - docker-compose --project-name vestibule up -d
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+    - DOCKER_BUILDKIT=1 docker build --pull -t "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG" .
+    - docker push "$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG"
+  except:
+    - master
