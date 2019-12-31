@@ -29,3 +29,7 @@
 .label input[type="checkbox"] {
   margin-right: 0.5rem;
 }
+
+.has-margin-bottom-100px {
+  margin-bottom: 100px;
+}

@@ -29,7 +29,7 @@ export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div id="apps-list" class="columns is-multiline is-centered"></div>
-    <button id="apps-new" class="button is-primary is-rounded is-hidden">+</button>
+    <button id="apps-new" class="button is-primary is-rounded is-hidden has-margin-bottom-100px">+</button>
 
     <div class="modal" id="apps-modal">
       <div class="modal-background"></div>
@@ -304,7 +304,7 @@ async function postApp() {
     }
     apps = await response.json();
     await displayApps(apps);
-    await reloadAppsOnServer(apps);
+    await reloadAppsOnServer();
   } catch (e) {
     Messages.Show("is-warning", e.message);
     console.error(e);
