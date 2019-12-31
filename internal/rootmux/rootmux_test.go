@@ -27,7 +27,7 @@ var (
 	updatedAppsWithSchemes = strings.Replace(initialApps, "api.vestibule.", "http://api.vestibule.", 1)
 	initialUsersBuff, _    = ioutil.ReadFile("../../configs/users.json")
 	initialUsers           = reg.ReplaceAllString(string(initialUsersBuff), "")
-	newUser                = `{"id":3,"login":"new_user","memberOf":["USERS","OTHERS"],"password":"test"}`
+	newUser                = `{"id":"3","login":"new_user","memberOf":["USERS","OTHERS"],"password":"test"}`
 )
 
 func init() {
@@ -189,11 +189,11 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 			// Try to delete an app (must pass)
 			do("DELETE", "/api/admin/apps/4", "", "", 200, "[{\"id\":1")
 			// Try to get the users (must pass)
-			do("GET", "/api/admin/users/", "", "", 200, "[{\"id\":1,")
+			do("GET", "/api/admin/users/", "", "", 200, `[{"id":"1",`)
 			// Try to create an user (must pass)
-			do("POST", "/api/admin/users/", "", newUser, 200, "[{\"id\":1,")
+			do("POST", "/api/admin/users/", "", newUser, 200, `[{"id":"1",`)
 			// Try to delete an user (must pass)
-			do("DELETE", "/api/admin/users/3", "", "", 200, "[{\"id\":1,")
+			do("DELETE", "/api/admin/users/3", "", "", 200, `[{"id":"1",`)
 			// Try to get the user informations (must pass)
 			do("GET", "/api/common/WhoAmI", "", "", 200, `{"id":`)
 		}

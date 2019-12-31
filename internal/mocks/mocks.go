@@ -50,7 +50,7 @@ func CreateMockOAuth2() *http.ServeMux {
 				"CN=USERS",
 				"CN=OTHERS"
 			],
-			"id": 1000,
+			"id": "1000",
 			"login": "USER"
 		}`))
 	})
@@ -63,7 +63,7 @@ func CreateMockOAuth2() *http.ServeMux {
 				"CN=ADMINS",
 				"CN=OTHERS"
 			],
-			"id": 1,
+			"id": "1",
 			"login": "ADMIN"
 		}`))
 	})

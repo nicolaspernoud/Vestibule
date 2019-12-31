@@ -43,13 +43,13 @@ func TestAddUser(t *testing.T) {
 	defer os.Remove(UsersFile)
 
 	handler := http.HandlerFunc(AddUser)
-	tester.DoRequestOnHandler(t, handler, "POST", "/", "", `{"id":1,"login":"admin","password": "password"}`, http.StatusOK, `[{"id":1,"login":"admin"`)
-	tester.DoRequestOnHandler(t, handler, "POST", "/", "", `{"id":1,"login":"admin","password": ""}`, http.StatusBadRequest, `passwords cannot be blank`)
+	tester.DoRequestOnHandler(t, handler, "POST", "/", "", `{"id":"1","login":"admin","password": "password"}`, http.StatusOK, `[{"id":"1","login":"admin"`)
+	tester.DoRequestOnHandler(t, handler, "POST", "/", "", `{"id":"1","login":"admin","password": ""}`, http.StatusBadRequest, `passwords cannot be blank`)
 }
 
 func TestMatchUser(t *testing.T) {
 	UsersFile = "../../configs/users.json"
-	existingUser := User{ID: 2, Login: "user", Roles: []string{"USERS", "OTHERS"}, PasswordHash: "$2a$10$PgiAoLxZhgNtr7kRK/DH5ezwT./7vRkWqFNEtJD1670z3Zf60HqgG"}
+	existingUser := User{ID: "2", Login: "user", Roles: []string{"USERS", "OTHERS"}, PasswordHash: "$2a$10$PgiAoLxZhgNtr7kRK/DH5ezwT./7vRkWqFNEtJD1670z3Zf60HqgG"}
 	veryLongString, _ := common.GenerateRandomString(10000)
 	specialCharString := "\""
 
@@ -92,8 +92,8 @@ func TestMatchUser(t *testing.T) {
 
 func writeUsers() (name string) {
 	users := []*User{
-		{ID: 1, Login: "admin", Password: "password"},
-		{ID: 2, Login: "user", Password: "password"},
+		{ID: "1", Login: "admin", Password: "password"},
+		{ID: "2", Login: "user", Password: "password"},
 	}
 	f, err := ioutil.TempFile("", "users")
 	if err != nil {
