@@ -15,8 +15,14 @@ document.addEventListener("DOMContentLoaded", function() {
     burger.classList.toggle("is-active");
     menu.classList.toggle("is-active");
   });
+  menu.addEventListener("click", () => {
+    if (burger.classList.contains("is-active")) {
+      burger.classList.toggle("is-active");
+      menu.classList.toggle("is-active");
+    }
+  });
   window.addEventListener("hashchange", navigate);
-  location.hash = "#apps";
+  navigate();
 });
 
 async function navigate() {

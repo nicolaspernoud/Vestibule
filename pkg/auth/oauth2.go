@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strings"
@@ -12,7 +11,7 @@ import (
 
 	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/jwt"
-
+	"github.com/nicolaspernoud/vestibule/pkg/log"
 	"golang.org/x/oauth2"
 )
 
@@ -49,7 +48,7 @@ func (m Manager) HandleOAuth2Login(w http.ResponseWriter, r *http.Request) {
 	// Generate state and store it in cookie
 	oauthStateString, err := common.GenerateRandomString(16)
 	if err != nil {
-		log.Fatalf("Error generating OAuth2 strate string :%v\n", err)
+		log.Logger.Fatalf("Error generating OAuth2 strate string :%v\n", err)
 	}
 	jwt.StoreData(oauthStateString, m.Hostname, oAuth2StateKey, 30*time.Second, w)
 	url := m.Config.AuthCodeURL(oauthStateString)
@@ -115,6 +114,8 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 		}
 		// Store the user in cookie
 		jwt.StoreData(user, m.Hostname, authTokenKey, 24*time.Hour, w)
+		// Log the connexion
+		log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, req.RemoteAddr, log.GetCityAndCountryFromRequest(req))
 		// Redirect
 		http.Redirect(w, r, "/", http.StatusFound)
 	}

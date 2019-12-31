@@ -21,7 +21,7 @@ export async function mount(where) {
     <div class="table-container">
       <table class="table is-bordered is-narrow is-hoverable is-fullwidth">
         <thead>
-          <tr>
+          <tr class="is-selected">
             <th>Id</th>
             <th>Login</th>
             <th>Password</th>
@@ -82,7 +82,7 @@ export async function mount(where) {
             </div>
           </div>
           <div class="field" id="users-modal-roles-container">
-            <label>Roles</label>
+            <label>Roles (separated with commas)</label>
             <div class="control">
               <input class="input" type="text" id="users-modal-roles" />
             </div>
@@ -104,7 +104,6 @@ function cleanUser(user) {
   for (const prop of props) {
     user[prop] = user[prop] === undefined ? "" : user[prop];
   }
-  user.passwordHash = user.passwordHash === undefined ? "" : "...";
 }
 
 function userTemplate(user) {
@@ -114,13 +113,23 @@ function userTemplate(user) {
       <th>${user.id}</th>
       <td>${user.login}</td>
       <td>${user.password}</td>
-      <td>${user.passwordHash}</td>
+      <td>${user.passwordHash === undefined ? "" : "..."}</td>
       <td>${user.name}</td>
       <td>${user.surname}</td>
       <td>${user.memberOf}</td>
       <td>
-        <a id="users-user-edit-${user.id}">Edit</a>
-        <a id="users-user-delete-${user.id}">Delete</a>
+        <a id="users-user-edit-${user.id}" class="button is-link">
+          <span>Edit</span>
+          <span class="icon is-small">
+            <i class="fas fa-pen"></i>
+          </span>
+        </a>
+        <a id="users-user-delete-${user.id}" class="button is-danger">
+          <span>Delete</span>
+          <span class="icon is-small">
+            <i class="fas fa-times"></i>
+          </span>
+        </a>
       </td>
     </tr>
   `;

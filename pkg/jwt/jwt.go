@@ -90,7 +90,6 @@ func StoreData(d interface{}, hostName string, cookieName string, duration time.
 	}
 	cookie := http.Cookie{Name: cookieName, Domain: hostName, Value: base64.StdEncoding.EncodeToString(b.Bytes()), Expires: expiration, Secure: !debugMode, HttpOnly: true, SameSite: http.SameSiteLaxMode}
 	http.SetCookie(w, &cookie)
-	//log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", sentData.Login, data.Name, data.Surname, req.RemoteAddr, log.GetCityAndCountryFromRequest(req))
 }
 
 // ExtractToken extracts the jwt from a cookie

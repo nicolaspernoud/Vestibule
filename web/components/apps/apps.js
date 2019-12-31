@@ -61,14 +61,14 @@ export async function mount(where) {
             </div>
           </div>
           <div class="field">
-            <label class="label">Host</label>
+            <label class="label">Host (allow subdomains with "*." prefix)</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-host" />
             </div>
           </div>
           <div class="field">
             <div class="control">
-              <label class="label" class="checkbox"><input id="apps-modal-isproxy" type="checkbox" />App proxies to a server</label>
+              <label class="label"><input id="apps-modal-isproxy" type="checkbox" />App proxies to a server</label>
             </div>
           </div>
           <div class="field" id="apps-modal-forwardto-container">
@@ -85,11 +85,11 @@ export async function mount(where) {
           </div>
           <div class="field">
             <div class="control">
-              <label class="label" class="checkbox"><input id="apps-modal-secured" type="checkbox" />Secure access to app</label>
+              <label class="label"><input id="apps-modal-secured" type="checkbox" />Secure access to app</label>
             </div>
           </div>
           <div class="field" id="apps-modal-roles-container">
-            <label class="label">Allow access to roles</label>
+            <label class="label">Allow access to roles (separated with commas)</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-roles" />
             </div>
@@ -270,7 +270,7 @@ async function newApp() {
   id_field.value = maxid + 1;
   name_field.value = "";
   icon_field.value = "file";
-  host_field.value = "";
+  host_field.value = `*.new_application.${location.hostname}`;
   isproxy_field.checked = false;
   forwardto_field.value = "";
   serve_field.value = "";

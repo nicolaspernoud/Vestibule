@@ -42,6 +42,8 @@ func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 	}
 	// Store the user in cookie
 	jwt.StoreData(user, m.Hostname, authTokenKey, 24*time.Hour, w)
+	// Log the connexion
+	log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 	// Redirect
 	http.Redirect(w, r, "/", http.StatusFound)
 }
