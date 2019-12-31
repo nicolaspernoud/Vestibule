@@ -1,10 +1,13 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
+import { Icons } from "./icons.js";
 
 // DOM elements
 let mountpoint;
 let id_field;
+let name_field;
+let icon_field;
 let host_field;
 let isproxy_field;
 let forwardto_field;
@@ -40,53 +43,68 @@ export async function mount(where) {
         </header>
         <section class="modal-card-body">
           <div class="field">
-            <label>Id</label>
+            <label class="label">Id</label>
             <div class="control">
               <input class="input" type="number" id="apps-modal-id" />
             </div>
           </div>
           <div class="field">
-            <label>Host</label>
+            <label class="label">Name</label>
+            <div class="control">
+              <input class="input" type="text" id="apps-modal-name" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Icon</label>
+            <div class="control has-icons-left">
+              <input class="input" type="text" id="apps-modal-icon" />
+              <span class="icon is-small is-left has-text-info">
+                <i id="apps-modal-icon-preview" class="fas fa-file"></i>
+              </span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Host</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-host" />
             </div>
           </div>
           <div class="field">
             <div class="control">
-              <label class="checkbox"><input id="apps-modal-isproxy" type="checkbox" />App proxies to a server</label>
+              <label class="label" class="checkbox"><input id="apps-modal-isproxy" type="checkbox" />App proxies to a server</label>
             </div>
           </div>
           <div class="field" id="apps-modal-forwardto-container">
-            <label>Forward To</label>
+            <label class="label">Forward To</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-forwardto" />
             </div>
           </div>
           <div class="field" id="apps-modal-serve-container">
-            <label>Serve</label>
+            <label class="label">Serve</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-serve" />
             </div>
           </div>
           <div class="field">
             <div class="control">
-              <label class="checkbox"><input id="apps-modal-secured" type="checkbox" />Secure access to app</label>
+              <label class="label" class="checkbox"><input id="apps-modal-secured" type="checkbox" />Secure access to app</label>
             </div>
           </div>
           <div class="field" id="apps-modal-roles-container">
-            <label>Allow access to roles</label>
+            <label class="label">Allow access to roles</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-roles" />
             </div>
           </div>
           <div class="field">
-            <label>Injected Basic Auth login</label>
+            <label class="label">Injected Basic Auth login</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-login" />
             </div>
           </div>
           <div class="field">
-            <label>Injected Basic Auth password</label>
+            <label class="label">Injected Basic Auth password</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-password" />
             </div>
@@ -96,6 +114,13 @@ export async function mount(where) {
           <button id="apps-modal-save" class="button is-success">Save changes</button>
           <button id="apps-modal-cancel" class="button">Cancel</button>
         </footer>
+      </div>
+    </div>
+
+    <div class="modal" id="apps-icons-modal">
+      <div class="modal-background"></div>
+      <div class="modal-card">
+        <section id="apps-icons-modal-list" class="modal-card-body"></section>
       </div>
     </div>
   `;
@@ -108,11 +133,14 @@ export async function mount(where) {
 }
 
 function appTemplate(app) {
+  cleanApp(app);
   return /* HTML */ `
     <div id="apps-app-${app.id}" class="column is-two-thirds animated zoomIn faster">
       <div class="card">
         <header class="card-header">
-          <p class="card-header-title has-text-white">${app.id} - ${app.host}</p>
+          <p class="card-header-title has-text-white">
+            <span class="icon has-text-warning"><i class="fas fa-${app.icon ? app.icon : "file"}"></i></span>${app.name ? app.name : app.id} - ${app.host}
+          </p>
         </header>
         <div class="card-content has-reduced-padding">
           <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
@@ -178,6 +206,8 @@ async function deleteApp(app) {
 
 function registerModalFields() {
   id_field = document.getElementById("apps-modal-id");
+  name_field = document.getElementById("apps-modal-name");
+  icon_field = document.getElementById("apps-modal-icon");
   host_field = document.getElementById("apps-modal-host");
   isproxy_field = document.getElementById("apps-modal-isproxy");
   forwardto_field = document.getElementById("apps-modal-forwardto");
@@ -201,6 +231,9 @@ function registerModalFields() {
   document.getElementById(`apps-new`).addEventListener("click", function() {
     newApp();
   });
+  icon_field.addEventListener("click", function() {
+    pickIcon();
+  });
   isproxy_field.addEventListener("click", function() {
     toggleForwardServe();
   });
@@ -210,7 +243,10 @@ function registerModalFields() {
 }
 
 async function editApp(app) {
+  cleanApp(app);
   id_field.value = app.id;
+  name_field.value = app.name;
+  icon_field.value = app.icon;
   host_field.value = app.host;
   isproxy_field.checked = app.isProxy;
   forwardto_field.value = app.forwardTo;
@@ -222,12 +258,22 @@ async function editApp(app) {
   toggleModal();
 }
 
+function cleanApp(app) {
+  let props = ["name", "forwardTo", "serve", "roles", "login", "password"];
+  for (const prop of props) {
+    app[prop] = app[prop] === undefined ? "" : app[prop];
+  }
+  app.icon = app.icon === undefined ? "file" : app.icon;
+}
+
 async function newApp() {
   let maxid = 0;
   apps.map(function(app) {
     if (app.id > maxid) maxid = app.id;
   });
   id_field.value = maxid + 1;
+  name_field.value = "";
+  icon_field.value = "file";
   host_field.value = "";
   isproxy_field.checked = false;
   forwardto_field.value = "";
@@ -245,6 +291,8 @@ async function postApp() {
       method: "post",
       body: JSON.stringify({
         id: parseInt(id_field.value),
+        name: name_field.value,
+        icon: icon_field.value,
         host: host_field.value,
         isProxy: isproxy_field.checked,
         forwardTo: forwardto_field.value,
@@ -285,6 +333,7 @@ async function reloadAppsOnServer() {
 function toggleModal() {
   toggleForwardServe();
   toggleRoles();
+  updateIcon();
   document.getElementById("apps-modal").classList.toggle("is-active");
 }
 
@@ -304,4 +353,32 @@ function toggleRoles() {
   } else {
     roles_container.style.display = "none";
   }
+}
+
+function updateIcon() {
+  document.getElementById("apps-modal-icon-preview").setAttribute("class", "fas fa-" + icon_field.value);
+}
+
+async function pickIcon() {
+  const iconsTemplate =
+    '<div class="buttons">' +
+    Icons.map(
+      icon => /* HTML */ `
+        <button class="button${icon_field.value == icon ? " is-primary" : ""}" id="apps-icon-modal-list-${icon}">
+          <span class="icon">
+            <i class="fas fa-${icon}"></i>
+          </span>
+        </button>
+      `
+    ).join("") +
+    "</div>";
+  document.getElementById("apps-icons-modal-list").innerHTML = iconsTemplate;
+  Icons.map(icon =>
+    document.getElementById(`apps-icon-modal-list-${icon}`).addEventListener("click", function() {
+      icon_field.value = icon;
+      updateIcon();
+      document.getElementById("apps-icons-modal").classList.toggle("is-active");
+    })
+  );
+  document.getElementById("apps-icons-modal").classList.toggle("is-active");
 }

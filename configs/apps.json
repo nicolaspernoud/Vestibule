@@ -1,13 +1,12 @@
 [
 	{
 		"id": 1,
+		"name": "API",
+		"icon": "brain",
 		"isProxy": true,
 		"host": "api.vestibule.127.0.0.1.nip.io",
 		"forwardTo": "localhost:8091",
-		"serve": "",
 		"secured": true,
-		"login": "",
-		"password": "",
 		"roles": [
 			"USERS",
 			"ADMINS"
@@ -15,28 +14,23 @@
 	},
 	{
 		"id": 2,
+		"name": "External",
+		"icon": "sign-out-alt",
 		"isProxy": true,
 		"host": "external.vestibule.127.0.0.1.nip.io",
 		"forwardTo": "www.example.com",
-		"serve": "",
 		"secured": true,
-		"login": "",
-		"password": "",
 		"roles": [
 			"ADMINS"
 		]
 	},
 	{
 		"id": 3,
+		"name": "Static site accessing the API",
+		"icon": "file",
 		"isProxy": false,
 		"host": "static.vestibule.127.0.0.1.nip.io",
-		"forwardTo": "",
 		"serve": "./testdata/static",
-		"secured": false,
-		"login": "",
-		"password": "",
-		"roles": [
-			""
-		]
+		"secured": false
 	}
 ]

@@ -18,14 +18,16 @@ var (
 // App represents a app serving static content proxying a web server
 type App struct {
 	ID        int      `json:"id"`
-	IsProxy   bool     `json:"isProxy"`   // true if reverse proxy
-	Host      string   `json:"host"`      // to match against request Host header
-	ForwardTo string   `json:"forwardTo"` // non-empty if reverse proxy
-	Serve     string   `json:"serve"`     // non-empty if file server
-	Secured   bool     `json:"secured"`   // true if the handler is JWT secured
-	Login     string   `json:"login"`     // Basic auth login for automatic login
-	Password  string   `json:"password"`  // Basic auth password for automatic login
-	Roles     []string `json:"roles"`     // Roles allowed to access the app
+	Name      string   `json:"name,omitempty"`      // name of the app
+	Icon      string   `json:"icon,omitempty"`      // true if reverse proxy
+	IsProxy   bool     `json:"isProxy"`             // true if reverse proxy
+	Host      string   `json:"host"`                // to match against request Host header
+	ForwardTo string   `json:"forwardTo,omitempty"` // non-empty if reverse proxy
+	Serve     string   `json:"serve,omitempty"`     // non-empty if file server
+	Secured   bool     `json:"secured"`             // true if the handler is JWT secured
+	Login     string   `json:"login,omitempty"`     // Basic auth login for automatic login
+	Password  string   `json:"password,omitempty"`  // Basic auth password for automatic login
+	Roles     []string `json:"roles,omitempty"`     // Roles allowed to access the app
 }
 
 type app struct {
