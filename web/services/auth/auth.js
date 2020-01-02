@@ -1,6 +1,5 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
-import * as Login from "/components/login/login.js";
 
 // Local variables
 let user;

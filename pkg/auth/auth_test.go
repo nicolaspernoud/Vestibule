@@ -12,7 +12,7 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/tester"
 )
 
-func Test_checkUserHasRole(t *testing.T) {
+func TestCheckUserHasRole(t *testing.T) {
 	type args struct {
 		user         User
 		allowedRoles []string

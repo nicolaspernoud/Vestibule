@@ -125,7 +125,7 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 // getState gets an user from a request
 func getState(r *http.Request) (string, error) {
 	state, ok := r.Context().Value(jwt.ContextData).(string)
-	if ok != true {
+	if !ok {
 		return "", errors.New("state could be got from context")
 	}
 	return state, nil

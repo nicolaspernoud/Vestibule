@@ -121,7 +121,7 @@ export async function mount(where) {
     </div>
   `;
   user = await Auth.GetUser();
-  if (!(user === undefined) && user.isAdmin) {
+  if (user !== undefined && user.isAdmin) {
     document.getElementById("apps-new").classList.toggle("is-hidden");
   }
   registerModalFields();

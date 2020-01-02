@@ -1,6 +1,5 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
-import * as Apps from "/components/apps/apps.js";
 
 // DOM elements
 let mountpoint;
