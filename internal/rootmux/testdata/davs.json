@@ -1,0 +1,28 @@
+[
+	{
+		"id": 1,
+		"host": "unsecureddav.vestibule.io",
+		"root": "./testdata/data",
+		"writable": true,
+		"secured": false
+	},
+	{
+		"id": 2,
+		"host": "userdav.vestibule.io",
+		"root": "./testdata/data",
+		"secured": true,
+		"roles": [
+			"USERS"
+		]
+	},
+	{
+		"id": 3,
+		"host": "admindav.vestibule.io",
+		"root": "./testdata/data",
+		"writable": true,
+		"secured": true,
+		"roles": [
+			"ADMINS"
+		]
+	}
+]

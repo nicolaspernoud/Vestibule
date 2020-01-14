@@ -7,18 +7,27 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 	"time"
 )
 
+//Header is a http header
+type Header struct {
+	Key   string
+	Value string
+}
+
 // DoRequestOnHandler does a request on a router (or handler) and check the response
-func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route string, authHeader string, payload string, expectedStatus int, expectedBody string) string {
+func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route string, header Header, payload string, expectedStatus int, expectedBody string) string {
 	req, err := http.NewRequest(method, route, strings.NewReader(payload))
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("Authorization", authHeader)
+	if header.Key != "" {
+		req.Header.Set(header.Key, header.Value)
+	}
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
 	if status := rr.Code; status != expectedStatus {
@@ -31,7 +40,7 @@ func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route 
 }
 
 // DoRequestOnServer does a request on listening server
-func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookiejar.Jar, method string, url string, authHeader string, payload string, expectedStatus int, expectedBody string) string {
+func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookiejar.Jar, method string, testURL string, header Header, payload string, expectedStatus int, expectedBody string) string {
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
@@ -45,17 +54,25 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 		}
 		return dialer.DialContext(ctx, network, addr)
 	}
-	if strings.HasPrefix(url, "/") {
-		url = "http://" + hostname + ":" + port + url
+	if strings.HasPrefix(testURL, "/") {
+		testURL = "http://" + hostname + ":" + port + testURL
 	} else {
-		url = "http://" + url + ":" + port
+		u, _ := url.Parse("http://" + testURL)
+		testURL = "http://" + u.Host + ":" + port + u.Path + "?" + u.RawQuery
 	}
-	req, err := http.NewRequest(method, url, strings.NewReader(payload))
+	req, err := http.NewRequest(method, testURL, strings.NewReader(payload))
 	if err != nil {
 		t.Fatal(err)
 	}
-	req.Header.Set("Authorization", authHeader)
-	client := &http.Client{Jar: jar}
+	if header.Key != "" {
+		req.Header.Set(header.Key, header.Value)
+	}
+	var client *http.Client
+	if jar != nil {
+		client = &http.Client{Jar: jar}
+	} else {
+		client = &http.Client{}
+	}
 	res, err := client.Do(req)
 	if err != nil {
 		t.Fatal(err)
@@ -66,17 +83,17 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 	}
 	bodyString := string(body)
 	if status := res.StatusCode; status != expectedStatus {
-		t.Errorf("Tested %v %v %v ; handler returned wrong status code: got %v want %v", method, url, payload, status, expectedStatus)
+		t.Errorf("Tested %v %v %v ; handler returned wrong status code: got %v want %v", method, testURL, payload, status, expectedStatus)
 	}
 	if !strings.HasPrefix(bodyString, expectedBody) {
-		t.Errorf("Tested %v %v %v ; handler returned unexpected body: got %v want %v", method, url, payload, bodyString, expectedBody)
+		t.Errorf("Tested %v %v %v ; handler returned unexpected body: got %v want %v", method, testURL, payload, bodyString, expectedBody)
 	}
 	return bodyString
 }
 
 // CreateServerTester wraps DoRequestOnServer to factorize t, port and jar
-func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar) func(method string, url string, authHeader string, payload string, expectedStatus int, expectedBody string) {
-	return func(method string, url string, authHeader string, payload string, expectedStatus int, expectedBody string) {
-		DoRequestOnServer(t, port, hostname, jar, method, url, authHeader, payload, expectedStatus, expectedBody)
+func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar) func(method string, url string, header Header, payload string, expectedStatus int, expectedBody string) string {
+	return func(method string, url string, header Header, payload string, expectedStatus int, expectedBody string) string {
+		return DoRequestOnServer(t, port, hostname, jar, method, url, header, payload, expectedStatus, expectedBody)
 	}
 }

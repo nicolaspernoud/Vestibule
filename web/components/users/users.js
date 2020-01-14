@@ -1,6 +1,7 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS } from "/services/common/common.js";
+import * as Auth from "/services/auth/auth.js";
 
 // DOM elements
 let mountpoint;
@@ -14,6 +15,7 @@ let roles_field;
 
 // local variables
 let users;
+let user;
 
 export async function mount(where) {
   mountpoint = where;
@@ -35,7 +37,11 @@ export async function mount(where) {
         <tbody id="users"></tbody>
       </table>
     </div>
-    <button id="users-new" class="button is-primary is-rounded">+</button>
+    <button id="users-new" class="button is-primary">
+      <span class="icon is-small">
+        <i class="fas fa-plus"></i>
+      </span>
+    </button>
 
     <div class="modal" id="users-modal">
       <div class="modal-background"></div>
@@ -96,6 +102,7 @@ export async function mount(where) {
     </div>
   `;
   registerModalFields();
+  user = await Auth.GetUser();
   await firstShowUsers();
 }
 
@@ -167,7 +174,10 @@ async function firstShowUsers() {
 async function deleteUser(user) {
   try {
     const response = await fetch("/api/admin/users/" + user.id, {
-      method: "delete"
+      method: "delete",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      })
     });
     if (response.status !== 200) {
       throw new Error(`User could not be deleted (status ${response.status})`);
@@ -236,6 +246,9 @@ async function postUser() {
   try {
     const response = await fetch("/api/admin/users/", {
       method: "POST",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      }),
       body: JSON.stringify({
         id: id_field.value,
         login: login_field.value,

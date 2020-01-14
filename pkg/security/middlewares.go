@@ -1,17 +1,17 @@
 package security
 
-import "net/http"
+import (
+	"net/http"
+	"strconv"
+)
 
 // CorsMiddleware enables CORS Request on server (for development purposes)
-func CorsMiddleware(next http.Handler, frameSource *string) http.Handler {
+func CorsMiddleware(next http.Handler, allowedOrigin string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", *frameSource)
+		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PROPFIND, MKCOL, MOVE, COPY")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-XSRF-TOKEN, Authorization, Depth, Destination")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, XSRF-TOKEN, Authorization, Depth, Destination")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
-		if req.Method == "OPTIONS" {
-			return
-		}
 		next.ServeHTTP(w, req)
 	})
 }
@@ -27,4 +27,12 @@ func WebSecurityMiddleware(next http.Handler, frameSource *string) http.Handler 
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, req)
 	})
+}
+
+// GetFullHostname returns the full hostname of the server
+func GetFullHostname(hostname string, port int) string {
+	if port == 80 || port == 443 {
+		return "https://" + hostname
+	}
+	return "https://" + hostname + ":" + strconv.Itoa(port)
 }

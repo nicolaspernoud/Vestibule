@@ -25,7 +25,7 @@
         "COMMON_ROLE": "OTHERS",
         "HOSTNAME": "vestibule.127.0.0.1.nip.io"
       },
-      "args": ["-debug", "-apps=./configs/apps.json", "-https_port=1443"],
+      "args": ["-debug", "-apps=./configs/apps.json", "-davs=./configs/davs.json", "-https_port=1443"],
       "showLog": true
     },
     {
@@ -49,8 +49,16 @@
         "COMMON_ROLE": "LDD_ORG_DG-DEES-DINSI_TOUS",
         "HOSTNAME": "vestibule.127.0.0.1.nip.io"
       },
-      "args": ["-debug", "-apps=./configs/apps.json", "-https_port=1443"],
+      "args": ["-debug", "-apps=./configs/apps.json", "-davs=./configs/davs.json", "-https_port=1443"],
       "showLog": true
+    },
+    {
+      "name": "Debug vestibule client",
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "url": "https://vestibule.127.0.0.1.nip.io:1443",
+      "webRoot": "${workspaceFolder}/web"
     }
   ]
 }

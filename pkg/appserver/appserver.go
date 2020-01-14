@@ -7,11 +7,9 @@ This package is based upon https://github.com/nf/webfront (Copyright 2011 Google
 package appserver
 
 import (
-	"context"
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -23,30 +21,30 @@ import (
 )
 
 var (
-	port         int
-	frameSource  string
-	mainHostName string
-	authz        authzFunc
+	port        int
+	frameSource string
 )
 
 // authzFunc creates a middleware to allow access according to a role array
-type authzFunc func(http.Handler, []string) http.Handler
+type authzFunc func(http.Handler, []string, bool) http.Handler
 
 // Server implements an http.Handler that acts as either a reverse proxy or a simple file server, as determined by a rule set.
 type Server struct {
-	mu   sync.RWMutex // guards the fields below
-	last time.Time
-	apps []*app
+	Mu    sync.RWMutex // guards the fields below
+	last  time.Time
+	Apps  []*app
+	file  string
+	authz authzFunc
 }
 
 // NewServer constructs a Server that reads apps from file
-func NewServer(file string, portFromMain int, frameSourceFromMain string, mainHostNameFromMain string, authzFromMain authzFunc) (*Server, error) {
+func NewServer(file string, portFromMain int, frameSourceFromMain string, authzFromMain authzFunc) (*Server, error) {
 	port = portFromMain
 	frameSource = frameSourceFromMain
-	mainHostName = mainHostNameFromMain
-	authz = authzFromMain
 	s := new(Server)
-	if err := s.LoadApps(file); err != nil {
+	s.authz = authzFromMain
+	s.file = file
+	if err := s.LoadApps(); err != nil {
 		return nil, err
 	}
 	return s, nil
@@ -64,14 +62,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // handler returns the appropriate Handler for the given Request,
 // or nil if none found.
 func (s *Server) handler(req *http.Request) http.Handler {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.Mu.RLock()
+	defer s.Mu.RUnlock()
 	host := req.Host
 	// Some clients include a port in the request host; strip it.
 	if i := strings.Index(host, ":"); i >= 0 {
 		host = host[:i]
 	}
-	for _, app := range s.apps {
+	for _, app := range s.Apps {
 		// Standard case
 		if !strings.HasPrefix(app.Host, "*.") && host == app.Host {
 			return app.handler
@@ -85,46 +83,28 @@ func (s *Server) handler(req *http.Request) http.Handler {
 }
 
 // LoadApps tests whether file has been modified since its last invocation and, if so, loads the app set from file.
-func (s *Server) LoadApps(file string) error {
-	fi, err := os.Stat(file)
+func (s *Server) LoadApps() error {
+	fi, err := os.Stat(s.file)
 	if err != nil {
 		return err
 	}
 	mtime := fi.ModTime()
-	if !mtime.After(s.last) && s.apps != nil {
+	if !mtime.After(s.last) && s.Apps != nil {
 		return nil // no change
 	}
-	apps, err := parseApps(file)
+	apps, err := parseApps(s.file, s.authz)
 	if err != nil {
 		return err
 	}
-	s.mu.Lock()
+	s.Mu.Lock()
 	s.last = mtime
-	s.apps = apps
-	s.mu.Unlock()
+	s.Apps = apps
+	s.Mu.Unlock()
 	return nil
 }
 
-// HostPolicy implements autocert.HostPolicy by consulting
-// the apps list for a matching host name.
-func (s *Server) HostPolicy(ctx context.Context, host string) error {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	// Check if host is main host
-	if host == mainHostName {
-		return nil
-	}
-	// If not check if the host is in allowed apps
-	for _, app := range s.apps {
-		if (host == app.Host) || (strings.Contains(app.Host, "*") && strings.HasSuffix(host, strings.TrimPrefix(app.Host, "*."))) {
-			return nil
-		}
-	}
-	return fmt.Errorf("unrecognized host %q", host)
-}
-
 // parseApps reads app definitions from file, constructs the app handlers,and returns the resultant apps.
-func parseApps(file string) ([]*app, error) {
+func parseApps(file string, authz authzFunc) ([]*app, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
@@ -135,7 +115,7 @@ func parseApps(file string) ([]*app, error) {
 		return nil, err
 	}
 	for _, r := range apps {
-		r.handler = makeHandler(r)
+		r.handler = makeHandler(r, authz)
 		if r.handler == nil {
 			log.Printf("bad app: %#v", r)
 		}
@@ -144,7 +124,7 @@ func parseApps(file string) ([]*app, error) {
 }
 
 // makeHandler constructs the appropriate Handler for the given app.
-func makeHandler(app *app) http.Handler {
+func makeHandler(app *app, authz authzFunc) http.Handler {
 	var handler http.Handler
 	if fwdTo := app.ForwardTo; app.IsProxy && fwdTo != "" {
 		fwdFrom := strings.TrimPrefix(app.Host, "*.")
@@ -191,5 +171,5 @@ func makeHandler(app *app) http.Handler {
 	if !app.Secured || handler == nil {
 		return handler
 	}
-	return authz(handler, app.Roles)
+	return authz(handler, app.Roles, false)
 }

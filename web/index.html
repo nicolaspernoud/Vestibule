@@ -3,38 +3,20 @@
   <title>Vestibule</title>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="assets/bulmaswatch.min.css" />
+  <link rel="icon" href="assets/brand/favicon.ico" />
+  <link rel="stylesheet" href="assets/bulma.min.css" />
   <link rel="stylesheet" href="assets/animate.css" />
   <link rel="stylesheet" href="style.css" />
   <script defer src="https://use.fontawesome.com/releases/v5.12.0/js/all.js"></script>
   <script defer type="module" src="main.js"></script>
   <body>
     <!-- Navbar -->
-    <nav class="navbar is-primary is-fixed-top" role="navigation" aria-label="main navigation">
-      <div class="navbar-brand">
-        <a class="navbar-item is-size-4" href="/"><img src="assets/logo.svg" alt="logo" />Vestibule</a>
-        <a role="button" id="navbar-burger" class="navbar-burger burger" aria-label="menu" aria-expanded="false">
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-          <span aria-hidden="true"></span>
-        </a>
-      </div>
-      <div id="navbar-menu" class="navbar-menu animated fadeIn faster">
-        <div class="navbar-start">
-          <a class="navbar-item" href="#apps"> Apps </a>
-          <a class="navbar-item is-hidden" id="goto-users" href="#users"> Users </a>
-        </div>
-        <div class="navbar-end">
-          <a class="navbar-item" id="goto-login" href="#login"> Log in </a>
-          <a class="navbar-item is-hidden animated fadeIn" id="goto-logout" href="/Logout"> Log out </a>
-        </div>
-      </div>
-    </nav>
+    <nav id="navbar" class="navbar is-dark is-fixed-top" role="navigation" aria-label="main navigation"></nav>
 
     <!-- Main content-->
     <section class="section" id="main"></section>
     <div id="spinner" class="spinner">
-      <img src="assets/spinner.svg" alt="spinner" />
+      <img src="assets/spinner.svg" alt="spinner" style="box-shadow: none;" />
     </div>
 
     <!-- Footer -->

@@ -1,7 +1,7 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
-import { Icons } from "./icons.js";
+import { Icons } from "/services/common/icons.js";
 import { AnimateCSS } from "/services/common/common.js";
 
 // DOM elements
@@ -29,7 +29,11 @@ export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div id="apps-list" class="columns is-multiline is-centered"></div>
-    <button id="apps-new" class="button is-primary is-rounded is-hidden has-margin-bottom-100px">+</button>
+    <button id="apps-new" class="button is-primary is-hidden">
+      <span class="icon is-small">
+        <i class="fas fa-plus"></i>
+      </span>
+    </button>
 
     <div class="modal" id="apps-modal">
       <div class="modal-background"></div>
@@ -106,6 +110,7 @@ export async function mount(where) {
               <input class="input" type="text" id="apps-modal-password" />
             </div>
           </div>
+          </br>
         </section>
         <footer class="modal-card-foot">
           <button id="apps-modal-save" class="button is-success">Save changes</button>
@@ -134,7 +139,7 @@ function appTemplate(app) {
     <div id="apps-app-${app.id}" class="column is-two-thirds">
       <div class="card">
         <header class="card-header">
-          <p class="card-header-title has-text-white">
+          <p class="card-header-title">
             <span class="icon has-text-warning"><i class="fas fa-${app.icon ? app.icon : "file"}"></i></span>${app.name ? app.name : app.id} - ${app.host}
           </p>
         </header>
@@ -144,6 +149,7 @@ function appTemplate(app) {
           ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
         </div>
         <footer class="card-footer">
+          <a class="card-footer-item" id="apps-app-open-${app.id}">Open</a>
           <a class="card-footer-item" onclick="window.location.href = 'https://${app.host}:${location.port}'">Visit</a>
           ${user.isAdmin ? '<a class="card-footer-item" id="apps-app-edit-' + app.id + '">Edit</a>' : ""}
           ${user.isAdmin ? '<a class="card-footer-item" id="apps-app-delete-' + app.id + '">Delete</a>' : ""}
@@ -154,18 +160,29 @@ function appTemplate(app) {
 }
 
 function displayApps(apps) {
-  const markup = apps.map(app => appTemplate(app)).join("");
+  const markup = apps
+    .map(app => {
+      if (user.isAdmin || !app.secured || app.roles.some(r => user.memberOf.includes(r))) {
+        return appTemplate(app);
+      }
+    })
+    .join("");
   document.getElementById("apps-list").innerHTML = markup;
-  if (user.isAdmin) {
-    apps.map(app => {
+  apps.map(app => {
+    if (user.isAdmin) {
       document.getElementById(`apps-app-edit-${app.id}`).addEventListener("click", function() {
         editApp(app);
       });
       document.getElementById(`apps-app-delete-${app.id}`).addEventListener("click", function() {
         deleteApp(app);
       });
-    });
-  }
+    }
+    if (user.isAdmin || !app.secured || app.roles.some(r => user.memberOf.includes(r))) {
+      document.getElementById(`apps-app-open-${app.id}`).addEventListener("click", function() {
+        openWebview(app);
+      });
+    }
+  });
 }
 
 async function firstShowApps() {
@@ -187,7 +204,10 @@ async function firstShowApps() {
 async function deleteApp(app) {
   try {
     const response = await fetch("/api/admin/apps/" + app.id, {
-      method: "delete"
+      method: "delete",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      })
     });
     if (response.status !== 200) {
       throw new Error(`App could not be deleted (status ${response.status})`);
@@ -285,6 +305,9 @@ async function postApp() {
   try {
     const response = await fetch("/api/admin/apps/", {
       method: "post",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      }),
       body: JSON.stringify({
         id: parseInt(id_field.value),
         name: name_field.value,
@@ -314,7 +337,7 @@ async function postApp() {
 
 async function reloadAppsOnServer() {
   try {
-    const response = await fetch("/api/admin/apps/reload", {
+    const response = await fetch("/api/admin/reload", {
       method: "get"
     });
     if (response.status !== 200) {
@@ -388,4 +411,30 @@ async function pickIcon() {
     })
   );
   document.getElementById("apps-icons-modal").classList.toggle("is-active");
+}
+
+function openWebview(app) {
+  const url = `https://${app.host}:${location.port}`;
+  let webview = document.createElement("div");
+  webview.classList.add("modal", "is-active");
+  webview.innerHTML = /* HTML */ `
+    <div class="modal-background animated fadeIn faster"></div>
+    <div class="modal-content animated zoomIn faster" style="width: 90vw;">
+      <header class="modal-card-head">
+        <p class="modal-card-title">${app.name}</p>
+        <button class="delete" aria-label="close" id="apps-webview-close"></button>
+      </header>
+      <section class="modal-card-body is-paddingless">
+        <iframe src="${url}" style="height: 75vh;width: 100%;"></iframe>
+      </section>
+      <footer class="modal-card-foot"></footer>
+    </div>
+  `;
+  webview.querySelector("#" + "apps-webview-close").addEventListener("click", () => {
+    AnimateCSS(webview.getElementsByClassName("modal-background")[0], "fadeOut", function() {
+      webview.parentNode.removeChild(webview);
+    });
+    AnimateCSS(webview.getElementsByClassName("modal-content")[0], "zoomOut");
+  });
+  document.body.appendChild(webview);
 }

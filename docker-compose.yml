@@ -5,7 +5,7 @@ services:
     image: vestibule
     build: .
     restart: unless-stopped
-    command: -apps=./configs/apps.json -letsencrypt_cache=./letsencrypt_cache
+    command: -apps=./configs/apps.json -davs=./configs/davs.json -letsencrypt_cache=./letsencrypt_cache
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./configs:/app/configs

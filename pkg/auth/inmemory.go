@@ -11,8 +11,8 @@ import (
 	"time"
 
 	"github.com/nicolaspernoud/vestibule/pkg/common"
-	"github.com/nicolaspernoud/vestibule/pkg/jwt"
 	"github.com/nicolaspernoud/vestibule/pkg/log"
+	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -41,7 +41,15 @@ func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// Store the user in cookie
-	jwt.StoreData(user, m.Hostname, authTokenKey, 24*time.Hour, w)
+	// Store only the relevant info
+	// Generate
+	xsrfToken, err := common.GenerateRandomString(16)
+	if err != nil {
+		http.Error(w, "error generating XSRF Token", 500)
+		return
+	}
+	tokenData := TokenData{User: User{ID: user.ID, Login: user.Login, Roles: user.Roles}, XSRFToken: xsrfToken}
+	tokens.Manager.StoreData(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
 	// Log the connexion
 	log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 	// Redirect

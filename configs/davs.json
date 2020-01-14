@@ -1,0 +1,38 @@
+[
+	{
+		"id": 1,
+		"host": "unsecureddav.vestibule.127.0.0.1.nip.io",
+		"root": "./data",
+		"writable": true,
+		"name": "Unsecured Webdav service",
+		"icon": "box",
+		"secured": false,
+		"roles": [
+			""
+		]
+	},
+	{
+		"id": 2,
+		"host": "userdav.vestibule.127.0.0.1.nip.io",
+		"root": "./data",
+		"name": "Reserved to users",
+		"icon": "book-reader",
+		"secured": true,
+		"roles": [
+			"USERS",
+			"ADMINS"
+		]
+	},
+	{
+		"id": 3,
+		"host": "admindav.vestibule.127.0.0.1.nip.io",
+		"root": "./data",
+		"writable": true,
+		"name": "Only for admins",
+		"icon": "user-graduate",
+		"secured": true,
+		"roles": [
+			"ADMINS"
+		]
+	}
+]

@@ -11,10 +11,6 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/common"
 )
 
-var (
-	appsFile string
-)
-
 // App represents a app serving static content proxying a web server
 type App struct {
 	ID        int      `json:"id"`
@@ -35,11 +31,6 @@ type app struct {
 	handler http.Handler
 }
 
-// Init inits the app files
-func Init(file string) {
-	appsFile = file
-}
-
 // ByID implements sort.Interface for []App based on the Id field
 type ByID []App
 
@@ -48,23 +39,23 @@ func (a ByID) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 func (a ByID) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
 // ProcessApps processes apps regarding of HTTP method
-func ProcessApps(w http.ResponseWriter, req *http.Request) {
+func (s *Server) ProcessApps(w http.ResponseWriter, req *http.Request) {
 	switch method := req.Method; method {
 	case "GET":
-		SendApps(w, req)
+		s.SendApps(w, req)
 	case "POST":
-		AddApp(w, req)
+		s.AddApp(w, req)
 	case "DELETE":
-		DeleteApp(w, req)
+		s.DeleteApp(w, req)
 	default:
 		http.Error(w, "method not allowed", 400)
 	}
 }
 
 // SendApps send apps as response from an http requests
-func SendApps(w http.ResponseWriter, req *http.Request) {
+func (s *Server) SendApps(w http.ResponseWriter, req *http.Request) {
 	var apps []App
-	err := common.Load(appsFile, &apps)
+	err := common.Load(s.file, &apps)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -73,9 +64,9 @@ func SendApps(w http.ResponseWriter, req *http.Request) {
 }
 
 // AddApp adds an app
-func AddApp(w http.ResponseWriter, req *http.Request) {
+func (s *Server) AddApp(w http.ResponseWriter, req *http.Request) {
 	var apps []App
-	err := common.Load(appsFile, &apps)
+	err := common.Load(s.file, &apps)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -103,18 +94,18 @@ func AddApp(w http.ResponseWriter, req *http.Request) {
 		apps = append(apps, newApp)
 		sort.Sort(ByID(apps))
 	}
-	err = common.Save(appsFile, &apps)
+	err = common.Save(s.file, &apps)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-	SendApps(w, req)
+	s.SendApps(w, req)
 }
 
 // DeleteApp adds an app
-func DeleteApp(w http.ResponseWriter, req *http.Request) {
+func (s *Server) DeleteApp(w http.ResponseWriter, req *http.Request) {
 	var apps []App
-	err := common.Load(appsFile, &apps)
+	err := common.Load(s.file, &apps)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -132,10 +123,10 @@ func DeleteApp(w http.ResponseWriter, req *http.Request) {
 			newApps = append(newApps, app)
 		}
 	}
-	err = common.Save(appsFile, &newApps)
+	err = common.Save(s.file, &newApps)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
-	SendApps(w, req)
+	s.SendApps(w, req)
 }

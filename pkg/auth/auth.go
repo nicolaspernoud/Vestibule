@@ -1,17 +1,24 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
+	"time"
 
-	"github.com/nicolaspernoud/vestibule/pkg/jwt"
+	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 )
+
+type key int
 
 const (
 	authTokenKey string = "auth_token"
+	// ContextData is the user
+	ContextData key = 0
 )
 
 // User represents a logged in user
@@ -27,12 +34,36 @@ type User struct {
 	Password     string   `json:"password,omitempty"`
 }
 
-// ValidateJWTAndRolesMiddleware validates that the token is valid and that the user has the correct roles
-func ValidateJWTAndRolesMiddleware(next http.Handler, allowedRoles []string) http.Handler {
+// TokenData represents the data held into a token
+type TokenData struct {
+	User
+	URL              string `json:"url,omitempty"`
+	ReadOnly         bool   `json:"readonly,omitempty"`
+	SharingUserLogin string `json:"sharinguserlogin,omitempty"`
+	XSRFToken        string `json:"xsrftoken,omitempty"`
+}
+
+// ValidateAuthMiddleware validates that the token is valid and that the user has the correct roles
+func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF bool) http.Handler {
 	roleChecker := func(w http.ResponseWriter, r *http.Request) {
-		user, err := GetUser(r)
+		user := TokenData{}
+		checkXSRF, err := tokens.Manager.ExtractAndValidateToken(r, authTokenKey, &user, checkXSRF)
+		// Handle CORS preflight requests
+		if err != nil && r.Method == "OPTIONS" {
+			// Handle GIO preflight requests
+			if strings.Contains(r.UserAgent(), "gvfs") {
+				w.Header().Set("WWW-Authenticate", `Basic realm="server"`)
+				http.Error(w, "gio authentication", 401)
+			}
+			return
+		}
 		if err != nil {
-			http.Error(w, err.Error(), 400)
+			http.Error(w, "error extracting token: "+err.Error(), 401)
+			return
+		}
+		// Check XSRF Token
+		if r.Method != "GET" && checkXSRF && r.Header.Get("XSRF-TOKEN") != user.XSRFToken {
+			http.Error(w, "XSRF protection triggered", 401)
 			return
 		}
 		err = checkUserHasRole(user, allowedRoles)
@@ -40,9 +71,25 @@ func ValidateJWTAndRolesMiddleware(next http.Handler, allowedRoles []string) htt
 			http.Error(w, err.Error(), 403)
 			return
 		}
-		next.ServeHTTP(w, r)
+		err = checkUserHasRole(user, []string{os.Getenv("ADMIN_ROLE")})
+		if err == nil {
+			user.IsAdmin = true
+		}
+		// Check for url
+		requestURL := strings.Split(r.Host, ":")[0] + r.URL.Path
+		if user.URL != "" && user.URL != requestURL {
+			http.Error(w, "token restricted to url: "+user.URL, 401)
+			return
+		}
+		// Check for method
+		if user.ReadOnly && r.Method != http.MethodGet {
+			http.Error(w, "token is read only", 403)
+			return
+		}
+		ctx := context.WithValue(r.Context(), ContextData, user)
+		next.ServeHTTP(w, r.WithContext(ctx))
 	}
-	return jwt.ValidateJWTMiddleware(http.HandlerFunc(roleChecker), authTokenKey)
+	return http.HandlerFunc(roleChecker)
 }
 
 // HandleLogout remove the user from the cookie store
@@ -58,17 +105,20 @@ func (m Manager) HandleLogout(w http.ResponseWriter, r *http.Request) {
 }
 
 // WhoAmI returns the user data
-func WhoAmI(w http.ResponseWriter, r *http.Request) {
-	user, err := GetUser(r)
-	if err != nil {
-		http.Error(w, err.Error(), 400)
-		return
+func WhoAmI() http.Handler {
+	whoAmI := func(w http.ResponseWriter, r *http.Request) {
+		user, err := GetTokenData(r)
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		json.NewEncoder(w).Encode(user)
 	}
-	json.NewEncoder(w).Encode(user)
+	return http.HandlerFunc(whoAmI)
 }
 
 // checkUserHasRole checks if the user has the required role
-func checkUserHasRole(user User, allowedRoles []string) error {
+func checkUserHasRole(user TokenData, allowedRoles []string) error {
 	for _, allowedRole := range allowedRoles {
 		for _, userRole := range user.Roles {
 			if userRole != "" && (userRole == allowedRole) {
@@ -79,21 +129,50 @@ func checkUserHasRole(user User, allowedRoles []string) error {
 	return fmt.Errorf("no user role among %v is in allowed roles (%v)", user.Roles, allowedRoles)
 }
 
-// GetUser gets an user from a request
-func GetUser(r *http.Request) (User, error) {
-	var user User
-	data := r.Context().Value(jwt.ContextData)
-	dataStr, err := json.Marshal(data)
+//GetShareToken gets a share token for a given ressource
+func GetShareToken(w http.ResponseWriter, r *http.Request) {
+	user, err := GetTokenData(r)
 	if err != nil {
-		return user, errors.New("user could not be recovered from context")
+		http.Error(w, err.Error(), 400)
+		return
 	}
-	err = json.Unmarshal([]byte(dataStr), &user)
+
+	if r.Method != http.MethodPost {
+		http.Error(w, "method not allowed", 405)
+		return
+	}
+	var wantedToken struct {
+		Sharedfor string `json:"sharedfor"`
+		URL       string `json:"url"`
+		Lifespan  int    `json:"lifespan"`
+		ReadOnly  bool   `json:"readonly,omitempty"`
+	}
+	err = json.NewDecoder(r.Body).Decode(&wantedToken)
 	if err != nil {
-		return user, errors.New("user could not be unmarshaled from json")
+		http.Error(w, err.Error(), 400)
+		return
 	}
-	err = checkUserHasRole(user, []string{os.Getenv("ADMIN_ROLE")})
-	if err == nil {
-		user.IsAdmin = true
+	if wantedToken.URL == "" {
+		http.Error(w, "url cannot be empty", 400)
+		return
+	}
+	user.Login = user.Login + "_share_for_" + wantedToken.Sharedfor
+	user.URL = wantedToken.URL
+	user.ReadOnly = wantedToken.ReadOnly
+	user.SharingUserLogin = wantedToken.Sharedfor
+	token, err := tokens.Manager.CreateToken(user, time.Now().Add(time.Hour*time.Duration(24*wantedToken.Lifespan)))
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	fmt.Fprintf(w, token)
+}
+
+// GetTokenData gets an user from a request
+func GetTokenData(r *http.Request) (TokenData, error) {
+	user, ok := r.Context().Value(ContextData).(TokenData)
+	if !ok {
+		return user, errors.New("user could be got from context")
 	}
 	return user, nil
 }

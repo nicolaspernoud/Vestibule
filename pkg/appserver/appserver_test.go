@@ -14,6 +14,8 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/tester"
 )
 
+var noH = tester.Header{Key: "", Value: ""}
+
 func TestServer(t *testing.T) {
 	// Create the proxy target servers
 	target := httptest.NewServer(http.HandlerFunc(testHandler))
@@ -52,7 +54,7 @@ func TestServer(t *testing.T) {
 	})
 	defer os.Remove(appFile)
 
-	s, err := NewServer(appFile, 443, "localhost", "localhost", mockAuth)
+	s, err := NewServer(appFile, 443, "localhost", mockAuth)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -60,17 +62,17 @@ func TestServer(t *testing.T) {
 	// Create tests
 	var tests = []struct {
 		url        string
-		authHeader string
+		authHeader tester.Header
 		code       int
 		body       string
 	}{
-		{"http://test.proxy/", "", 200, "OK"},
-		{"http://foo.test.proxy/", "", 404, "Not found."},
-		{"http://footest.proxy/", "", 404, "Not found."},
-		{"http://test.wildcard/", "", 200, "OK"},
-		{"http://foo.test.wildcard/", "", 200, "OK"},
-		{"http://test.static/", "", 200, "contents of index.html"},
-		{"http://test.net/", "", 404, "Not found."},
+		{"http://test.proxy/", noH, 200, "OK"},
+		{"http://foo.test.proxy/", noH, 404, "Not found."},
+		{"http://footest.proxy/", noH, 404, "Not found."},
+		{"http://test.wildcard/", noH, 200, "OK"},
+		{"http://foo.test.wildcard/", noH, 200, "OK"},
+		{"http://test.static/", noH, 200, "contents of index.html"},
+		{"http://test.net/", noH, 404, "Not found."},
 	}
 
 	// Run tests
@@ -136,6 +138,6 @@ func writeApps(apps []*app) (name string) {
 	return f.Name()
 }
 
-func mockAuth(next http.Handler, allowedRoles []string) http.Handler {
+func mockAuth(next http.Handler, allowedRoles []string, checkXSRF bool) http.Handler {
 	return next
 }

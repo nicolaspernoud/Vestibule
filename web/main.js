@@ -1,36 +1,30 @@
 import * as Apps from "/components/apps/apps.js";
+import * as Davs from "/components/davs/davs.js";
 import * as Users from "/components/users/users.js";
 import * as Login from "/components/login/login.js";
 import * as Auth from "/services/auth/auth.js";
+import * as Navbar from "/components/navbar/navbar.js";
 import { AnimateCSS } from "/services/common/common.js";
 
 const mountPoint = document.getElementById("main");
 const spinner = document.getElementById("spinner");
 
 document.addEventListener("DOMContentLoaded", function() {
-  // Hamburger menu
-  const burger = document.getElementById("navbar-burger");
-  const menu = document.getElementById("navbar-menu");
-  burger.addEventListener("click", () => {
-    burger.classList.toggle("is-active");
-    menu.classList.toggle("is-active");
-  });
-  menu.addEventListener("click", () => {
-    if (burger.classList.contains("is-active")) {
-      burger.classList.toggle("is-active");
-      menu.classList.toggle("is-active");
-    }
-  });
+  Navbar.mount("navbar");
   window.addEventListener("hashchange", navigate);
   navigate();
 });
 
 async function navigate() {
-  await hideShowInterfaceElements();
   switch (location.hash) {
     case "#apps":
       load(mountPoint, async function() {
         await Apps.mount("main");
+      });
+      break;
+    case "#davs":
+      load(mountPoint, async function() {
+        await Davs.mount("main");
       });
       break;
     case "#users":
@@ -46,21 +40,6 @@ async function navigate() {
     default:
       location.hash = "#apps";
       break;
-  }
-}
-
-async function hideShowInterfaceElements() {
-  const user = await Auth.GetUser();
-  if (user === undefined) {
-    document.getElementById("goto-users").classList.add("is-hidden");
-    document.getElementById("goto-logout").classList.add("is-hidden");
-    document.getElementById("goto-login").classList.remove("is-hidden");
-  } else {
-    document.getElementById("goto-logout").classList.remove("is-hidden");
-    document.getElementById("goto-login").classList.add("is-hidden");
-    if (user.isAdmin) {
-      document.getElementById("goto-users").classList.remove("is-hidden");
-    }
   }
 }
 

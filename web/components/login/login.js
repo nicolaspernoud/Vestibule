@@ -1,5 +1,6 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
+import * as Navbar from "/components/navbar/navbar.js";
 
 // DOM elements
 let mountpoint;
@@ -66,6 +67,7 @@ async function doLogin() {
       throw new Error(`Login error (status ${response.status})`);
     }
     location.hash = "#apps";
+    Navbar.CreateMenu();
   } catch (e) {
     Messages.Show("is-warning", e.message);
     console.error(e);

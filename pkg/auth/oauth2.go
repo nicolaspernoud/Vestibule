@@ -2,7 +2,6 @@ package auth
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -10,8 +9,8 @@ import (
 	"time"
 
 	"github.com/nicolaspernoud/vestibule/pkg/common"
-	"github.com/nicolaspernoud/vestibule/pkg/jwt"
 	"github.com/nicolaspernoud/vestibule/pkg/log"
+	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 	"golang.org/x/oauth2"
 )
 
@@ -50,7 +49,7 @@ func (m Manager) HandleOAuth2Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Logger.Fatalf("Error generating OAuth2 strate string :%v\n", err)
 	}
-	jwt.StoreData(oauthStateString, m.Hostname, oAuth2StateKey, 30*time.Second, w)
+	tokens.Manager.StoreData(oauthStateString, m.Hostname, oAuth2StateKey, 30*time.Second, w)
 	url := m.Config.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -58,8 +57,9 @@ func (m Manager) HandleOAuth2Login(w http.ResponseWriter, r *http.Request) {
 // HandleOAuth2Callback handles the OAuth2 Callback and get user info
 func (m Manager) HandleOAuth2Callback() http.Handler {
 	oauth2Handler := func(w http.ResponseWriter, r *http.Request) {
-		// Recover state from jwt
-		oauthState, err := getState(r)
+		// Recover state from tokens
+		var oauthState string
+		_, err := tokens.Manager.ExtractAndValidateToken(r, oAuth2StateKey, &oauthState, false)
 		if err != nil {
 			fmt.Println("Code exchange failed with ", err)
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -113,20 +113,18 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 			user.Roles[key] = strings.TrimPrefix(strings.Split(role, ",")[0], "CN=")
 		}
 		// Store the user in cookie
-		jwt.StoreData(user, m.Hostname, authTokenKey, 24*time.Hour, w)
+		// Generate
+		xsrfToken, err := common.GenerateRandomString(16)
+		if err != nil {
+			http.Error(w, "error generating XSRF Token", 500)
+			return
+		}
+		tokenData := TokenData{User: user, XSRFToken: xsrfToken}
+		tokens.Manager.StoreData(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
 		// Log the connexion
 		log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, req.RemoteAddr, log.GetCityAndCountryFromRequest(req))
 		// Redirect
 		http.Redirect(w, r, "/", http.StatusFound)
 	}
-	return jwt.ValidateJWTMiddleware(http.HandlerFunc(oauth2Handler), oAuth2StateKey)
-}
-
-// getState gets an user from a request
-func getState(r *http.Request) (string, error) {
-	state, ok := r.Context().Value(jwt.ContextData).(string)
-	if !ok {
-		return "", errors.New("state could be got from context")
-	}
-	return state, nil
+	return http.HandlerFunc(oauth2Handler)
 }

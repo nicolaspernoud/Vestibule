@@ -11,7 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/nicolaspernoud/vestibule/pkg/jwt"
+	"github.com/nicolaspernoud/vestibule/pkg/security"
+	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 
 	"github.com/nicolaspernoud/vestibule/internal/mocks"
 	"github.com/nicolaspernoud/vestibule/internal/rootmux"
@@ -22,6 +23,7 @@ import (
 
 var (
 	appsFile     = flag.String("apps", "", "apps definition `file`")
+	davsFile     = flag.String("davs", "", "davs definition `file`")
 	letsCacheDir = flag.String("letsencrypt_cache", "./letsencrypt_cache", "let's encrypt cache `directory`")
 	logFile      = flag.String("log_file", "", "Optional file to log to, defaults to no file logging")
 	httpsPort    = flag.Int("https_port", 443, "HTTPS port to serve on (defaults to 443)")
@@ -48,13 +50,14 @@ func main() {
 		}()
 	}
 	log.Logger.Println("--- Server is starting ---")
-	log.Logger.Println("Main hostname is ", "https://"+os.Getenv("HOSTNAME")+":"+strconv.Itoa(*httpsPort))
+	fullHostname := security.GetFullHostname(os.Getenv("HOSTNAME"), *httpsPort)
+	log.Logger.Println("Main hostname is ", fullHostname)
 
 	// Initializations
-	jwt.Init(*debugMode)
+	tokens.Init("./configs/tokenskey.json", *debugMode)
 
 	// Create the server
-	rootMux := rootmux.CreateRootMux(*httpsPort, *appsFile, "web")
+	rootMux := rootmux.CreateRootMux(*httpsPort, *appsFile, *davsFile, "web")
 
 	// Serve locally with https on debug mode or with let's encrypt on production mode
 	if *debugMode {

@@ -1,12 +1,16 @@
 package rootmux
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/nicolaspernoud/vestibule/pkg/appserver"
 	"github.com/nicolaspernoud/vestibule/pkg/auth"
+	"github.com/nicolaspernoud/vestibule/pkg/davserver"
+	"github.com/nicolaspernoud/vestibule/pkg/security"
 	"golang.org/x/crypto/acme/autocert"
 
 	"github.com/nicolaspernoud/vestibule/pkg/common"
@@ -21,15 +25,22 @@ type RootMux struct {
 }
 
 // CreateRootMux creates a RootMux
-func CreateRootMux(port int, appsFile string, staticDir string) RootMux {
+func CreateRootMux(port int, appsFile string, davsFile string, staticDir string) RootMux {
 	hostname := os.Getenv("HOSTNAME")
+	fullHostname := security.GetFullHostname(hostname, port)
 	// Create the app handler
-	appServer, err := appserver.NewServer(appsFile, port, hostname, hostname, auth.ValidateJWTAndRolesMiddleware)
+	appServer, err := appserver.NewServer(appsFile, port, fullHostname, auth.ValidateAuthMiddleware)
 	if err != nil {
 		log.Logger.Fatal(err)
 	}
-	var appHandler http.Handler = appServer
-	appserver.Init(appsFile)
+	// Create the dav handler
+	davServer, err := davserver.NewServer(davsFile, auth.ValidateAuthMiddleware)
+	if err != nil {
+		log.Logger.Fatal(err)
+	}
+	// Put the two handler together
+	adH := &appDavHandler{as: appServer, ds: davServer, dsCORSAllowOrigin: fullHostname}
+	policy := CreateHostPolicy(hostname, adH)
 	// Create the main handler
 	mainMux := http.NewServeMux()
 	// ALL USERS API ENDPOINTS
@@ -42,35 +53,108 @@ func CreateRootMux(port int, appsFile string, staticDir string) RootMux {
 	commonMux := http.NewServeMux()
 	commonMux.HandleFunc("/apps", func(w http.ResponseWriter, req *http.Request) {
 		if req.Method == http.MethodGet {
-			appserver.ProcessApps(w, req)
+			appServer.ProcessApps(w, req)
 			return
 		}
 		http.Error(w, "method not allowed", 405)
 	})
-	commonMux.HandleFunc("/WhoAmI", auth.WhoAmI)
-	mainMux.Handle("/api/common/", http.StripPrefix("/api/common", auth.ValidateJWTAndRolesMiddleware(commonMux, []string{os.Getenv("COMMON_ROLE")})))
+	commonMux.HandleFunc("/davs", func(w http.ResponseWriter, req *http.Request) {
+		if req.Method == http.MethodGet {
+			davServer.ProcessDavs(w, req)
+			return
+		}
+		http.Error(w, "method not allowed", 405)
+	})
+	mainMux.Handle("/api/common/WhoAmI", auth.ValidateAuthMiddleware(auth.WhoAmI(), []string{os.Getenv("COMMON_ROLE")}, false))
+	commonMux.HandleFunc("/Share", auth.GetShareToken)
+	mainMux.Handle("/api/common/", http.StripPrefix("/api/common", auth.ValidateAuthMiddleware(commonMux, []string{os.Getenv("COMMON_ROLE")}, true)))
 	// ADMIN API ENDPOINTS
 	adminMux := http.NewServeMux()
-	adminMux.Handle("/apps/reload", reloadApps(appServer, appsFile))
-	adminMux.HandleFunc("/apps/", appserver.ProcessApps)
+	adminMux.Handle("/reload", reload(adH))
+	adminMux.HandleFunc("/apps/", appServer.ProcessApps)
+	adminMux.HandleFunc("/davs/", davServer.ProcessDavs)
 	adminMux.HandleFunc("/users/", auth.ProcessUsers)
-	mainMux.Handle("/api/admin/", http.StripPrefix("/api/admin", auth.ValidateJWTAndRolesMiddleware(adminMux, []string{os.Getenv("ADMIN_ROLE")})))
+	mainMux.Handle("/api/admin/", http.StripPrefix("/api/admin", auth.ValidateAuthMiddleware(adminMux, []string{os.Getenv("ADMIN_ROLE")}, true)))
 	// Serve static files falling back to serving index.html
 	mainMux.Handle("/", http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)}))
 	// Put it together into the main handler
 	mux := http.NewServeMux()
 	mux.Handle(hostname+"/", mainMux)
-	mux.Handle("/", appHandler)
-	return RootMux{mux, appServer.HostPolicy, &m}
+	mux.Handle("/", adH)
+	return RootMux{mux, policy, &m}
 }
 
-func reloadApps(appServer *appserver.Server, appFile string) http.Handler {
+type appDavHandler struct {
+	as                *appserver.Server
+	ds                *davserver.Server
+	dsCORSAllowOrigin string
+}
+
+func (h *appDavHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	host := r.Host
+	// Some clients include a port in the request host; strip it.
+	if i := strings.Index(host, ":"); i >= 0 {
+		host = host[:i]
+	}
+	for _, a := range h.as.Apps {
+		if (host == a.Host) || (strings.Contains(a.Host, "*") && strings.HasSuffix(host, strings.TrimPrefix(a.Host, "*."))) {
+			h.as.ServeHTTP(w, r)
+			return
+		}
+	}
+	for _, d := range h.ds.Davs {
+		if host == d.Host {
+			security.CorsMiddleware(h.ds, h.dsCORSAllowOrigin).ServeHTTP(w, r)
+			return
+		}
+	}
+
+}
+
+func reload(adh *appDavHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		err := appServer.LoadApps(appFile)
+		err := adh.as.LoadApps()
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+		}
+		err = adh.ds.LoadDavs()
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 		} else {
-			fmt.Fprintf(w, "apps reloaded")
+			fmt.Fprintf(w, "apps and davs services reloaded")
 		}
 	})
+}
+
+// CreateHostPolicy implements autocert.HostPolicy
+func CreateHostPolicy(hostname string, h *appDavHandler) func(ctx context.Context, host string) error {
+	return func(ctx context.Context, host string) error {
+		// Appserver
+		h.as.Mu.RLock()
+		defer h.as.Mu.RUnlock()
+		// Check if host is main host
+		if host == hostname {
+			return nil
+		}
+		// If not check if the host is in allowed apps
+		for _, app := range h.as.Apps {
+			if (host == app.Host) || (strings.Contains(app.Host, "*") && strings.HasSuffix(host, strings.TrimPrefix(app.Host, "*."))) {
+				return nil
+			}
+		}
+		// Davserver
+		h.ds.Mu.RLock()
+		defer h.ds.Mu.RUnlock()
+		// Check if host is main host
+		if host == hostname {
+			return nil
+		}
+		// If not check if the host is in allowed apps
+		for _, app := range h.ds.Davs {
+			if host == app.Host {
+				return nil
+			}
+		}
+		return fmt.Errorf("unrecognized host %q", host)
+	}
 }

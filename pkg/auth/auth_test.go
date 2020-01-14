@@ -12,9 +12,11 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/tester"
 )
 
+var noH = tester.Header{Key: "", Value: ""}
+
 func TestCheckUserHasRole(t *testing.T) {
 	type args struct {
-		user         User
+		user         TokenData
 		allowedRoles []string
 	}
 	tests := []struct {
@@ -22,12 +24,12 @@ func TestCheckUserHasRole(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		{"has_all_roles", args{user: User{Roles: []string{"role01", "role02"}}, allowedRoles: []string{"role01", "role02"}}, false},
-		{"has_one_role", args{user: User{Roles: []string{"role01", "role03"}}, allowedRoles: []string{"role01", "role02"}}, false},
-		{"has_not_role", args{user: User{Roles: []string{"role03", "role04"}}, allowedRoles: []string{"role01", "role02"}}, true},
-		{"user_roles_are_empty", args{user: User{Roles: []string{}}, allowedRoles: []string{"role01", "role02"}}, true},
-		{"allowed_roles_are_empty", args{user: User{Roles: []string{"role01", "role02"}}, allowedRoles: []string{}}, true},
-		{"all_roles_are_empty", args{user: User{Roles: []string{}}, allowedRoles: []string{}}, true},
+		{"has_all_roles", args{user: TokenData{User: User{Roles: []string{"role01", "role02"}}}, allowedRoles: []string{"role01", "role02"}}, false},
+		{"has_one_role", args{user: TokenData{User: User{Roles: []string{"role01", "role03"}}}, allowedRoles: []string{"role01", "role02"}}, false},
+		{"has_not_role", args{user: TokenData{User: User{Roles: []string{"role03", "role04"}}}, allowedRoles: []string{"role01", "role02"}}, true},
+		{"user_roles_are_empty", args{user: TokenData{User: User{Roles: []string{}}}, allowedRoles: []string{"role01", "role02"}}, true},
+		{"allowed_roles_are_empty", args{user: TokenData{User: User{Roles: []string{"role01", "role02"}}}, allowedRoles: []string{}}, true},
+		{"all_roles_are_empty", args{user: TokenData{User: User{Roles: []string{}}}, allowedRoles: []string{}}, true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -43,8 +45,8 @@ func TestAddUser(t *testing.T) {
 	defer os.Remove(UsersFile)
 
 	handler := http.HandlerFunc(AddUser)
-	tester.DoRequestOnHandler(t, handler, "POST", "/", "", `{"id":"1","login":"admin","password": "password"}`, http.StatusOK, `[{"id":"1","login":"admin"`)
-	tester.DoRequestOnHandler(t, handler, "POST", "/", "", `{"id":"1","login":"admin","password": ""}`, http.StatusBadRequest, `passwords cannot be blank`)
+	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"1","login":"admin","password": "password"}`, http.StatusOK, `[{"id":"1","login":"admin"`)
+	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"1","login":"admin","password": ""}`, http.StatusBadRequest, `passwords cannot be blank`)
 }
 
 func TestMatchUser(t *testing.T) {

@@ -7,7 +7,7 @@ example :
 
 ```bash
 . ./.env
-vestibule -apps=./configs/apps.json -letsencrypt_cache=./letsencrypt_cache
+vestibule -apps=./configs/apps.json -davs=./configs/davs.json -letsencrypt_cache=./letsencrypt_cache
 ```
 
 and go to HOSTNAME to configure apps (do not forget to login before !)
@@ -19,4 +19,18 @@ and go to HOSTNAME to configure apps (do not forget to login before !)
 ```bash
 go get -u
 go mod tidy
+```
+
+# Register both remotes
+
+```bash
+git remote add forge https://forge.grandlyon.com/NPERNOUD/vestibule.git
+git remote set-url --add --push origin https://forge.grandlyon.com/NPERNOUD/vestibule.git
+git remote set-url --add --push origin https://github.com/nicolaspernoud/Vestibule.git
+```
+
+# Get all branches
+
+```bash
+git fetch --all
 ```

@@ -88,6 +88,6 @@ func CreateMockAPI() *http.ServeMux {
 				"bar": "foo"
 			}`))
 		})
-	}(), &frameSource))
+	}(), frameSource))
 	return mux
 }
