@@ -34,6 +34,14 @@
   margin-right: 0.5rem;
 }
 
+.has-50px-margin-bottom {
+  margin-bottom: 50px;
+}
+
 html {
   background-color: lightgray;
+}
+
+.card-header-title {
+  padding: 5px;
 }

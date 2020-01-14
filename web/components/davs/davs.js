@@ -25,7 +25,7 @@ export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div id="davs-list" class="columns is-multiline is-centered"></div>
-    <button id="davs-new" class="button is-primary is-hidden">
+    <button id="davs-new" class="button is-primary is-hidden has-50px-margin-bottom">
       <span class="icon is-small">
         <i class="fas fa-plus"></i>
       </span>
@@ -122,7 +122,7 @@ function davTemplate(dav) {
       <div class="card">
         <header class="card-header">
           <p class="card-header-title">
-            <span class="icon has-text-warning"><i class="fas fa-${dav.icon ? dav.icon : "file"}"></i></span>${dav.name ? dav.name : dav.id} - ${dav.host}
+            <span class="icon is-medium has-text-warning"><i class="fas fa-${dav.icon ? dav.icon : "file"}"></i></span>${dav.name ? dav.name : dav.id} - ${dav.host}
           </p>
         </header>
         <div class="card-content has-reduced-padding">

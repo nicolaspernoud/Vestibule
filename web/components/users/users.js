@@ -37,7 +37,7 @@ export async function mount(where) {
         <tbody id="users"></tbody>
       </table>
     </div>
-    <button id="users-new" class="button is-primary">
+    <button id="users-new" class="button is-primary has-50px-margin-bottom">
       <span class="icon is-small">
         <i class="fas fa-plus"></i>
       </span>

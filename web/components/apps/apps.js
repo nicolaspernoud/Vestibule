@@ -29,7 +29,7 @@ export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div id="apps-list" class="columns is-multiline is-centered"></div>
-    <button id="apps-new" class="button is-primary is-hidden">
+    <button id="apps-new" class="button is-primary is-hidden has-50px-margin-bottom">
       <span class="icon is-small">
         <i class="fas fa-plus"></i>
       </span>
@@ -140,7 +140,7 @@ function appTemplate(app) {
       <div class="card">
         <header class="card-header">
           <p class="card-header-title">
-            <span class="icon has-text-warning"><i class="fas fa-${app.icon ? app.icon : "file"}"></i></span>${app.name ? app.name : app.id} - ${app.host}
+            <span class="icon is-medium has-text-warning"><i class="fas fa-${app.icon ? app.icon : "file"}"></i></span>${app.name ? app.name : app.id} - ${app.host}
           </p>
         </header>
         <div class="card-content has-reduced-padding">
