@@ -24,8 +24,8 @@ let user;
 export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
-    <div id="davs-list" class="columns is-multiline is-centered"></div>
-    <button id="davs-new" class="button is-primary is-hidden has-50px-margin-bottom">
+    <div id="davs-list" class="flex-container"></div>
+    <button id="davs-new" class="button is-primary is-hidden">
       <span class="icon is-small">
         <i class="fas fa-plus"></i>
       </span>
@@ -118,22 +118,38 @@ export async function mount(where) {
 function davTemplate(dav) {
   cleanDav(dav);
   return /* HTML */ `
-    <div id="davs-dav-${dav.id}" class="column is-two-thirds">
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">
-            <span class="icon is-medium has-text-warning"><i class="fas fa-${dav.icon ? dav.icon : "file"}"></i></span>${dav.name ? dav.name : dav.id} - ${dav.host}
-          </p>
-        </header>
-        <div class="card-content has-reduced-padding">
-          <p>Serve ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
-          <p>${dav.secured ? "Restricted access to user with roles <strong>" + dav.roles + "</strong>" : "Unrestricted access"}</p>
+    <div id="davs-dav-${dav.id}" class="card icon-card">
+      <div class="card-content">
+        <button id="davs-dav-open-${dav.id}" class="button is-large is-white">
+          <span class="icon is-medium has-text-success">
+            <i class="fas fa-2x fa-${dav.icon ? dav.icon : "file"}"></i>
+          </span>
+        </button>
+      </div>
+      <div class="card-footer">
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button is-white">
+              <span class="icon is-small">
+                <i class="fas fa-angle-down"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p><strong>${dav.name ? dav.name : dav.id}</strong></p>
+              </div>
+              ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-edit-' + dav.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
+              ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
+              <div class="dropdown-item">
+                <p>${dav.host}</p>
+                <p>Serve ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
+                <p>${dav.secured ? "Restricted access to user with roles <strong>" + dav.roles + "</strong>" : "Unrestricted access"}</p>
+              </div>
+            </div>
+          </div>
         </div>
-        <footer class="card-footer">
-          <a class="card-footer-item" id="davs-dav-open-${dav.id}">Open</a>
-          ${user.isAdmin ? '<a class="card-footer-item" id="davs-dav-edit-' + dav.id + '">Edit</a>' : ""}
-          ${user.isAdmin ? '<a class="card-footer-item" id="davs-dav-delete-' + dav.id + '">Delete</a>' : ""}
-        </footer>
       </div>
     </div>
   `;

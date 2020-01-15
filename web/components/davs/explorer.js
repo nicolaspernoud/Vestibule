@@ -34,12 +34,12 @@ export class Explorer {
                     <i class="fas fa-folder-plus"></i>
                   </span>
                 </button>
-                <button class="button" style="padding-left: 5px; padding-right: 5px;">
-                  <input id="explorer-modal-upload" class="file-input" type="file" multiple />
-                  <span class="icon is-small is-marginless">
+                <div class="button" style="padding: 0 7px;">
+                  <span class="icon is-small" style="margin: 0;">
                     <i class="fas fa-upload"></i>
                   </span>
-                </button>
+                  <input class="file-input" type="file" id="explorer-modal-upload" multiple />
+                </div>
               `
             : ""}
         </div>
@@ -390,7 +390,14 @@ export class Explorer {
           console.log(`Upload of ${file.name} cancelled`);
         } else if (xhr.status == 201) {
           if (this.path === onStartPath) {
-            this.files.push(file);
+            this.files.push({
+              name: file.name,
+              path: file.path,
+              isDir: file.isDir,
+              type: file.type,
+              size: file.size,
+              lastModified: file.lastModified
+            });
             this.displayFiles();
           }
         } else {
@@ -556,7 +563,7 @@ function goUp(path) {
   if (path === "/") return path;
   if (path.endsWith("/")) path = path.substring(0, path.length - 1);
   const lastSlashPosition = path.lastIndexOf("/");
-  return lastSlashPosition === 0 ? "/" : path.substring(0, lastSlashPosition);
+  return lastSlashPosition === 0 ? "/" : path.substring(0, lastSlashPosition + 1);
 }
 
 function sizeToHuman(size) {

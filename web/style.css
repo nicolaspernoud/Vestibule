@@ -34,14 +34,26 @@
   margin-right: 0.5rem;
 }
 
-.has-50px-margin-bottom {
-  margin-bottom: 50px;
-}
-
 html {
   background-color: lightgray;
 }
 
-.card-header-title {
-  padding: 5px;
+.flex-container {
+  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-card {
+  margin: 1rem;
+}
+
+.icon-card:hover {
+  z-index: 10;
+}
+
+.dropdown-content {
+  width: 10rem;
+  word-wrap: break-word;
 }

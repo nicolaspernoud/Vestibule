@@ -28,13 +28,12 @@ let user;
 export async function mount(where) {
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
-    <div id="apps-list" class="columns is-multiline is-centered"></div>
-    <button id="apps-new" class="button is-primary is-hidden has-50px-margin-bottom">
+    <div id="apps-list" class="flex-container"></div>
+    <button id="apps-new" class="button is-primary is-hidden">
       <span class="icon is-small">
         <i class="fas fa-plus"></i>
       </span>
     </button>
-
     <div class="modal" id="apps-modal">
       <div class="modal-background"></div>
       <div class="modal-card" id="apps-modal-card">
@@ -136,24 +135,40 @@ export async function mount(where) {
 function appTemplate(app) {
   cleanApp(app);
   return /* HTML */ `
-    <div id="apps-app-${app.id}" class="column is-two-thirds">
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">
-            <span class="icon is-medium has-text-warning"><i class="fas fa-${app.icon ? app.icon : "file"}"></i></span>${app.name ? app.name : app.id} - ${app.host}
-          </p>
-        </header>
-        <div class="card-content has-reduced-padding">
-          <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
-          <p>${app.secured ? "Restricted access to user with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}</p>
-          ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
+    <div id="apps-app-${app.id}" class="card icon-card">
+      <div class="card-content">
+        <button id="apps-app-open-${app.id}" class="button is-large is-white">
+          <span class="icon is-medium has-text-success">
+            <i class="fas fa-2x fa-${app.icon ? app.icon : "file"}"></i>
+          </span>
+        </button>
+      </div>
+      <div class="card-footer">
+        <div class="dropdown is-hoverable">
+          <div class="dropdown-trigger">
+            <button class="button is-white">
+              <span class="icon is-small">
+                <i class="fas fa-angle-down"></i>
+              </span>
+            </button>
+          </div>
+          <div class="dropdown-menu" role="menu">
+            <div class="dropdown-content">
+              <div class="dropdown-item">
+                <p><strong>${app.name ? app.name : app.id}</strong></p>
+              </div>
+              <a class="dropdown-item" onclick="window.location.href = 'https://${app.host}:${location.port}'"><i class="fas fa-external-link-alt"></i><strong> Visit</strong></a>
+              ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-edit-' + app.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
+              ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-delete-' + app.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
+              <div class="dropdown-item">
+                <p>${app.host}</p>
+                <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
+                <p>${app.secured ? "Restricted access to users with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}</p>
+                ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
+              </div>
+            </div>
+          </div>
         </div>
-        <footer class="card-footer">
-          <a class="card-footer-item" id="apps-app-open-${app.id}">Open</a>
-          <a class="card-footer-item" onclick="window.location.href = 'https://${app.host}:${location.port}'">Visit</a>
-          ${user.isAdmin ? '<a class="card-footer-item" id="apps-app-edit-' + app.id + '">Edit</a>' : ""}
-          ${user.isAdmin ? '<a class="card-footer-item" id="apps-app-delete-' + app.id + '">Delete</a>' : ""}
-        </footer>
       </div>
     </div>
   `;

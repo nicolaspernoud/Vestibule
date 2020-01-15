@@ -37,7 +37,7 @@ export async function mount(where) {
         <tbody id="users"></tbody>
       </table>
     </div>
-    <button id="users-new" class="button is-primary has-50px-margin-bottom">
+    <button id="users-new" class="button is-primary">
       <span class="icon is-small">
         <i class="fas fa-plus"></i>
       </span>
@@ -125,13 +125,13 @@ function userTemplate(user) {
       <td>${user.surname}</td>
       <td>${user.memberOf}</td>
       <td>
-        <a id="users-user-edit-${user.id}" class="button is-link">
+        <a id="users-user-edit-${user.id}" class="button is-link is-small">
           <span>Edit</span>
           <span class="icon is-small">
             <i class="fas fa-pen"></i>
           </span>
         </a>
-        <a id="users-user-delete-${user.id}" class="button is-danger">
+        <a id="users-user-delete-${user.id}" class="button is-danger is-small">
           <span>Delete</span>
           <span class="icon is-small">
             <i class="fas fa-times"></i>
