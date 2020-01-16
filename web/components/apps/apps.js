@@ -9,6 +9,7 @@ let mountpoint;
 let id_field;
 let name_field;
 let icon_field;
+let color_field;
 let host_field;
 let isproxy_field;
 let forwardto_field;
@@ -63,6 +64,12 @@ export async function mount(where) {
               </span>
             </div>
           </div>
+          <div class="field">
+          <label class="label">Color</label>
+          <div class="control">
+            <input class="input" type="color" id="apps-modal-color" />
+          </div>
+        </div>
           <div class="field">
             <label class="label">Host (allow subdomains with "*." prefix)</label>
             <div class="control">
@@ -136,13 +143,14 @@ function appTemplate(app) {
   cleanApp(app);
   return /* HTML */ `
     <div id="apps-app-${app.id}" class="card icon-card">
-      <div class="card-content">
+      <div class="card-content has-text-centered">
         <button id="apps-app-open-${app.id}" class="button is-large is-white">
-          <span class="icon is-medium has-text-success">
+          <span class="icon is-medium" style="color:${app.color};">
             <i class="fas fa-2x fa-${app.icon ? app.icon : "file"}"></i>
           </span>
         </button>
       </div>
+      <p class="has-text-centered"><strong>${app.name ? app.name : app.id}</strong></p>
       <div class="card-footer">
         <div class="dropdown is-hoverable">
           <div class="dropdown-trigger">
@@ -154,14 +162,12 @@ function appTemplate(app) {
           </div>
           <div class="dropdown-menu" role="menu">
             <div class="dropdown-content">
-              <div class="dropdown-item">
-                <p><strong>${app.name ? app.name : app.id}</strong></p>
-              </div>
               <a class="dropdown-item" onclick="window.location.href = 'https://${app.host}:${location.port}'"><i class="fas fa-external-link-alt"></i><strong> Visit</strong></a>
               ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-edit-' + app.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
               ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-delete-' + app.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
+              <hr class="dropdown-divider" />
               <div class="dropdown-item">
-                <p>${app.host}</p>
+                <p><strong>${app.host}</strong></p>
                 <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
                 <p>${app.secured ? "Restricted access to users with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}</p>
                 ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
@@ -239,6 +245,7 @@ function registerModalFields() {
   id_field = document.getElementById("apps-modal-id");
   name_field = document.getElementById("apps-modal-name");
   icon_field = document.getElementById("apps-modal-icon");
+  color_field = document.getElementById("apps-modal-color");
   host_field = document.getElementById("apps-modal-host");
   isproxy_field = document.getElementById("apps-modal-isproxy");
   forwardto_field = document.getElementById("apps-modal-forwardto");
@@ -278,6 +285,7 @@ async function editApp(app) {
   id_field.value = app.id;
   name_field.value = app.name;
   icon_field.value = app.icon;
+  color_field.value = app.color;
   host_field.value = app.host;
   isproxy_field.checked = app.isProxy;
   forwardto_field.value = app.forwardTo;
@@ -305,6 +313,7 @@ async function newApp() {
   id_field.value = maxid + 1;
   name_field.value = "";
   icon_field.value = "file";
+  color_field.value = "#000000";
   host_field.value = `*.new_application.${location.hostname}`;
   isproxy_field.checked = false;
   forwardto_field.value = "";
@@ -327,12 +336,13 @@ async function postApp() {
         id: parseInt(id_field.value),
         name: name_field.value,
         icon: icon_field.value,
+        color: color_field.value,
         host: host_field.value,
         isProxy: isproxy_field.checked,
         forwardTo: forwardto_field.value,
         serve: serve_field.value,
         secured: secured_field.checked,
-        roles: roles_field.value.split(","),
+        roles: secured_field.checked ? roles_field.value.split(",") : "",
         login: login_field.value,
         password: password_field.value
       })

@@ -20,7 +20,7 @@
         "AUTH_URL": "http://localhost:8090/auth",
         "TOKEN_URL": "http://localhost:8090/token",
         "USERINFO_URL": "http://localhost:8090/admininfo",
-        "LOGOUT_URL": "http://localhost:8090/logout",
+        "LOGOUT_URL": "/",
         "ADMIN_ROLE": "ADMINS",
         "COMMON_ROLE": "OTHERS",
         "HOSTNAME": "vestibule.127.0.0.1.nip.io"

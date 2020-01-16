@@ -4,12 +4,10 @@
 		"host": "unsecureddav.vestibule.127.0.0.1.nip.io",
 		"root": "./data",
 		"writable": true,
-		"name": "Unsecured Webdav service",
+		"name": "Unsecured Webdav",
 		"icon": "box",
-		"secured": false,
-		"roles": [
-			""
-		]
+		"color": "#2ce027",
+		"secured": false
 	},
 	{
 		"id": 2,
@@ -17,6 +15,7 @@
 		"root": "./data",
 		"name": "Reserved to users",
 		"icon": "book-reader",
+		"color": "#5779cc",
 		"secured": true,
 		"roles": [
 			"USERS",
@@ -30,6 +29,7 @@
 		"writable": true,
 		"name": "Only for admins",
 		"icon": "user-graduate",
+		"color": "#d99219",
 		"secured": true,
 		"roles": [
 			"ADMINS"

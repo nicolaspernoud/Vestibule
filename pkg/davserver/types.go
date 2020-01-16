@@ -18,8 +18,9 @@ type Dav struct {
 	Root     string   `json:"root"`               // the file system directory to serve the webdav from
 	Writable bool     `json:"writable,omitempty"` // whether if the webdav is writable (default to read only)
 	Name     string   `json:"name,omitempty"`     // name of the file service
-	Icon     string   `json:"icon,omitempty"`     // true if reverse proxy
-	Secured  bool     `json:"secured"`            // true if the handler is JWT secured
+	Icon     string   `json:"icon,omitempty"`     // icon to display
+	Color    string   `json:"color,omitempty"`    // icon's color
+	Secured  bool     `json:"secured"`            // true if the handler is secured with auth
 	Roles    []string `json:"roles,omitempty"`    // Roles allowed to access the file service
 }
 

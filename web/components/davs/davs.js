@@ -10,6 +10,7 @@ let mountpoint;
 let id_field;
 let name_field;
 let icon_field;
+let color_field;
 let host_field;
 let writable_field;
 let root_field;
@@ -58,6 +59,12 @@ export async function mount(where) {
               <span class="icon is-small is-left has-text-info">
                 <i id="davs-modal-icon-preview" class="fas fa-file"></i>
               </span>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Color</label>
+            <div class="control">
+              <input class="input" type="color" id="davs-modal-color" />
             </div>
           </div>
           <div class="field">
@@ -119,13 +126,14 @@ function davTemplate(dav) {
   cleanDav(dav);
   return /* HTML */ `
     <div id="davs-dav-${dav.id}" class="card icon-card">
-      <div class="card-content">
+      <div class="card-content has-text-centered">
         <button id="davs-dav-open-${dav.id}" class="button is-large is-white">
-          <span class="icon is-medium has-text-success">
+          <span class="icon is-medium" style="color:${dav.color};">
             <i class="fas fa-2x fa-${dav.icon ? dav.icon : "file"}"></i>
           </span>
         </button>
       </div>
+      <p class="has-text-centered"><strong>${dav.name ? dav.name : dav.id}</strong></p>
       <div class="card-footer">
         <div class="dropdown is-hoverable">
           <div class="dropdown-trigger">
@@ -137,14 +145,13 @@ function davTemplate(dav) {
           </div>
           <div class="dropdown-menu" role="menu">
             <div class="dropdown-content">
-              <div class="dropdown-item">
-                <p><strong>${dav.name ? dav.name : dav.id}</strong></p>
-              </div>
+              <div class="dropdown-item"></div>
               ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-edit-' + dav.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
               ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
+              <hr class="dropdown-divider" />
               <div class="dropdown-item">
-                <p>${dav.host}</p>
-                <p>Serve ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
+                <p><strong>${dav.host}</strong></p>
+                <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
                 <p>${dav.secured ? "Restricted access to user with roles <strong>" + dav.roles + "</strong>" : "Unrestricted access"}</p>
               </div>
             </div>
@@ -220,6 +227,7 @@ function registerModalFields() {
   id_field = document.getElementById("davs-modal-id");
   name_field = document.getElementById("davs-modal-name");
   icon_field = document.getElementById("davs-modal-icon");
+  color_field = document.getElementById("davs-modal-color");
   host_field = document.getElementById("davs-modal-host");
   writable_field = document.getElementById("davs-modal-writable");
   root_field = document.getElementById("davs-modal-root");
@@ -251,6 +259,7 @@ async function editDav(dav) {
   id_field.value = dav.id;
   name_field.value = dav.name;
   icon_field.value = dav.icon;
+  color_field.value = dav.color;
   host_field.value = dav.host;
   writable_field.checked = dav.writable;
   root_field.value = dav.root;
@@ -275,6 +284,7 @@ async function newDav() {
   id_field.value = maxid + 1;
   name_field.value = "";
   icon_field.value = "file";
+  color_field.value = "#000000";
   host_field.value = `new_dav_service.${location.hostname}`;
   writable_field.checked = false;
   root_field.value = "";
@@ -294,11 +304,12 @@ async function postDav() {
         id: parseInt(id_field.value),
         name: name_field.value,
         icon: icon_field.value,
+        color: color_field.value,
         host: host_field.value,
         writable: writable_field.checked,
         root: root_field.value,
         secured: secured_field.checked,
-        roles: roles_field.value.split(",")
+        roles: secured_field.checked ? roles_field.value.split(",") : ""
       })
     });
     if (response.status !== 200) {
