@@ -5,7 +5,7 @@
 [x] Rework nav
 [x] Make logo and title alterable
 [x] Allow opening on apps in iframes (for given apps)
-[ ] Allow files preview
+[/] Allow files preview
 [x] Allow sharing for selected users -> restrict tokens for a given ressource
 [x] Check CSRF token for given conditions
 [ ] Allow translations

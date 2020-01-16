@@ -2,6 +2,7 @@
 import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
 import { AnimateCSS } from "/services/common/common.js";
+import { Open, GetType } from "/components/davs/open.js";
 
 export class Explorer {
   constructor(hostname) {
@@ -150,11 +151,16 @@ export class Explorer {
           `
         : ""}
     `;
-    if (file.isDir) {
-      el.querySelector("#" + "explorer-content").addEventListener("click", () => {
+
+    el.querySelector("#" + "explorer-content").addEventListener("click", () => {
+      if (file.isDir) {
         this.navigate(file.path);
-      });
-    }
+      } else if (GetType(file)) {
+        const openModal = new Open(this.hostname, this.readwrite, this.files, file);
+        openModal.show(true);
+      }
+    });
+
     if (this.readwrite) {
       el.querySelector("#" + "explorer-rename").addEventListener("click", () => {
         this.rename(file);
