@@ -20,7 +20,7 @@ export class Explorer {
         <button class="delete" aria-label="close" id="explorer-modal-close"></button>
       </header>
       <section id="explorer-modal-content" class="modal-card-body"></section>
-      <progress id="explorer-modal-progress" class="progress is-small is-primary" style="margin-bottom:0px;"></progress>
+      <progress id="explorer-modal-progress" class="progress is-primary" style="margin-bottom:0px;"></progress>
       <footer id="explorer-modal-footer" class="modal-card-foot">
         <div class="buttons" id="explorer-modal-footer-buttons">
           <button id="explorer-modal-back" class="button is-success">
