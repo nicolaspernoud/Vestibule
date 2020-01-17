@@ -164,7 +164,7 @@ function appTemplate(app) {
             <div class="dropdown-content">
               <a class="dropdown-item" onclick="window.location.href = 'https://${app.host}:${location.port}'"><i class="fas fa-external-link-alt"></i><strong> Visit</strong></a>
               ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-edit-' + app.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
-              ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-delete-' + app.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
+              ${user.isAdmin ? '<a class="dropdown-item has-text-danger" id="apps-app-delete-' + app.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
               <hr class="dropdown-divider" />
               <div class="dropdown-item">
                 <p><strong>${app.host}</strong></p>

@@ -58,3 +58,7 @@ html {
   width: 12rem;
   word-wrap: break-word;
 }
+
+::-moz-focus-inner {
+  border: 0;
+}

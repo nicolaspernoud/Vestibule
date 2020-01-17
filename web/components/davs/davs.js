@@ -147,7 +147,7 @@ function davTemplate(dav) {
             <div class="dropdown-content">
               <div class="dropdown-item"></div>
               ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-edit-' + dav.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
-              ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
+              ${user.isAdmin ? '<a class="dropdown-item has-text-danger" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
               <hr class="dropdown-divider" />
               <div class="dropdown-item">
                 <p><strong>${dav.host}</strong></p>

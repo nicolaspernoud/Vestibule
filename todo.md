@@ -14,3 +14,5 @@
 [x] Foldable apps/davs
 [ ] Add security headers (check with mozilla observatory) => remove duplicate headers on appserver
 [x] Add colors to apps
+[ ] Do mobile integration (PWA like)
+[ ] Give credits to fluent bulma et animate.css
