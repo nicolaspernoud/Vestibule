@@ -1,12 +1,11 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
-import * as Auth from "/services/auth/auth.js";
 import { AnimateCSS } from "/services/common/common.js";
+import { Share } from "/components/davs/share.js";
 
 export class Open {
-  constructor(hostname, readwrite, files, file) {
+  constructor(hostname, files, file) {
     this.hostname = hostname;
-    this.readonly = !readwrite;
     this.files = files;
     this.file = file;
     this.index = files.findIndex(element => element.name === file.name);
@@ -36,7 +35,8 @@ export class Open {
     if (this.type == "text") {
       try {
         const response = await fetch(this.url, {
-          method: "get"
+          method: "get",
+          credentials: "include"
         });
         if (response.status !== 200) {
           throw new Error(`Text content could not be fetched (status ${response.status})`);
@@ -58,6 +58,10 @@ export class Open {
     });
     this.openModal.querySelector("#" + "open-next").addEventListener("click", () => {
       this.update(true);
+    });
+    this.openModal.querySelector("#" + "open-share").addEventListener("click", () => {
+      const shareModal = new Share(this.hostname, this.file);
+      shareModal.show();
     });
     document.body.appendChild(this.openModal);
   }
@@ -104,7 +108,7 @@ export class Open {
             <button id="open-next" class="button">
               <span class="icon is-small"><i class="fas fa-arrow-circle-right"></i></span>
             </button>
-            <button id="open-share" class="button" disabled>
+            <button id="open-share" class="button">
               <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
             </button>
             <button id="open-close" class="button">

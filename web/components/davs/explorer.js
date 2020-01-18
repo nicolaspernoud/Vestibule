@@ -3,6 +3,8 @@ import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
 import { AnimateCSS } from "/services/common/common.js";
 import { Open, GetType } from "/components/davs/open.js";
+import { Edit } from "/components/davs/edit.js";
+import { Share } from "/components/davs/share.js";
 
 export class Explorer {
   constructor(hostname) {
@@ -133,6 +135,13 @@ export class Explorer {
                   <a id="explorer-copy" class="level-item">
                     <span class="icon is-small"><i class="fas fa-copy"></i></span>
                   </a>
+                  ${GetType(file) === "text"
+                    ? /* HTML */ `
+                        <a id="explorer-edit" class="level-item">
+                          <span class="icon is-small"><i class="fas fa-edit"></i></span>
+                        </a>
+                      `
+                    : ""}
                 `
               : ""}
             <a id="explorer-share" class="level-item">
@@ -156,7 +165,7 @@ export class Explorer {
       if (file.isDir) {
         this.navigate(file.path);
       } else if (GetType(file)) {
-        const openModal = new Open(this.hostname, this.readwrite, this.files, file);
+        const openModal = new Open(this.hostname, this.files, file);
         openModal.show(true);
       }
     });
@@ -171,12 +180,19 @@ export class Explorer {
       el.querySelector("#" + "explorer-copy").addEventListener("click", () => {
         this.moveOrCopy(file, true);
       });
+      if (GetType(file) === "text") {
+        el.querySelector("#" + "explorer-edit").addEventListener("click", () => {
+          const editModal = new Edit(this.hostname, file);
+          editModal.show(true);
+        });
+      }
       el.querySelector("#" + "explorer-delete").addEventListener("click", () => {
         this.delete(file);
       });
     }
     el.querySelector("#" + "explorer-share").addEventListener("click", () => {
-      this.share(file);
+      const shareModal = new Share(this.hostname, file);
+      shareModal.show(true);
     });
     return el;
   }
@@ -440,108 +456,6 @@ export class Explorer {
       document.body.appendChild(msg);
       offset = offset + 50;
     }
-  }
-
-  share(file) {
-    let shareModal = document.createElement("div");
-    shareModal.classList.add("modal", "animated", "fadeIn", "faster", "is-active");
-    shareModal.innerHTML = /* HTML */ `
-      <div class="modal-background"></div>
-      <div class="modal-content">
-        <div class="box" style="margin: 2rem;">
-          <div class="field">
-            <label class="label">Share with</label>
-            <div class="control">
-              <input id="explorer-share-for" class="input" type="text" />
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Days</label>
-            <div class="control">
-              <input id="explorer-share-howlong" class="input" type="number" value="7" />
-            </div>
-          </div>
-          <div class="field is-grouped">
-            <div class="control">
-              <button id="explorer-share-ok" class="button is-success">
-                <span class="icon is-small"><i class="fas fa-check"></i></span>
-              </button>
-            </div>
-            <div class="control">
-              <button id="explorer-share-cancel" class="button is-danger">
-                <span class="icon is-small"><i class="fas fa-times-circle"></i></span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    shareModal.querySelector("#" + "explorer-share-ok").addEventListener("click", async () => {
-      try {
-        const lifespan = parseInt(shareModal.querySelector("#" + "explorer-share-howlong").value);
-        const response = await fetch(location.origin + "/api/common/Share", {
-          method: "POST",
-          headers: new Headers({
-            "XSRF-Token": this.user.xsrftoken
-          }),
-          credentials: "include",
-          body: JSON.stringify({
-            sharedfor: shareModal.querySelector("#" + "explorer-share-for").value,
-            lifespan: lifespan,
-            url: this.hostname + file.path,
-            readonly: true
-          })
-        });
-        if (response.status !== 200) {
-          throw new Error(`Share token could not be made (status ${response.status})`);
-        }
-        const shareToken = await response.text();
-        // Create result modal
-        let resultModal = document.createElement("div");
-        resultModal.classList.add("modal", "animated", "fadeIn", "faster", "is-active");
-        resultModal.innerHTML = /* HTML */ `
-          <div class="modal-background"></div>
-          <div class="modal-content">
-            <div class="box" style="margin: 2rem;">
-              <div class="content is-small">
-                <h1>This link will be available during ${lifespan} days</h1>
-                <a href="${this.hostname + file.path + "?token=" + shareToken}" class="button">
-                  <span class="icon">
-                    <i class="fas fa-link"></i>
-                  </span>
-                  <span>Download</span>
-                </a>
-              </div>
-              <div class="field is-grouped">
-                <div class="control">
-                  <button id="explorer-result-close" class="button is-success">
-                    <span class="icon is-small"><i class="fas fa-check"></i></span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        `;
-        resultModal.querySelector("#" + "explorer-result-close").addEventListener("click", () => {
-          AnimateCSS(resultModal, "fadeOut", function() {
-            resultModal.parentNode.removeChild(resultModal);
-          });
-        });
-        document.body.appendChild(resultModal);
-      } catch (e) {
-        Messages.Show("is-warning", e.message);
-        console.error(e);
-      }
-      AnimateCSS(shareModal, "fadeOut", function() {
-        shareModal.parentNode.removeChild(shareModal);
-      });
-    });
-    shareModal.querySelector("#" + "explorer-share-cancel").addEventListener("click", () => {
-      AnimateCSS(shareModal, "fadeOut", function() {
-        shareModal.parentNode.removeChild(shareModal);
-      });
-    });
-    document.body.appendChild(shareModal);
   }
 }
 
