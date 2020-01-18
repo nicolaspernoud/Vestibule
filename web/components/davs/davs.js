@@ -143,7 +143,7 @@ function davTemplate(dav) {
               </span>
             </button>
           </div>
-          <div class="dropdown-menu" role="menu">
+          <div class="dropdown-menu animated fadeIn faster" role="menu">
             <div class="dropdown-content">
               <div class="dropdown-item"></div>
               ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-edit-' + dav.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}

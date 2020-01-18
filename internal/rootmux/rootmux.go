@@ -10,6 +10,7 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/appserver"
 	"github.com/nicolaspernoud/vestibule/pkg/auth"
 	"github.com/nicolaspernoud/vestibule/pkg/davserver"
+	"github.com/nicolaspernoud/vestibule/pkg/onlyoffice"
 	"github.com/nicolaspernoud/vestibule/pkg/security"
 	"golang.org/x/crypto/acme/autocert"
 
@@ -50,6 +51,8 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 	mainMux.Handle("/OAuth2Callback", m.HandleOAuth2Callback())
 	mainMux.HandleFunc("/Logout", m.HandleLogout)
 	mainMux.HandleFunc("/Login", m.HandleInMemoryLogin)
+	mainMux.HandleFunc("/onlyoffice", onlyoffice.HandleOpen(fullHostname))
+	mainMux.HandleFunc("/onlyoffice/save", onlyoffice.HandleSaveCallback)
 	commonMux := http.NewServeMux()
 	commonMux.HandleFunc("/apps", func(w http.ResponseWriter, req *http.Request) {
 		if req.Method == http.MethodGet {

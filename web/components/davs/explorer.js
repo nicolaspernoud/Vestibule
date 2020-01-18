@@ -161,9 +161,35 @@ export class Explorer {
         : ""}
     `;
 
-    el.querySelector("#" + "explorer-content").addEventListener("click", () => {
+    el.querySelector("#" + "explorer-content").addEventListener("click", async () => {
       if (file.isDir) {
         this.navigate(file.path);
+      } else if (GetType(file) === "document") {
+        try {
+          const response = await fetch(location.origin + "/api/common/Share", {
+            method: "POST",
+            headers: new Headers({
+              "XSRF-Token": this.user.xsrftoken
+            }),
+            credentials: "include",
+            body: JSON.stringify({
+              sharedfor: "external_editor",
+              lifespan: 1,
+              url: this.hostname + file.path,
+              readonly: false
+            })
+          });
+          if (response.status !== 200) {
+            throw new Error(`Share token could not be made (status ${response.status})`);
+          }
+          const token = await response.text();
+          window.location.href = `${location.origin}/onlyoffice?file=${this.hostname + file.path}&mtime=${new Date(file.lastModified).getTime()}&user=${
+            this.user.login
+          }&token=${token}`;
+        } catch (e) {
+          Messages.Show("is-warning", e.message);
+          console.error(e);
+        }
       } else if (GetType(file)) {
         const openModal = new Open(this.hostname, this.files, file);
         openModal.show(true);

@@ -160,7 +160,7 @@ function appTemplate(app) {
               </span>
             </button>
           </div>
-          <div class="dropdown-menu" role="menu">
+          <div class="dropdown-menu animated fadeIn faster" role="menu">
             <div class="dropdown-content">
               <a class="dropdown-item" onclick="window.location.href = 'https://${app.host}:${location.port}'"><i class="fas fa-external-link-alt"></i><strong> Visit</strong></a>
               ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-edit-' + app.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
