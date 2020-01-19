@@ -1,8 +1,8 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
-import { AnimateCSS } from "/services/common/common.js";
-import { Open, GetType } from "/components/davs/open.js";
+import { AnimateCSS, GetType } from "/services/common/common.js";
+import { Open } from "/components/davs/open.js";
 import { Edit } from "/components/davs/edit.js";
 import { Share } from "/components/davs/share.js";
 

@@ -20,3 +20,24 @@ export function RandomString(length) {
   }
   return text;
 }
+
+export function GetType(file) {
+  if (/(txt|md|csv|sh|nfo|log|json|yml|srt)$/.test(file.name.toLowerCase())) {
+    return "text";
+  }
+  if (/(docx|doc|odt|xlsx|xls|ods|pptx|ppt|opd)$/.test(file.name.toLowerCase())) {
+    return "document";
+  }
+  if (/(jpg|png|gif|svg|jpeg)$/.test(file.name.toLowerCase())) {
+    return "image";
+  }
+  if (/(mp3|wav|ogg)$/.test(file.name.toLowerCase())) {
+    return "audio";
+  }
+  if (/(mp4|avi|mkv|m4v)$/.test(file.name.toLowerCase())) {
+    return "video";
+  }
+  if (/(pdf)$/.test(file.name.toLowerCase())) {
+    return "other";
+  }
+}

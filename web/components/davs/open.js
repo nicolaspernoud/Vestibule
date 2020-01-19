@@ -1,6 +1,6 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
-import { AnimateCSS } from "/services/common/common.js";
+import { AnimateCSS, RandomString, GetType, GID } from "/services/common/common.js";
 import { Share } from "/components/davs/share.js";
 
 export class Open {
@@ -11,6 +11,12 @@ export class Open {
     this.index = files.findIndex(element => element.name === file.name);
     this.type = GetType(this.file);
     this.url = `${hostname}${file.path}`;
+    // Random id seed
+    this.prefix = RandomString(8);
+  }
+
+  gid(id) {
+    return GID(this, id);
   }
 
   update(isNext) {
@@ -48,22 +54,22 @@ export class Open {
       }
     }
     this.openModal.innerHTML = this.computeTemplate(content);
-    this.openModal.querySelector("#" + "open-close").addEventListener("click", () => {
+    document.body.appendChild(this.openModal);
+    this.gid("open-close").addEventListener("click", () => {
       AnimateCSS(this.openModal, "fadeOut", () => {
         this.openModal.parentNode.removeChild(this.openModal);
       });
     });
-    this.openModal.querySelector("#" + "open-previous").addEventListener("click", () => {
+    this.gid("open-previous").addEventListener("click", () => {
       this.update(false);
     });
-    this.openModal.querySelector("#" + "open-next").addEventListener("click", () => {
+    this.gid("open-next").addEventListener("click", () => {
       this.update(true);
     });
-    this.openModal.querySelector("#" + "open-share").addEventListener("click", () => {
+    this.gid("open-share").addEventListener("click", () => {
       const shareModal = new Share(this.hostname, this.file);
       shareModal.show();
     });
-    document.body.appendChild(this.openModal);
   }
 
   computeTemplate(content) {
@@ -102,42 +108,21 @@ export class Open {
           <h1>${this.file.name}</h1>
           </br>
           <div class="buttons">
-            <button id="open-previous" class="button">
+            <button id="${this.prefix}open-previous" class="button">
               <span class="icon is-small"><i class="fas fa-arrow-circle-left"></i></span>
             </button>
-            <button id="open-next" class="button">
+            <button id="${this.prefix}open-next" class="button">
               <span class="icon is-small"><i class="fas fa-arrow-circle-right"></i></span>
             </button>
-            <button id="open-share" class="button">
+            <button id="${this.prefix}open-share" class="button">
               <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
             </button>
-            <button id="open-close" class="button">
+            <button id="${this.prefix}open-close" class="button">
               <span class="icon is-small"><i class="fas fa-times"></i></span>
             </button>
           </div>
         </div>
       </div>
     `;
-  }
-}
-
-export function GetType(file) {
-  if (/(txt|md|csv|sh|nfo|log|json|yml|srt)$/.test(file.name.toLowerCase())) {
-    return "text";
-  }
-  if (/(docx|doc|odt|xlsx|xls|ods|pptx|ppt|opd)$/.test(file.name.toLowerCase())) {
-    return "document";
-  }
-  if (/(jpg|png|gif|svg|jpeg)$/.test(file.name.toLowerCase())) {
-    return "image";
-  }
-  if (/(mp3|wav|ogg)$/.test(file.name.toLowerCase())) {
-    return "audio";
-  }
-  if (/(mp4|avi|mkv|m4v)$/.test(file.name.toLowerCase())) {
-    return "video";
-  }
-  if (/(pdf)$/.test(file.name.toLowerCase())) {
-    return "other";
   }
 }
