@@ -1,6 +1,6 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
-import { AnimateCSS } from "/services/common/common.js";
+import { AnimateCSS, RandomString } from "/services/common/common.js";
 import * as Auth from "/services/auth/auth.js";
 
 // DOM elements
@@ -210,7 +210,7 @@ function registerModalFields() {
     newUser();
   });
   password_field.addEventListener("click", function() {
-    password_field.value = randomString(48);
+    password_field.value = RandomString(48);
   });
 }
 
@@ -284,13 +284,4 @@ function toggleModal() {
     AnimateCSS(modal, "fadeIn");
     AnimateCSS(card, "zoomIn");
   }
-}
-
-function randomString(length) {
-  let text = "";
-  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  for (let i = 0; i < length; i++) {
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
-  return text;
 }

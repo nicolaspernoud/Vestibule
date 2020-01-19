@@ -1,6 +1,6 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
-import { AnimateCSS } from "/services/common/common.js";
+import { AnimateCSS, RandomString, GID } from "/services/common/common.js";
 import * as Auth from "/services/auth/auth.js";
 
 export class Share {
@@ -9,6 +9,12 @@ export class Share {
     this.file = file;
     this.url = `${hostname}${file.path}`;
     this.fullURL = `${location.protocol}//${hostname}${location.port !== "" ? ":" + location.port : ""}${file.path}`;
+    // Random id seed
+    this.prefix = RandomString(8);
+  }
+
+  gid(id) {
+    return GID(this, id);
   }
 
   async show() {
@@ -22,23 +28,23 @@ export class Share {
           <div class="field">
             <label class="label">Share with</label>
             <div class="control">
-              <input id="explorer-share-for" class="input" type="text" />
+              <input id="${this.prefix}share-for" class="input" type="text" />
             </div>
           </div>
           <div class="field">
             <label class="label">Days</label>
             <div class="control">
-              <input id="explorer-share-howlong" class="input" type="number" value="7" />
+              <input id="${this.prefix}share-howlong" class="input" type="number" value="7" />
             </div>
           </div>
           <div class="field is-grouped">
             <div class="control">
-              <button id="explorer-share-ok" class="button is-success">
+              <button id="${this.prefix}share-ok" class="button is-success">
                 <span class="icon is-small"><i class="fas fa-check"></i></span>
               </button>
             </div>
             <div class="control">
-              <button id="explorer-share-cancel" class="button is-danger">
+              <button id="${this.prefix}share-cancel" class="button is-danger">
                 <span class="icon is-small"><i class="fas fa-times-circle"></i></span>
               </button>
             </div>
@@ -46,9 +52,10 @@ export class Share {
         </div>
       </div>
     `;
-    shareModal.querySelector("#" + "explorer-share-ok").addEventListener("click", async () => {
+    document.body.appendChild(shareModal);
+    this.gid("share-ok").addEventListener("click", async () => {
       try {
-        const lifespan = parseInt(shareModal.querySelector("#" + "explorer-share-howlong").value);
+        const lifespan = parseInt(this.gid("share-howlong").value);
         const response = await fetch(location.origin + "/api/common/Share", {
           method: "POST",
           headers: new Headers({
@@ -56,7 +63,7 @@ export class Share {
           }),
           credentials: "include",
           body: JSON.stringify({
-            sharedfor: shareModal.querySelector("#" + "explorer-share-for").value,
+            sharedfor: this.gid("share-for").value,
             lifespan: lifespan,
             url: this.url,
             readonly: true
@@ -84,7 +91,7 @@ export class Share {
               </div>
               <div class="field is-grouped">
                 <div class="control">
-                  <button id="explorer-result-close" class="button is-success">
+                  <button id="${this.prefix}explorer-result-close" class="button is-success">
                     <span class="icon is-small"><i class="fas fa-check"></i></span>
                   </button>
                 </div>
@@ -92,12 +99,12 @@ export class Share {
             </div>
           </div>
         `;
-        resultModal.querySelector("#" + "explorer-result-close").addEventListener("click", () => {
+        document.body.appendChild(resultModal);
+        this.gid("explorer-result-close").addEventListener("click", () => {
           AnimateCSS(resultModal, "fadeOut", function() {
             resultModal.parentNode.removeChild(resultModal);
           });
         });
-        document.body.appendChild(resultModal);
       } catch (e) {
         Messages.Show("is-warning", e.message);
         console.error(e);
@@ -106,11 +113,10 @@ export class Share {
         shareModal.parentNode.removeChild(shareModal);
       });
     });
-    shareModal.querySelector("#" + "explorer-share-cancel").addEventListener("click", () => {
+    this.gid("share-cancel").addEventListener("click", () => {
       AnimateCSS(shareModal, "fadeOut", function() {
         shareModal.parentNode.removeChild(shareModal);
       });
     });
-    document.body.appendChild(shareModal);
   }
 }

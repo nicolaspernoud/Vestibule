@@ -7,3 +7,16 @@ export function AnimateCSS(el, animationName, callback) {
   }
   el.addEventListener("animationend", handleAnimationEnd);
 }
+
+export let GID = (obj, id) => {
+  return document.getElementById(obj.prefix + id);
+};
+
+export function RandomString(length) {
+  let text = "";
+  const possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  for (let i = 0; i < length; i++) {
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  }
+  return text;
+}
