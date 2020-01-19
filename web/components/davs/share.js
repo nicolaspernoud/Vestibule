@@ -8,6 +8,7 @@ export class Share {
     this.hostname = hostname;
     this.file = file;
     this.url = `${hostname}${file.path}`;
+    this.fullURL = `${location.protocol}//${hostname}${location.port !== "" ? ":" + location.port : ""}${file.path}`;
   }
 
   async show() {
@@ -74,7 +75,7 @@ export class Share {
             <div class="box" style="margin: 2rem;">
               <div class="content is-small">
                 <h1>This link will be available during ${lifespan} days</h1>
-                <a href="${this.url + "?token=" + shareToken}" class="button">
+                <a href="${this.fullURL + "?token=" + encodeURIComponent(shareToken)}" class="button">
                   <span class="icon">
                     <i class="fas fa-link"></i>
                   </span>

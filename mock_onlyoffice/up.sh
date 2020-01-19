@@ -17,4 +17,4 @@ docker exec -it onlyoffice /var/www/onlyoffice/documentserver/npm/node_modules/.
 docker exec -it onlyoffice /bin/bash -c 'echo "$DOCKER_HOST vestibule.127.0.0.1.nip.io" >>/etc/hosts'
 docker exec -it onlyoffice /bin/bash -c 'echo "$DOCKER_HOST unsecureddav.vestibule.127.0.0.1.nip.io" >>/etc/hosts'
 docker exec -it onlyoffice /bin/bash -c 'echo "$DOCKER_HOST userdav.vestibule.127.0.0.1.nip.io" >>/etc/hosts'
-docker exec -it onlyoffice /bin/bash -c 'echo "$DOCKER_HOST uadmindav.vestibule.127.0.0.1.nip.io" >>/etc/hosts'
+docker exec -it onlyoffice /bin/bash -c 'echo "$DOCKER_HOST admindav.vestibule.127.0.0.1.nip.io" >>/etc/hosts'

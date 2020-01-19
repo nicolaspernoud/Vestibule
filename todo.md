@@ -9,7 +9,7 @@
 [x] Allow sharing for selected users -> restrict tokens for a given ressource
 [x] Check CSRF token for given conditions
 [ ] Allow translations
-[ ] Allow onlyoffice opening
+[/] Allow onlyoffice opening => add saving and converting
 [x] Loading on explorer
 [x] Foldable apps/davs
 [ ] Add security headers (check with mozilla observatory) => remove duplicate headers on appserver
@@ -18,3 +18,6 @@
 [ ] Give credits to fluent bulma et animate.css
 [ ] Documentation and video
 [ ] Improve login window
+[ ] Refactoring
+[ ] Gatling performance tests (proxy overhead)
+[ ] Correct test for token in query

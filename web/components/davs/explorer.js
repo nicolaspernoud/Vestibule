@@ -8,7 +8,8 @@ import { Share } from "/components/davs/share.js";
 
 export class Explorer {
   constructor(hostname) {
-    this.hostname = `${location.protocol}//${hostname}${location.port !== "" ? ":" + location.port : ""}`;
+    this.hostname = hostname;
+    this.fullHostname = `${location.protocol}//${hostname}${location.port !== "" ? ":" + location.port : ""}`;
     this.files = [];
     this.path = "/";
   }
@@ -75,7 +76,7 @@ export class Explorer {
     this.path = path;
     this.progress.classList.remove("is-hidden");
     try {
-      const response = await fetch(this.hostname + this.path, {
+      const response = await fetch(this.fullHostname + this.path, {
         method: "PROPFIND",
         headers: new Headers({
           Depth: "1",
@@ -112,7 +113,7 @@ export class Explorer {
     el.innerHTML = /* HTML */ `
       <figure class="media-left">
         ${file.type.includes("image")
-          ? '<p class="image is-48x48"><img src="' + this.hostname + file.path + '"/></p>'
+          ? '<p class="image is-48x48"><img src="' + this.fullHostname + file.path + '"/></p>'
           : `<span class="icon is-large"><i class="fas fa-3x fa-${file.isDir ? "folder" : "file"}"></i></span>`}
       </figure>
       <div class="media-content">
@@ -121,7 +122,7 @@ export class Explorer {
         </div>
         <nav class="level is-mobile">
           <div class="level-left">
-            <a class="level-item" href=${this.hostname + file.path}>
+            <a class="level-item" href=${this.fullHostname + file.path}>
               <span class="icon is-small"><i class="fas fa-download"></i></span>
             </a>
             ${this.readwrite
@@ -183,15 +184,15 @@ export class Explorer {
             throw new Error(`Share token could not be made (status ${response.status})`);
           }
           const token = await response.text();
-          window.location.href = `${location.origin}/onlyoffice?file=${this.hostname + file.path}&mtime=${new Date(file.lastModified).getTime()}&user=${
+          window.location.href = `${location.origin}/onlyoffice?file=${this.fullHostname + file.path}&mtime=${new Date(file.lastModified).getTime()}&user=${
             this.user.login
-          }&token=${token}`;
+          }&token=${encodeURIComponent(token)}`;
         } catch (e) {
           Messages.Show("is-warning", e.message);
           console.error(e);
         }
       } else if (GetType(file)) {
-        const openModal = new Open(this.hostname, this.files, file);
+        const openModal = new Open(this.fullHostname, this.files, file);
         openModal.show(true);
       }
     });
@@ -208,7 +209,7 @@ export class Explorer {
       });
       if (GetType(file) === "text") {
         el.querySelector("#" + "explorer-edit").addEventListener("click", () => {
-          const editModal = new Edit(this.hostname, file);
+          const editModal = new Edit(this.fullHostname, file);
           editModal.show(true);
         });
       }
@@ -255,10 +256,10 @@ export class Explorer {
     field.setSelectionRange(0, file.name.lastIndexOf("."));
     renameModal.querySelector("#" + "explorer-rename-ok").addEventListener("click", async () => {
       try {
-        const response = await fetch(this.hostname + file.path, {
+        const response = await fetch(this.fullHostname + file.path, {
           method: "MOVE",
           headers: new Headers({
-            Destination: this.hostname + this.path + renameModal.getElementsByTagName("input")[0].value,
+            Destination: this.fullHostname + this.path + renameModal.getElementsByTagName("input")[0].value,
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
@@ -305,10 +306,10 @@ export class Explorer {
     `;
     pasteControl.getElementsByTagName("a")[0].addEventListener("click", async () => {
       try {
-        const response = await fetch(this.hostname + file.path, {
+        const response = await fetch(this.fullHostname + file.path, {
           method: isCopy ? "COPY" : "MOVE",
           headers: new Headers({
-            Destination: this.hostname + this.path + file.name,
+            Destination: this.fullHostname + this.path + file.name,
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
@@ -336,7 +337,7 @@ export class Explorer {
   async newFolder() {
     const folder = { name: "New Folder", isDir: true, type: "dir", size: 0, lastModified: new Date(), path: this.path + "New Folder" };
     try {
-      const response = await fetch(this.hostname + folder.path, {
+      const response = await fetch(this.fullHostname + folder.path, {
         method: "MKCOL",
         headers: new Headers({
           "XSRF-Token": this.user.xsrftoken
@@ -381,7 +382,7 @@ export class Explorer {
     `;
     deleteModal.querySelector("#" + "explorer-delete-ok").addEventListener("click", async () => {
       try {
-        const response = await fetch(this.hostname + file.path, {
+        const response = await fetch(this.fullHostname + file.path, {
           method: "DELETE",
           headers: new Headers({
             "XSRF-Token": this.user.xsrftoken
@@ -460,12 +461,12 @@ export class Explorer {
       xhr.onerror = function(e) {
         Messages.Show("is-warning", e.message);
       };
-      xhr.open("PUT", this.hostname + file.path);
+      xhr.open("PUT", this.fullHostname + file.path);
       xhr.send(file);
       delBtn.addEventListener("click", async () => {
         xhr.abort();
         try {
-          const response = await fetch(this.hostname + file.path, {
+          const response = await fetch(this.fullHostname + file.path, {
             method: "DELETE",
             headers: new Headers({
               "XSRF-Token": this.user.xsrftoken

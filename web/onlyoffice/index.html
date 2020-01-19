@@ -38,7 +38,7 @@
     async function openDocument() {
       const urlParams = new URLSearchParams(window.location.search);
       const file = urlParams.get("file");
-      const token = urlParams.get("token");
+      const token = encodeURIComponent(urlParams.get("token"));
       const user = urlParams.get("user");
       const mtime = urlParams.get("mtime");
       const fileName = file.split("/").pop();
