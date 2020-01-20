@@ -1,23 +1,10 @@
-[x] Work out CORS restriction
-[x] Display only davs and apps accessible to the user
-[x] Disable alteration controls on read only davs explorer
-[x] Enable dav mounting
-[x] Rework nav
-[x] Make logo and title alterable
-[x] Allow opening on apps in iframes (for given apps)
-[x] Allow files preview
-[x] Allow sharing for selected users -> restrict tokens for a given ressource
-[x] Check CSRF token for given conditions
-[ ] Allow translations
+[ ] Make logo and title alterable => page title
+[/] Check CSRF token for given conditions
+[ ] Allow specifying path on opened iframes
 [/] Allow onlyoffice opening => add saving and converting
-[x] Loading on explorer
-[x] Foldable apps/davs
 [ ] Add security headers (check with mozilla observatory) => remove duplicate headers on appserver
-[x] Add colors to apps
 [/] Do mobile integration (PWA like)
-[x] Give credits to fluent bulma et animate.css
-[/] Documentation and video
-[x] Improve login window
-[x] Refactoring
+[ ] Correct images display
 [ ] Gatling performance tests (proxy overhead)
-[x] Correct test for token in query
+[ ] Allow translations
+[/] Documentation and video

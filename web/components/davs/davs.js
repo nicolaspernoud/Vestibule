@@ -153,6 +153,7 @@ function davTemplate(dav) {
                 <p><strong>${dav.host}</strong></p>
                 <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
                 <p>${dav.secured ? "Restricted access to user with roles <strong>" + dav.roles + "</strong>" : "Unrestricted access"}</p>
+                <p><strong>${dav.id}</strong></p>
               </div>
             </div>
           </div>

@@ -11,7 +11,7 @@ import (
 // HandleOpen open the main onlyoffice  window
 func HandleOpen(fullHostname string) func(w http.ResponseWriter, req *http.Request) {
 	return func(w http.ResponseWriter, req *http.Request) {
-		t, err := template.ParseFiles("web/onlyoffice/index.html")
+		t, err := template.ParseFiles("web/onlyoffice/index.tmpl")
 		if err != nil {
 			http.Error(w, "could not open onlyoffice template: "+err.Error(), 500)
 			return
