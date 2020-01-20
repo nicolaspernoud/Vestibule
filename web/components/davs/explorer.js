@@ -113,7 +113,7 @@ export class Explorer {
     el.innerHTML = /* HTML */ `
       <figure class="media-left">
         ${file.type.includes("image")
-          ? '<p class="image is-48x48"><img src="' + this.fullHostname + file.path + '"/></p>'
+          ? '<p class="image is-48x48"><img id="explorer-image" src="assets/spinner.svg"/></p>'
           : `<span class="icon is-large"><i class="fas fa-3x fa-${file.isDir ? "folder" : "file"}"></i></span>`}
       </figure>
       <div class="media-content">
@@ -161,7 +161,9 @@ export class Explorer {
           `
         : ""}
     `;
-
+    if (file.type.includes("image")) {
+      this.loadImage(el.querySelector("#" + "explorer-image"), this.fullHostname + file.path);
+    }
     el.querySelector("#" + "explorer-content").addEventListener("click", async () => {
       if (file.isDir) {
         this.navigate(file.path);
@@ -222,6 +224,27 @@ export class Explorer {
       shareModal.show(true);
     });
     return el;
+  }
+
+  async loadImage(image, url) {
+    try {
+      const response = await fetch(url, {
+        method: "GET",
+        headers: new Headers({
+          "XSRF-Token": this.user.xsrftoken
+        }),
+        credentials: "include"
+      });
+      if (response.status !== 200) {
+        throw new Error(`Error loading image (status ${response.status})`);
+      }
+      const blob = await response.blob();
+      const objectURL = URL.createObjectURL(blob);
+      image.src = objectURL;
+    } catch (e) {
+      Messages.Show("is-warning", e.message);
+      console.error(e);
+    }
   }
 
   rename(file) {
@@ -503,7 +526,7 @@ function parseWebDavResponse(txt) {
     file.lastModified = x[i].getElementsByTagName("D:getlastmodified")[0].textContent;
     files.push(file);
   }
-  return files;
+  return files.sort(fileSortFunction);
 }
 
 function goUp(path) {
@@ -520,4 +543,16 @@ function sizeToHuman(size) {
 
 function intToLocaleDate(idate) {
   return new Date(idate).toLocaleString();
+}
+
+function fileSortFunction(a, b) {
+  if (a.isDir !== b.isDir) {
+    if (a.isDir) {
+      return -1;
+    } else {
+      return 1;
+    }
+  } else {
+    return a.name.localeCompare(b.name);
+  }
 }

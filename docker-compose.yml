@@ -17,7 +17,6 @@ services:
     environment:
       - HOSTNAME=${HOSTNAME}
       - ADMIN_ROLE=${ADMIN_ROLE}
-      - COMMON_ROLE=${COMMON_ROLE}
       - REDIRECT_URL=${REDIRECT_URL}
       - CLIENT_ID=${CLIENT_ID}
       - CLIENT_SECRET=${CLIENT_SECRET}

@@ -8,6 +8,7 @@
 		"host": "api.vestibule.127.0.0.1.nip.io",
 		"forwardTo": "localhost:8091",
 		"secured": true,
+		"openpath": "/test",
 		"roles": [
 			"USERS",
 			"ADMINS"

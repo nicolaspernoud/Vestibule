@@ -62,7 +62,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			return
 		}
 		// Check XSRF Token
-		if r.Method != "GET" && checkXSRF && r.Header.Get("XSRF-TOKEN") != user.XSRFToken {
+		if checkXSRF && r.Header.Get("XSRF-TOKEN") != user.XSRFToken {
 			http.Error(w, "XSRF protection triggered", 401)
 			return
 		}
@@ -120,6 +120,9 @@ func WhoAmI() http.Handler {
 // checkUserHasRole checks if the user has the required role
 func checkUserHasRole(user TokenData, allowedRoles []string) error {
 	for _, allowedRole := range allowedRoles {
+		if allowedRole == "*" {
+			return nil
+		}
 		for _, userRole := range user.Roles {
 			if userRole != "" && (userRole == allowedRole) {
 				return nil

@@ -3,8 +3,7 @@
 		"id": "1",
 		"login": "admin",
 		"memberOf": [
-			"ADMINS",
-			"OTHERS"
+			"ADMINS"
 		],
 		"passwordHash": "$2a$10$w6aIsC8lfMSB9tXIDRgk9OztQS.4gBQA9Uoi0X7mCzz5mlTRIx4tq"
 	},
@@ -12,8 +11,7 @@
 		"id": "2",
 		"login": "user",
 		"memberOf": [
-			"USERS",
-			"OTHERS"
+			"USERS"
 		],
 		"passwordHash": "$2a$10$PgiAoLxZhgNtr7kRK/DH5ezwT./7vRkWqFNEtJD1670z3Zf60HqgG"
 	}

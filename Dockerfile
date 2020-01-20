@@ -17,7 +17,8 @@ FROM alpine
 
 WORKDIR /app
 
-RUN apk update && apk add ca-certificates libcap
+RUN apk update && apk add ca-certificates libcap mailcap
+# ca-certificates for autocert (Let's Encrypt) and mailcap to get mime types for downloaded documents
 
 COPY --from=server-builder /vestibule/vestibule /app
 COPY --from=server-builder /vestibule/dev_certificates /app/dev_certificates

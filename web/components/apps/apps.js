@@ -17,6 +17,7 @@ let serve_field;
 let secured_field;
 let login_field;
 let password_field;
+let openpath_field;
 let roles_field;
 let forwardto_container;
 let serve_container;
@@ -65,11 +66,11 @@ export async function mount(where) {
             </div>
           </div>
           <div class="field">
-          <label class="label">Color</label>
-          <div class="control">
-            <input class="input" type="color" id="apps-modal-color" />
+            <label class="label">Color</label>
+            <div class="control">
+              <input class="input" type="color" id="apps-modal-color" />
+            </div>
           </div>
-        </div>
           <div class="field">
             <label class="label">Host (allow subdomains with "*." prefix)</label>
             <div class="control">
@@ -116,7 +117,13 @@ export async function mount(where) {
               <input class="input" type="text" id="apps-modal-password" />
             </div>
           </div>
-          </br>
+          <div class="field">
+            <label class="label">Path on iframe opening</label>
+            <div class="control">
+              <input class="input" type="text" id="apps-modal-openpath" />
+            </div>
+          </div>
+          <br />
         </section>
         <footer class="modal-card-foot">
           <button id="apps-modal-save" class="button is-success">Save changes</button>
@@ -210,7 +217,10 @@ function displayApps(apps) {
 async function firstShowApps() {
   try {
     const response = await fetch("/api/common/apps", {
-      method: "get"
+      method: "get",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      })
     });
     if (response.status !== 200) {
       throw new Error(`Apps could not be fetched (status ${response.status})`);
@@ -255,6 +265,7 @@ function registerModalFields() {
   roles_field = document.getElementById("apps-modal-roles");
   login_field = document.getElementById("apps-modal-login");
   password_field = document.getElementById("apps-modal-password");
+  openpath_field = document.getElementById("apps-modal-openpath");
   forwardto_container = document.getElementById("apps-modal-forwardto-container");
   serve_container = document.getElementById("apps-modal-serve-container");
   roles_container = document.getElementById("apps-modal-roles-container");
@@ -295,11 +306,12 @@ async function editApp(app) {
   roles_field.value = app.roles;
   login_field.value = app.login;
   password_field.value = app.password;
+  openpath_field.value = app.openpath;
   toggleModal();
 }
 
 function cleanApp(app) {
-  let props = ["name", "forwardTo", "serve", "roles", "login", "password"];
+  let props = ["name", "forwardTo", "serve", "roles", "login", "password", "openpath"];
   for (const prop of props) {
     app[prop] = app[prop] === undefined ? "" : app[prop];
   }
@@ -323,6 +335,7 @@ async function newApp() {
   roles_field.value = "";
   login_field.value = "";
   password_field.value = "";
+  openpath_field.value = "";
   toggleModal();
 }
 
@@ -345,7 +358,8 @@ async function postApp() {
         secured: secured_field.checked,
         roles: secured_field.checked ? roles_field.value.split(",") : "",
         login: login_field.value,
-        password: password_field.value
+        password: password_field.value,
+        openpath: openpath_field.value
       })
     });
     if (response.status !== 200) {
@@ -364,7 +378,10 @@ async function postApp() {
 async function reloadAppsOnServer() {
   try {
     const response = await fetch("/api/admin/reload", {
-      method: "get"
+      method: "get",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      })
     });
     if (response.status !== 200) {
       throw new Error(`App could not be reloaded (status ${response.status})`);
@@ -440,7 +457,7 @@ async function pickIcon() {
 }
 
 function openWebview(app) {
-  const url = `https://${app.host}:${location.port}`;
+  const url = `https://${app.host}:${location.port}${app.openpath}`;
   let webview = document.createElement("div");
   webview.classList.add("modal", "is-active");
   webview.innerHTML = /* HTML */ `

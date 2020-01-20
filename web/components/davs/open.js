@@ -43,6 +43,9 @@ export class Open {
       try {
         const response = await fetch(this.url, {
           method: "get",
+          headers: new Headers({
+            "XSRF-Token": user.xsrftoken
+          }),
           credentials: "include"
         });
         if (response.status !== 200) {

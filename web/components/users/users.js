@@ -15,7 +15,7 @@ let roles_field;
 
 // local variables
 let users;
-let user;
+let current_user;
 
 export async function mount(where) {
   mountpoint = where;
@@ -102,7 +102,7 @@ export async function mount(where) {
     </div>
   `;
   registerModalFields();
-  user = await Auth.GetUser();
+  current_user = await Auth.GetUser();
   await firstShowUsers();
 }
 
@@ -158,7 +158,10 @@ function displayUsers() {
 async function firstShowUsers() {
   try {
     const response = await fetch("/api/admin/users/", {
-      method: "get"
+      method: "get",
+      headers: new Headers({
+        "XSRF-Token": current_user.xsrftoken
+      })
     });
     if (response.status !== 200) {
       throw new Error(`Users could not be fetched (status ${response.status})`);
@@ -176,7 +179,7 @@ async function deleteUser(user) {
     const response = await fetch("/api/admin/users/" + user.id, {
       method: "delete",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
+        "XSRF-Token": current_user.xsrftoken
       })
     });
     if (response.status !== 200) {
@@ -247,7 +250,7 @@ async function postUser() {
     const response = await fetch("/api/admin/users/", {
       method: "POST",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
+        "XSRF-Token": current_user.xsrftoken
       }),
       body: JSON.stringify({
         id: id_field.value,

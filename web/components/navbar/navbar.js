@@ -8,6 +8,7 @@ let menu;
 
 export function mount(mountpoint) {
   const where = document.getElementById(mountpoint);
+  window.document.title = brand.title;
   where.innerHTML = /* HTML */ `
     <div class="navbar-brand">
       <a class="navbar-item is-size-4" href="/"><img src="assets/brand/logo.svg" alt="logo" />${brand.title}</a>

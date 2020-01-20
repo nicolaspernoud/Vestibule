@@ -68,9 +68,9 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 		}
 		http.Error(w, "method not allowed", 405)
 	})
-	mainMux.Handle("/api/common/WhoAmI", auth.ValidateAuthMiddleware(auth.WhoAmI(), []string{os.Getenv("COMMON_ROLE")}, false))
+	mainMux.Handle("/api/common/WhoAmI", auth.ValidateAuthMiddleware(auth.WhoAmI(), []string{"*"}, false))
 	commonMux.HandleFunc("/Share", auth.GetShareToken)
-	mainMux.Handle("/api/common/", http.StripPrefix("/api/common", auth.ValidateAuthMiddleware(commonMux, []string{os.Getenv("COMMON_ROLE")}, true)))
+	mainMux.Handle("/api/common/", http.StripPrefix("/api/common", auth.ValidateAuthMiddleware(commonMux, []string{"*"}, true)))
 	// ADMIN API ENDPOINTS
 	adminMux := http.NewServeMux()
 	adminMux.Handle("/reload", reload(adH))

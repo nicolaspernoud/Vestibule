@@ -51,7 +51,7 @@ func TestAddUser(t *testing.T) {
 
 func TestMatchUser(t *testing.T) {
 	UsersFile = "../../configs/users.json"
-	existingUser := User{ID: "2", Login: "user", Roles: []string{"USERS", "OTHERS"}, PasswordHash: "$2a$10$PgiAoLxZhgNtr7kRK/DH5ezwT./7vRkWqFNEtJD1670z3Zf60HqgG"}
+	existingUser := User{ID: "2", Login: "user", Roles: []string{"USERS"}, PasswordHash: "$2a$10$PgiAoLxZhgNtr7kRK/DH5ezwT./7vRkWqFNEtJD1670z3Zf60HqgG"}
 	veryLongString, _ := common.GenerateRandomString(10000)
 	specialCharString := "\""
 

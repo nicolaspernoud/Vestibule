@@ -22,7 +22,6 @@
         "USERINFO_URL": "http://localhost:8090/admininfo",
         "LOGOUT_URL": "/",
         "ADMIN_ROLE": "ADMINS",
-        "COMMON_ROLE": "OTHERS",
         "HOSTNAME": "vestibule.127.0.0.1.nip.io",
         "ONLYOFFICE_TITLE": "VestibuleOffice",
         "ONLYOFFICE_SERVER": "https://localhost:2443"
@@ -48,7 +47,6 @@
         "USERINFO_URL": "https://connexion-rec.grandlyon.fr/IdPOAuth2/userinfo/oidc-rec",
         "LOGOUT_URL": "https://connexion-rec.grandlyon.fr/auth/logout.jsp",
         "ADMIN_ROLE": "GGD_ORG_DG-DEES-DINSI-DAAG_TOUS",
-        "COMMON_ROLE": "LDD_ORG_DG-DEES-DINSI_TOUS",
         "HOSTNAME": "vestibule.127.0.0.1.nip.io",
         "ONLYOFFICE_TITLE": "VestibuleOffice",
         "ONLYOFFICE_SERVER": "https://localhost:2443"

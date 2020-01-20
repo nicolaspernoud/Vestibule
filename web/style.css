@@ -62,3 +62,11 @@ html {
 ::-moz-focus-inner {
   border: 0;
 }
+
+img {
+  box-shadow: none;
+}
+
+.image.is-48x48 {
+  overflow: hidden;
+}

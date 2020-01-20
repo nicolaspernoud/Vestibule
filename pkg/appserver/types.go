@@ -24,6 +24,7 @@ type App struct {
 	Secured   bool     `json:"secured"`             // true if the handler is secured with auth
 	Login     string   `json:"login,omitempty"`     // Basic auth login for automatic login
 	Password  string   `json:"password,omitempty"`  // Basic auth password for automatic login
+	OpenPath  string   `json:"openpath,omitempty"`  // Opened path on iframe preview
 	Roles     []string `json:"roles,omitempty"`     // Roles allowed to access the app
 }
 

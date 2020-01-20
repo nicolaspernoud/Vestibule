@@ -3,6 +3,7 @@ package onlyoffice
 import (
 	"encoding/json"
 	"net/http"
+	"net/url"
 	"os"
 	"text/template"
 	"time"
@@ -78,7 +79,7 @@ func HandleSaveCallback(w http.ResponseWriter, req *http.Request) {
 		}
 		defer resp.Body.Close()
 		// PUT the content on the ressource gotten from the query
-		ressource := req.URL.Query().Get("file") + "?token=" + req.URL.Query().Get("token")
+		ressource := req.URL.Query().Get("file") + "?token=" + url.QueryEscape(req.URL.Query().Get("token"))
 		req, err := http.NewRequest("PUT", ressource, resp.Body)
 		client := &http.Client{}
 		_, err = client.Do(req)

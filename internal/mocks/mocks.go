@@ -48,7 +48,7 @@ func CreateMockOAuth2() *http.ServeMux {
 			"displayName": "Us ER",
 			"memberOf": [
 				"CN=USERS",
-				"CN=OTHERS"
+				"CN=OTHER_GROUP"
 			],
 			"id": "1000",
 			"login": "USER"
@@ -61,7 +61,7 @@ func CreateMockOAuth2() *http.ServeMux {
 			"displayName": "Ad MIN",
 			"memberOf": [
 				"CN=ADMINS",
-				"CN=OTHERS"
+				"CN=OTHER_GROUP"
 			],
 			"id": "1",
 			"login": "ADMIN"

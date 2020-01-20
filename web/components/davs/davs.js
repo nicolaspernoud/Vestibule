@@ -192,7 +192,10 @@ function displayDavs(davs) {
 async function firstShowDavs() {
   try {
     const response = await fetch("/api/common/davs", {
-      method: "get"
+      method: "get",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      })
     });
     if (response.status !== 200) {
       throw new Error(`Davs could not be fetched (status ${response.status})`);
@@ -329,7 +332,10 @@ async function postDav() {
 async function reloadDavsOnServer() {
   try {
     const response = await fetch("/api/admin/reload", {
-      method: "get"
+      method: "get",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      })
     });
     if (response.status !== 200) {
       throw new Error(`Dav could not be reloaded (status ${response.status})`);
