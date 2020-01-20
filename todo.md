@@ -5,6 +5,10 @@
 [ ] Add security headers (check with mozilla observatory) => remove duplicate headers on appserver
 [/] Do mobile integration (PWA like)
 [ ] Correct images display
+[ ] Sort files in explorer
+[ ] Handle already existing files on paste
+[ ] Check sonarqube code smells
+[ ] Push mime types in container
 [ ] Gatling performance tests (proxy overhead)
 [ ] Allow translations
 [/] Documentation and video
