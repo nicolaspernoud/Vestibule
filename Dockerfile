@@ -22,7 +22,7 @@ RUN apk update && apk add ca-certificates libcap
 COPY --from=server-builder /vestibule/vestibule /app
 COPY --from=server-builder /vestibule/dev_certificates /app/dev_certificates
 COPY --from=server-builder /vestibule/web /app/web
-COPY --from=server-builder /vestibule/data/ipgeodatabase /app/data/ipgeodatabase
+COPY --from=server-builder /vestibule/configs /app/configs
 
 RUN setcap cap_net_bind_service=+ep vestibule
 

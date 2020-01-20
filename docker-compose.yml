@@ -5,11 +5,11 @@ services:
     image: vestibule
     build: .
     restart: unless-stopped
-    command: -apps=./configs/apps.json -davs=./configs/davs.json -letsencrypt_cache=./letsencrypt_cache
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - ./configs:/app/configs
       - ./letsencrypt_cache:/app/letsencrypt_cache
+      - ./data:/app/data
     ports:
       - 443:443
       - 80:80

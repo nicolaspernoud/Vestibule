@@ -22,8 +22,8 @@ import (
 )
 
 var (
-	appsFile     = flag.String("apps", "", "apps definition `file`")
-	davsFile     = flag.String("davs", "", "davs definition `file`")
+	appsFile     = flag.String("apps", "./configs/apps.json", "apps definition `file`")
+	davsFile     = flag.String("davs", "./configs/davs.json", "davs definition `file`")
 	letsCacheDir = flag.String("letsencrypt_cache", "./letsencrypt_cache", "let's encrypt cache `directory`")
 	logFile      = flag.String("log_file", "", "Optional file to log to, defaults to no file logging")
 	httpsPort    = flag.Int("https_port", 443, "HTTPS port to serve on (defaults to 443)")
