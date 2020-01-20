@@ -27,7 +27,7 @@ var (
 		last:    time.Now(),
 		content: make(map[string]string),
 	}
-	ipDbLocation = "./ipgeodatabase/GeoLite2-City.mmdb"
+	ipDbLocation = "./data/ipgeodatabase/GeoLite2-City.mmdb"
 	f            *os.File
 )
 

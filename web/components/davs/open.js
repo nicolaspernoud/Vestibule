@@ -22,11 +22,12 @@ export class Open {
   update(isNext) {
     const idx = isNext ? this.index + 1 : this.index - 1;
     if (idx >= 0 && idx < this.files.length) {
-      this.index = idx;
-      this.file = this.files[idx];
-      this.type = GetType(this.file);
-      this.url = `${this.hostname}${this.file.path}`;
-      if (this.type && !this.file.isDir) {
+      const type = GetType(this.files[idx]);
+      if (type && type !== "document" && !this.files[idx].isDir) {
+        this.index = idx;
+        this.file = this.files[idx];
+        this.type = type;
+        this.url = `${this.hostname}${this.file.path}`;
         this.openModal.parentNode.removeChild(this.openModal);
         this.show(false);
       }

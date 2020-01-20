@@ -218,7 +218,7 @@ async function editUser(user) {
   cleanUser(user);
   id_field.value = user.id;
   login_field.value = user.login;
-  password_field.value = user.passwordHash !== "" ? "" : randomString(48);
+  password_field.value = user.passwordHash !== "" ? "" : RandomString(48);
   passwordhash_field.value = user.passwordHash;
   name_field.value = user.name;
   surname_field.value = user.surname;
@@ -234,7 +234,7 @@ async function newUser() {
   maxid++;
   id_field.value = maxid.toString();
   login_field.value = "";
-  password_field.value = randomString(48);
+  password_field.value = RandomString(48);
   passwordhash_field.value = "";
   name_field.value = "";
   surname_field.value = "";

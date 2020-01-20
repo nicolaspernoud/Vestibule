@@ -196,6 +196,8 @@ func createUserTests(t *testing.T) func(wg *sync.WaitGroup) {
 			doNoJar("GET", "userdav.vestibule.io/mydata/test.txt", noH, "", 401, "error extracting token")
 			// Try to use the share token for the specified ressource (must pass)
 			doNoJar("GET", "userdav.vestibule.io/mydata/test.txt", shareHeader, "", 200, "This is a test")
+			// Try to use the share token for the specified ressource with query (must pass)
+			doNoJar("GET", "userdav.vestibule.io/mydata/test.txt?token="+url.QueryEscape(strings.TrimPrefix(shareHeader.Value, "Bearer ")), noH, "", 200, "This is a test")
 			// Try to use the readonly share token to alter the specified ressource (must fail)
 			doNoJar("PUT", "userdav.vestibule.io/mydata/test.txt", shareHeader, "Altered content", 403, "token is read only")
 			// Try to use the share token for an other ressource (must fail)*/

@@ -7,6 +7,7 @@ let mountpoint;
 let login_field;
 let password_field;
 let login_inmemory;
+let login_icon;
 
 export function mount(where) {
   mountpoint = where;
@@ -33,8 +34,12 @@ export function mount(where) {
             </div>
           </div>
           <footer class="card-footer">
-            <a id="login-inmemory" class="card-footer-item">Login</a>
-            <a id="login-oauth2" class="card-footer-item" href="/OAuth2Login">Login with OAuth2</a>
+            <a id="login-inmemory" class="card-footer-item">
+              <span class="icon" id="login-icon"><i class="fas fa-key"></i></span>Login
+            </a>
+            <a id="login-oauth2" class="card-footer-item" href="/OAuth2Login">
+              <span class="icon"><i class="fab fa-keycdn"></i></span>Login with OAuth2
+            </a>
           </footer>
         </div>
       </div>
@@ -56,9 +61,11 @@ function registerModalFields() {
   login_inmemory.addEventListener("click", function() {
     doLogin();
   });
+  login_icon = document.getElementById("login-icon");
 }
 
 async function doLogin() {
+  login_icon.classList.add("fa-pulse");
   try {
     const response = await fetch("/Login", {
       method: "POST",
@@ -75,5 +82,6 @@ async function doLogin() {
   } catch (e) {
     Messages.Show("is-warning", e.message);
     console.error(e);
+    login_icon.classList.remove("fa-pulse");
   }
 }
