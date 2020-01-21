@@ -1,6 +1,7 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
 import * as Navbar from "/components/navbar/navbar.js";
+import { loginModes } from "/assets/brand/brand.js";
 
 // DOM elements
 let mountpoint;
@@ -34,12 +35,20 @@ export function mount(where) {
             </div>
           </div>
           <footer class="card-footer">
-            <a id="login-inmemory" class="card-footer-item">
-              <span class="icon" id="login-icon"><i class="fas fa-key"></i></span>Login
-            </a>
-            <a id="login-oauth2" class="card-footer-item" href="/OAuth2Login">
-              <span class="icon"><i class="fab fa-keycdn"></i></span>Login with OAuth2
-            </a>
+            ${loginModes.inmemory
+              ? /* HTML */ `
+                  <a id="login-inmemory" class="card-footer-item">
+                    <span class="icon" id="login-icon"><i class="fas fa-key"></i></span>Login
+                  </a>
+                `
+              : ""}
+            ${loginModes.oauth2
+              ? /* HTML */ `
+                  <a id="login-oauth2" class="card-footer-item" href="/OAuth2Login">
+                    <span class="icon"><i class="fab fa-keycdn"></i></span>Login with OAuth2
+                  </a>
+                `
+              : ""}
           </footer>
         </div>
       </div>

@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"os"
 	"strings"
@@ -58,7 +59,15 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			return
 		}
 		if err != nil {
-			http.Error(w, "error extracting token: "+err.Error(), 401)
+			redirectTo := os.Getenv("HOSTNAME")
+			_, port, perr := net.SplitHostPort(r.Host)
+			if perr == nil {
+				redirectTo += ":" + port
+			}
+			w.Header().Set("Content-Type", "text/html")
+			w.WriteHeader(http.StatusUnauthorized)
+			responseContent := fmt.Sprintf("error extracting token: %v<meta http-equiv=\"Refresh\" content=\"0; url=https://%v/#login\"/>", err.Error(), redirectTo)
+			fmt.Fprintf(w, responseContent)
 			return
 		}
 		// Check XSRF Token
