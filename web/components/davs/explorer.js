@@ -165,7 +165,7 @@ export class Explorer {
 
   registerEvents(file) {
     if (file.type.includes("image")) {
-      this.loadImage(document.getElementById(`file-${file.id}-image`), this.fullHostname + file.path);
+      LoadImage(document.getElementById(`file-${file.id}-image`), this.fullHostname + file.path, this.user);
     }
     document.getElementById(`file-${file.id}-content`).addEventListener("click", async () => {
       if (file.isDir) {
@@ -226,27 +226,6 @@ export class Explorer {
       const shareModal = new Share(this.hostname, file);
       shareModal.show(true);
     });
-  }
-
-  async loadImage(image, url) {
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-        headers: new Headers({
-          "XSRF-Token": this.user.xsrftoken
-        }),
-        credentials: "include"
-      });
-      if (response.status !== 200) {
-        throw new Error(`Error loading image (status ${response.status})`);
-      }
-      const blob = await response.blob();
-      const objectURL = URL.createObjectURL(blob);
-      image.src = objectURL;
-    } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
-    }
   }
 
   rename(file) {
@@ -557,5 +536,26 @@ function fileSortFunction(a, b) {
     }
   } else {
     return a.name.localeCompare(b.name);
+  }
+}
+
+export async function LoadImage(image, url, user) {
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: new Headers({
+        "XSRF-Token": user.xsrftoken
+      }),
+      credentials: "include"
+    });
+    if (response.status !== 200) {
+      throw new Error(`Error loading image (status ${response.status})`);
+    }
+    const blob = await response.blob();
+    const objectURL = URL.createObjectURL(blob);
+    image.src = objectURL;
+  } catch (e) {
+    Messages.Show("is-warning", e.message);
+    console.error(e);
   }
 }

@@ -3,6 +3,7 @@ import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString, GetType, GID } from "/services/common/common.js";
 import { Share } from "/components/davs/share.js";
 import * as Auth from "/services/auth/auth.js";
+import { LoadImage } from "/components/davs/explorer.js";
 
 export class Open {
   constructor(hostname, files, file) {
@@ -61,6 +62,9 @@ export class Open {
     }
     this.openModal.innerHTML = this.computeTemplate(content);
     document.body.appendChild(this.openModal);
+    if (this.type === "image") {
+      LoadImage(this.gid("open-image"), this.url, this.user);
+    }
     this.gid("open-close").addEventListener("click", () => {
       AnimateCSS(this.openModal, "fadeOut", () => {
         this.openModal.parentNode.removeChild(this.openModal);
@@ -80,52 +84,46 @@ export class Open {
 
   computeTemplate(content) {
     return /* HTML */ `
-      <div class="modal-content">
-        <div class="box">
-          ${
-            this.type == "other"
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">${this.file.name}</p>
+          <button class="delete" aria-label="close" id="${this.prefix}open-close"></button>
+        </header>
+        <div class="modal-content">
+          <div class="box">
+            ${this.type == "other"
               ? /* HTML */ `
                   <object data="${this.url}"></object>
                 `
-              : ""
-          }
-          ${this.type == "image" ? `<img src="${this.url}" alt="Previewed image" />` : ""}
-          ${
-            this.type == "audio"
+              : ""}
+            ${this.type == "image" ? `<img id="${this.prefix}open-image" src="assets/spinner.svg" alt="Previewed image" />` : ""}
+            ${this.type == "audio"
               ? /* HTML */ `
                   <audio controls autoplay><source src="${this.url}" /></audio>
                 `
-              : ""
-          }
-          ${
-            this.type == "video"
+              : ""}
+            ${this.type == "video"
               ? /* HTML */ `
                   <video controls autoplay><source src="${this.url}" /></video>
                 `
-              : ""
-          }
-          ${
-            this.type == "text"
+              : ""}
+            ${this.type == "text"
               ? /* HTML */ `
                   <textarea class="textarea" readonly>${content}</textarea>
                 `
-              : ""
-          }
-          <h1>${this.file.name}</h1>
-          </br>
-          <div class="buttons">
-            <button id="${this.prefix}open-previous" class="button">
-              <span class="icon is-small"><i class="fas fa-arrow-circle-left"></i></span>
-            </button>
-            <button id="${this.prefix}open-next" class="button">
-              <span class="icon is-small"><i class="fas fa-arrow-circle-right"></i></span>
-            </button>
-            <button id="${this.prefix}open-share" class="button">
-              <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
-            </button>
-            <button id="${this.prefix}open-close" class="button">
-              <span class="icon is-small"><i class="fas fa-times"></i></span>
-            </button>
+              : ""}
+            <br />
+            <div class="buttons">
+              <button id="${this.prefix}open-previous" class="button">
+                <span class="icon is-small"><i class="fas fa-arrow-circle-left"></i></span>
+              </button>
+              <button id="${this.prefix}open-next" class="button">
+                <span class="icon is-small"><i class="fas fa-arrow-circle-right"></i></span>
+              </button>
+              <button id="${this.prefix}open-share" class="button">
+                <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

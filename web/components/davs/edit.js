@@ -27,7 +27,7 @@ export class Edit {
       const response = await fetch(this.url, {
         method: "get",
         headers: new Headers({
-          "XSRF-Token": user.xsrftoken
+          "XSRF-Token": this.user.xsrftoken
         }),
         credentials: "include"
       });
@@ -57,21 +57,23 @@ export class Edit {
 
   computeTemplate(content) {
     return /* HTML */ `
-    <div class="modal-content">
-        <div class="box">
-          <textarea id="${this.prefix}edit-content" class="textarea">${content}</textarea>
-          <h1>${this.file.name}</h1>
-          </br>
-          <div class="buttons">
-            <button id="${this.prefix}edit-save" class="button">
-              <span class="icon is-small"><i class="fas fa-save"></i></span>
-            </button>
-            <button id="${this.prefix}edit-share" class="button">
-              <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
-            </button>
-            <button id="${this.prefix}edit-close" class="button">
-              <span class="icon is-small"><i class="fas fa-times"></i></span>
-            </button>
+      <div class="modal-card">
+        <header class="modal-card-head">
+          <p class="modal-card-title">${this.file.name}</p>
+          <button class="delete" aria-label="close" id="${this.prefix}edit-close"></button>
+        </header>
+        <div class="modal-content">
+          <div class="box">
+            <textarea id="${this.prefix}edit-content" class="textarea">${content}</textarea>
+            <br />
+            <div class="buttons">
+              <button id="${this.prefix}edit-save" class="button">
+                <span class="icon is-small"><i class="fas fa-save"></i></span>
+              </button>
+              <button id="${this.prefix}edit-share" class="button">
+                <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -91,7 +93,6 @@ export class Edit {
       if (response.status !== 201) {
         throw new Error(`Text content could not be updated (status ${response.status})`);
       }
-      content = await response.text();
     } catch (e) {
       Messages.Show("is-warning", e.message);
       console.error(e);
