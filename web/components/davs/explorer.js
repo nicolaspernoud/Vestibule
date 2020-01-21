@@ -98,73 +98,76 @@ export class Explorer {
   }
 
   displayFiles() {
-    const content = document.getElementById("explorer-modal-content");
-    while (content.firstChild) {
-      content.removeChild(content.firstChild);
-    }
+    // Create template
+    const markup = this.files.map(file => this.fileTemplate(file)).join("");
+    document.getElementById("explorer-modal-content").innerHTML = markup;
+    // Register events
     this.files.map(file => {
-      content.appendChild(this.fileTemplate(file));
+      this.registerEvents(file);
     });
   }
 
   fileTemplate(file) {
-    let el = document.createElement("article");
-    el.classList.add("media", "animated", "fadeIn", "faster");
-    el.innerHTML = /* HTML */ `
-      <figure class="media-left">
-        ${file.type.includes("image")
-          ? '<p class="image is-48x48"><img id="explorer-image" src="assets/spinner.svg"/></p>'
-          : `<span class="icon is-large"><i class="fas fa-3x fa-${file.isDir ? "folder" : "file"}"></i></span>`}
-      </figure>
-      <div class="media-content">
-        <div id="explorer-content" class="content">
-          <p><strong>${file.name}</strong> <small>(${file.isDir ? "" : sizeToHuman(file.size) + " - "}${intToLocaleDate(file.lastModified)})</small></p>
-        </div>
-        <nav class="level is-mobile">
-          <div class="level-left">
-            <a class="level-item" href=${this.fullHostname + file.path}>
-              <span class="icon is-small"><i class="fas fa-download"></i></span>
-            </a>
-            ${this.readwrite
-              ? /* HTML */ `
-                  <a id="explorer-rename" class="level-item">
-                    <span class="icon is-small"><i class="fas fa-pen"></i></span>
-                  </a>
-                  <a id="explorer-cut" class="level-item">
-                    <span class="icon is-small"><i class="fas fa-cut"></i></span>
-                  </a>
-                  <a id="explorer-copy" class="level-item">
-                    <span class="icon is-small"><i class="fas fa-copy"></i></span>
-                  </a>
-                  ${GetType(file) === "text"
-                    ? /* HTML */ `
-                        <a id="explorer-edit" class="level-item">
-                          <span class="icon is-small"><i class="fas fa-edit"></i></span>
-                        </a>
-                      `
-                    : ""}
-                `
-              : ""}
-            <a id="explorer-share" class="level-item">
-              <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
-            </a>
+    return /* HTML */ `
+      <article class="media animated fadeIn faster">
+        <figure class="media-left">
+          ${file.type.includes("image")
+            ? `<p class="image is-48x48"><img id="file-${file.id}-image" src="assets/spinner.svg"/></p>`
+            : `<span class="icon is-large"><i class="fas fa-3x fa-${file.isDir ? "folder" : "file"}"></i></span>`}
+        </figure>
+        <div class="media-content">
+          <div id="file-${file.id}-content" class="content">
+            <p><strong>${file.name}</strong> <small>(${file.isDir ? "" : sizeToHuman(file.size) + " - "}${intToLocaleDate(file.lastModified)})</small></p>
           </div>
-        </nav>
-      </div>
-      ${this.readwrite
-        ? /* HTML */ `
-            <div class="media-right">
-              <a id="explorer-delete">
-                <span class="icon is-small has-text-danger"><i class="fas fa-trash-alt"></i></span>
+          <nav class="level is-mobile">
+            <div class="level-left">
+              <a class="level-item" href=${this.fullHostname + file.path}>
+                <span class="icon is-small"><i class="fas fa-download"></i></span>
+              </a>
+              ${this.readwrite
+                ? /* HTML */ `
+                    <a id="file-${file.id}-rename" class="level-item">
+                      <span class="icon is-small"><i class="fas fa-pen"></i></span>
+                    </a>
+                    <a id="file-${file.id}-cut" class="level-item">
+                      <span class="icon is-small"><i class="fas fa-cut"></i></span>
+                    </a>
+                    <a id="file-${file.id}-copy" class="level-item">
+                      <span class="icon is-small"><i class="fas fa-copy"></i></span>
+                    </a>
+                    ${GetType(file) === "text"
+                      ? /* HTML */ `
+                          <a id="file-${file.id}-edit" class="level-item">
+                            <span class="icon is-small"><i class="fas fa-edit"></i></span>
+                          </a>
+                        `
+                      : ""}
+                  `
+                : ""}
+              <a id="file-${file.id}-share" class="level-item">
+                <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
               </a>
             </div>
-          `
-        : ""}
+          </nav>
+        </div>
+        ${this.readwrite
+          ? /* HTML */ `
+              <div class="media-right">
+                <a id="file-${file.id}-delete">
+                  <span class="icon is-small has-text-danger"><i class="fas fa-trash-alt"></i></span>
+                </a>
+              </div>
+            `
+          : ""}
+      </article>
     `;
+  }
+
+  registerEvents(file) {
     if (file.type.includes("image")) {
-      this.loadImage(el.querySelector("#" + "explorer-image"), this.fullHostname + file.path);
+      this.loadImage(document.getElementById(`file-${file.id}-image`), this.fullHostname + file.path);
     }
-    el.querySelector("#" + "explorer-content").addEventListener("click", async () => {
+    document.getElementById(`file-${file.id}-content`).addEventListener("click", async () => {
       if (file.isDir) {
         this.navigate(file.path);
       } else if (GetType(file) === "document") {
@@ -200,30 +203,29 @@ export class Explorer {
     });
 
     if (this.readwrite) {
-      el.querySelector("#" + "explorer-rename").addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-rename`).addEventListener("click", () => {
         this.rename(file);
       });
-      el.querySelector("#" + "explorer-cut").addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-cut`).addEventListener("click", () => {
         this.moveOrCopy(file, false);
       });
-      el.querySelector("#" + "explorer-copy").addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-copy`).addEventListener("click", () => {
         this.moveOrCopy(file, true);
       });
       if (GetType(file) === "text") {
-        el.querySelector("#" + "explorer-edit").addEventListener("click", () => {
+        document.getElementById(`file-${file.id}-edit`).addEventListener("click", () => {
           const editModal = new Edit(this.fullHostname, file);
           editModal.show(true);
         });
       }
-      el.querySelector("#" + "explorer-delete").addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-delete`).addEventListener("click", () => {
         this.delete(file);
       });
     }
-    el.querySelector("#" + "explorer-share").addEventListener("click", () => {
+    document.getElementById(`file-${file.id}-share`).addEventListener("click", () => {
       const shareModal = new Share(this.hostname, file);
       shareModal.show(true);
     });
-    return el;
   }
 
   async loadImage(image, url) {
@@ -524,6 +526,7 @@ function parseWebDavResponse(txt) {
     file.type = file.isDir ? "dir" : x[i].getElementsByTagName("D:getcontenttype")[0].textContent;
     file.size = file.isDir ? 0 : parseInt(x[i].getElementsByTagName("D:getcontentlength")[0].textContent);
     file.lastModified = x[i].getElementsByTagName("D:getlastmodified")[0].textContent;
+    file.id = i;
     files.push(file);
   }
   return files.sort(fileSortFunction);

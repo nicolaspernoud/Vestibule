@@ -2,6 +2,7 @@
 import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString, GetType, GID } from "/services/common/common.js";
 import { Share } from "/components/davs/share.js";
+import * as Auth from "/services/auth/auth.js";
 
 export class Open {
   constructor(hostname, files, file) {
@@ -35,6 +36,7 @@ export class Open {
   }
 
   async show(animated) {
+    this.user = await Auth.GetUser();
     this.openModal = document.createElement("div");
     this.openModal.classList.add("modal", "is-active");
     if (animated) this.openModal.classList.add("animated", "fadeIn", "faster");
@@ -44,7 +46,7 @@ export class Open {
         const response = await fetch(this.url, {
           method: "get",
           headers: new Headers({
-            "XSRF-Token": user.xsrftoken
+            "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
         });
