@@ -59,16 +59,15 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			return
 		}
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
 			redirectTo := os.Getenv("HOSTNAME")
 			_, port, perr := net.SplitHostPort(r.Host)
 			if perr == nil {
 				redirectTo += ":" + port
 			}
-			w.Header().Set("Content-Type", "content-type: text/html; charset=utf-8")
-			responseContent := fmt.Sprintf("error extracting token: %v <meta http-equiv=\"Refresh\" content=\"0; url=https://%v/#login />", err.Error(), redirectTo)
+			w.Header().Set("Content-Type", "text/html")
+			w.WriteHeader(http.StatusUnauthorized)
+			responseContent := fmt.Sprintf("error extracting token: %v<meta http-equiv=\"Refresh\" content=\"0; url=https://%v/#login\"/>", err.Error(), redirectTo)
 			fmt.Fprintf(w, responseContent)
-			//http.Error(w, "+`<meta http-equiv="Refresh" content="0; url=/" />`, 401)
 			return
 		}
 		// Check XSRF Token
