@@ -57,25 +57,23 @@ export class Edit {
 
   computeTemplate(content) {
     return /* HTML */ `
+      <div class="modal-background"></div>
       <div class="modal-card">
         <header class="modal-card-head">
           <p class="modal-card-title">${this.file.name}</p>
           <button class="delete" aria-label="close" id="${this.prefix}edit-close"></button>
         </header>
-        <div class="modal-content">
-          <div class="box">
-            <textarea id="${this.prefix}edit-content" class="textarea">${content}</textarea>
-            <br />
-            <div class="buttons">
-              <button id="${this.prefix}edit-save" class="button">
-                <span class="icon is-small"><i class="fas fa-save"></i></span>
-              </button>
-              <button id="${this.prefix}edit-share" class="button">
-                <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <section class="modal-card-body">
+          <textarea id="${this.prefix}edit-content" class="textarea">${content}</textarea>
+        </section>
+        <footer class="modal-card-foot">
+          <button id="${this.prefix}edit-save" class="button">
+            <span class="icon is-small"><i class="fas fa-save"></i></span>
+          </button>
+          <button id="${this.prefix}edit-share" class="button">
+            <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
+          </button>
+        </footer>
       </div>
     `;
   }

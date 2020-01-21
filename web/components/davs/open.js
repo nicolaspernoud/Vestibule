@@ -84,48 +84,46 @@ export class Open {
 
   computeTemplate(content) {
     return /* HTML */ `
+      <div class="modal-background"></div>
       <div class="modal-card">
         <header class="modal-card-head">
           <p class="modal-card-title">${this.file.name}</p>
           <button class="delete" aria-label="close" id="${this.prefix}open-close"></button>
         </header>
-        <div class="modal-content">
-          <div class="box">
-            ${this.type == "other"
-              ? /* HTML */ `
-                  <object data="${this.url}"></object>
-                `
-              : ""}
-            ${this.type == "image" ? `<img id="${this.prefix}open-image" src="assets/spinner.svg" alt="Previewed image" />` : ""}
-            ${this.type == "audio"
-              ? /* HTML */ `
-                  <audio controls autoplay><source src="${this.url}" /></audio>
-                `
-              : ""}
-            ${this.type == "video"
-              ? /* HTML */ `
-                  <video controls autoplay><source src="${this.url}" /></video>
-                `
-              : ""}
-            ${this.type == "text"
-              ? /* HTML */ `
-                  <textarea class="textarea" readonly>${content}</textarea>
-                `
-              : ""}
-            <br />
-            <div class="buttons">
-              <button id="${this.prefix}open-previous" class="button">
-                <span class="icon is-small"><i class="fas fa-arrow-circle-left"></i></span>
-              </button>
-              <button id="${this.prefix}open-next" class="button">
-                <span class="icon is-small"><i class="fas fa-arrow-circle-right"></i></span>
-              </button>
-              <button id="${this.prefix}open-share" class="button">
-                <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
-              </button>
-            </div>
-          </div>
-        </div>
+        <section class="modal-card-body">
+          ${this.type == "other"
+            ? /* HTML */ `
+                <object data="${this.url}"></object>
+              `
+            : ""}
+          ${this.type == "image" ? `<img id="${this.prefix}open-image" src="assets/spinner.svg" alt="Previewed image" />` : ""}
+          ${this.type == "audio"
+            ? /* HTML */ `
+                <audio controls autoplay><source src="${this.url}" /></audio>
+              `
+            : ""}
+          ${this.type == "video"
+            ? /* HTML */ `
+                <video controls autoplay><source src="${this.url}" /></video>
+              `
+            : ""}
+          ${this.type == "text"
+            ? /* HTML */ `
+                <textarea class="textarea" readonly>${content}</textarea>
+              `
+            : ""}
+        </section>
+        <footer class="modal-card-foot">
+          <button id="${this.prefix}open-previous" class="button">
+            <span class="icon is-small"><i class="fas fa-arrow-circle-left"></i></span>
+          </button>
+          <button id="${this.prefix}open-next" class="button">
+            <span class="icon is-small"><i class="fas fa-arrow-circle-right"></i></span>
+          </button>
+          <button id="${this.prefix}open-share" class="button">
+            <span class="icon is-small"><i class="fas fa-share-alt"></i></span>
+          </button>
+        </footer>
       </div>
     `;
   }

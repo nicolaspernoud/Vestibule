@@ -6,3 +6,5 @@
 [ ] Allow translations
 [/] Documentation and video
 [/] Allow onlyoffice opening => add converting
+[ ] Redirect to login on auth failure
+[ ] Allow masking of Connect with OAuth2 button
