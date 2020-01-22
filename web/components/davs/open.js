@@ -3,16 +3,16 @@ import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString, GetType, GID } from "/services/common/common.js";
 import { Share } from "/components/davs/share.js";
 import * as Auth from "/services/auth/auth.js";
-import { LoadImage } from "/components/davs/explorer.js";
 
 export class Open {
-  constructor(hostname, files, file) {
+  constructor(hostname, fullHostname, files, file) {
     this.hostname = hostname;
+    this.fullHostname = fullHostname;
     this.files = files;
     this.file = file;
     this.index = files.findIndex(element => element.name === file.name);
     this.type = GetType(this.file);
-    this.url = `${hostname}${file.path}`;
+    this.url = `${fullHostname}${file.path}`;
     // Random id seed
     this.prefix = RandomString(8);
   }
@@ -29,7 +29,7 @@ export class Open {
         this.index = idx;
         this.file = this.files[idx];
         this.type = type;
-        this.url = `${this.hostname}${this.file.path}`;
+        this.url = `${this.fullHostname}${this.file.path}`;
         this.openModal.parentNode.removeChild(this.openModal);
         this.show(false);
       }
@@ -42,10 +42,11 @@ export class Open {
     this.openModal.classList.add("modal", "is-active");
     if (animated) this.openModal.classList.add("animated", "fadeIn", "faster");
     let content;
+    let token;
     if (this.type == "text") {
       try {
         const response = await fetch(this.url, {
-          method: "get",
+          method: "GET",
           headers: new Headers({
             "XSRF-Token": this.user.xsrftoken
           }),
@@ -59,12 +60,33 @@ export class Open {
         Messages.Show("is-warning", e.message);
         console.error(e);
       }
+    } else {
+      try {
+        const response = await fetch(location.origin + "/api/common/Share", {
+          method: "POST",
+          headers: new Headers({
+            "XSRF-Token": this.user.xsrftoken
+          }),
+          credentials: "include",
+          body: JSON.stringify({
+            sharedfor: "file_preview",
+            lifespan: 1,
+            url: this.hostname + this.file.path,
+            readonly: true
+          })
+        });
+        if (response.status !== 200) {
+          throw new Error(`Share token could not be made (status ${response.status})`);
+        }
+        token = await response.text();
+        token = encodeURIComponent(token);
+      } catch (e) {
+        Messages.Show("is-warning", e.message);
+        console.error(e);
+      }
     }
-    this.openModal.innerHTML = this.computeTemplate(content);
+    this.openModal.innerHTML = this.computeTemplate(content, token);
     document.body.appendChild(this.openModal);
-    if (this.type === "image") {
-      LoadImage(this.gid("open-image"), this.url, this.user);
-    }
     this.gid("open-close").addEventListener("click", () => {
       AnimateCSS(this.openModal, "fadeOut", () => {
         this.openModal.parentNode.removeChild(this.openModal);
@@ -77,34 +99,34 @@ export class Open {
       this.update(true);
     });
     this.gid("open-share").addEventListener("click", () => {
-      const shareModal = new Share(this.hostname, this.file);
+      const shareModal = new Share(this.fullHostname, this.file);
       shareModal.show();
     });
   }
 
-  computeTemplate(content) {
+  computeTemplate(content, token) {
     return /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-card">
         <header class="modal-card-head">
-          <p class="modal-card-title">${this.file.name}</p>
           <button class="delete" aria-label="close" id="${this.prefix}open-close"></button>
+          <p class="modal-card-title has-text-centered">${this.file.name}</p>
         </header>
-        <section class="modal-card-body">
+        <section class="modal-card-body is-paddingless">
           ${this.type == "other"
             ? /* HTML */ `
-                <object data="${this.url}"></object>
+                <embed src="${this.url}?token=${token}&inline" type="application/pdf" width="100%" style="height: 75vh;" />
               `
             : ""}
-          ${this.type == "image" ? `<img id="${this.prefix}open-image" src="assets/spinner.svg" alt="Previewed image" />` : ""}
+          ${this.type == "image" ? `<img id="${this.prefix}open-image" src="${this.url}?token=${token}" alt="Previewed image" />` : ""}
           ${this.type == "audio"
             ? /* HTML */ `
-                <audio controls autoplay><source src="${this.url}" /></audio>
+                <audio controls autoplay><source src="${this.url}?token=${token}" /></audio>
               `
             : ""}
           ${this.type == "video"
             ? /* HTML */ `
-                <video controls autoplay><source src="${this.url}" /></video>
+                <video controls autoplay><source src="${this.url}?token=${token}" /></video>
               `
             : ""}
           ${this.type == "text"

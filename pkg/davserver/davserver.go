@@ -201,9 +201,9 @@ func webdavLogger(r *http.Request, err error) {
 	user, err := auth.GetTokenData(r)
 	if err != nil && !common.Contains([]string{"PROPFIND", "OPTIONS", "LOCK", "UNLOCK", "GET"}, r.Method) || strings.Contains(user.Login, "_share_") {
 		if err != nil {
-			log.Logger.Printf("| %v | Webdav access error : [%s] %s, %s | %v | %v", user, r.Method, r.URL, err, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
+			log.Logger.Printf("| %v | Webdav access error : [%s] %s, %s | %v | %v", user.Login, r.Method, r.URL, err, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 		} else {
-			log.Logger.Printf("| %v | Webdav access : [%s] %s | %v | %v", user, r.Method, r.URL.Path, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
+			log.Logger.Printf("| %v | Webdav access : [%s] %s | %v | %v", user.Login, r.Method, r.URL.Path, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 		}
 	}
 }

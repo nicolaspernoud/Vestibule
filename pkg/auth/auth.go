@@ -85,10 +85,12 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			user.IsAdmin = true
 		}
 		// Check for url
-		requestURL := strings.Split(r.Host, ":")[0] + r.URL.Path
-		if user.URL != "" && user.URL != requestURL {
-			http.Error(w, "token restricted to url: "+user.URL, 401)
-			return
+		if user.URL != "" {
+			requestURL := strings.Split(r.Host, ":")[0] + r.URL.EscapedPath()
+			if user.URL != requestURL {
+				http.Error(w, "token restricted to url: "+user.URL, 401)
+				return
+			}
 		}
 		// Check for method
 		if user.ReadOnly && r.Method != http.MethodGet {

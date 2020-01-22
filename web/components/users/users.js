@@ -158,7 +158,7 @@ function displayUsers() {
 async function firstShowUsers() {
   try {
     const response = await fetch("/api/admin/users/", {
-      method: "get",
+      method: "GET",
       headers: new Headers({
         "XSRF-Token": current_user.xsrftoken
       })

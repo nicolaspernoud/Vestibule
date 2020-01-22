@@ -121,7 +121,7 @@ export class Explorer {
           </div>
           <nav class="level is-mobile">
             <div class="level-left">
-              <a class="level-item" href=${this.fullHostname + file.path}>
+              <a class="level-item" id="file-${file.id}-download">
                 <span class="icon is-small"><i class="fas fa-download"></i></span>
               </a>
               ${this.readwrite
@@ -197,7 +197,7 @@ export class Explorer {
           console.error(e);
         }
       } else if (GetType(file)) {
-        const openModal = new Open(this.fullHostname, this.files, file);
+        const openModal = new Open(this.hostname, this.fullHostname, this.files, file);
         openModal.show(true);
       }
     });
@@ -222,6 +222,9 @@ export class Explorer {
         this.delete(file);
       });
     }
+    document.getElementById(`file-${file.id}-download`).addEventListener("click", () => {
+      this.download(file);
+    });
     document.getElementById(`file-${file.id}-share`).addEventListener("click", () => {
       const shareModal = new Share(this.hostname, file);
       shareModal.show(true);
@@ -263,7 +266,7 @@ export class Explorer {
         const response = await fetch(this.fullHostname + file.path, {
           method: "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + this.path + renameModal.getElementsByTagName("input")[0].value,
+            Destination: this.fullHostname + this.path + encodeURIComponent(renameModal.getElementsByTagName("input")[0].value),
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
@@ -313,7 +316,7 @@ export class Explorer {
         const response = await fetch(this.fullHostname + file.path, {
           method: isCopy ? "COPY" : "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + this.path + file.name,
+            Destination: this.fullHostname + this.path + encodeURIComponent(file.name),
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
@@ -466,6 +469,7 @@ export class Explorer {
         Messages.Show("is-warning", e.message);
       };
       xhr.open("PUT", this.fullHostname + file.path);
+      xhr.setRequestHeader("XSRF-Token", this.user.xsrftoken);
       xhr.send(file);
       delBtn.addEventListener("click", async () => {
         xhr.abort();
@@ -486,6 +490,36 @@ export class Explorer {
       });
       document.body.appendChild(msg);
       offset = offset + 50;
+    }
+  }
+
+  async download(file) {
+    try {
+      const response = await fetch(location.origin + "/api/common/Share", {
+        method: "POST",
+        headers: new Headers({
+          "XSRF-Token": this.user.xsrftoken
+        }),
+        credentials: "include",
+        body: JSON.stringify({
+          sharedfor: "download",
+          lifespan: 1,
+          url: this.hostname + file.path,
+          readonly: true
+        })
+      });
+      if (response.status !== 200) {
+        throw new Error(`Share token could not be made (status ${response.status})`);
+      }
+      const shareToken = await response.text();
+      const shareURL = `${this.fullHostname + file.path}?token=${encodeURIComponent(shareToken)}`;
+      const link = document.createElement("a");
+      link.href = shareURL;
+      //document.body.appendChild(link); // required in FF (?), optional for Chrome
+      link.click();
+    } catch (e) {
+      Messages.Show("is-warning", e.message);
+      console.error(e);
     }
   }
 }
