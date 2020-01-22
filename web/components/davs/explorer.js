@@ -266,7 +266,7 @@ export class Explorer {
         const response = await fetch(this.fullHostname + file.path, {
           method: "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + this.path + renameModal.getElementsByTagName("input")[0].value,
+            Destination: this.fullHostname + this.path + encodeURIComponent(renameModal.getElementsByTagName("input")[0].value),
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
@@ -316,7 +316,7 @@ export class Explorer {
         const response = await fetch(this.fullHostname + file.path, {
           method: isCopy ? "COPY" : "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + this.path + file.name,
+            Destination: this.fullHostname + this.path + encodeURIComponent(file.name),
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"

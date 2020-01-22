@@ -60,10 +60,10 @@ export class Edit {
       <div class="modal-background"></div>
       <div class="modal-card">
         <header class="modal-card-head">
-          <p class="modal-card-title">${this.file.name}</p>
           <button class="delete" aria-label="close" id="${this.prefix}edit-close"></button>
+          <p class="modal-card-title has-text-centered">${this.file.name}</p>
         </header>
-        <section class="modal-card-body">
+        <section class="modal-card-body is-paddingless">
           <textarea id="${this.prefix}edit-content" class="textarea">${content}</textarea>
         </section>
         <footer class="modal-card-foot">

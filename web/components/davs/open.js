@@ -109,8 +109,8 @@ export class Open {
       <div class="modal-background"></div>
       <div class="modal-card">
         <header class="modal-card-head">
-          <p class="modal-card-title">${this.file.name}</p>
           <button class="delete" aria-label="close" id="${this.prefix}open-close"></button>
+          <p class="modal-card-title has-text-centered">${this.file.name}</p>
         </header>
         <section class="modal-card-body is-paddingless">
           ${this.type == "other"
