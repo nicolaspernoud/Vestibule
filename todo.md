@@ -8,4 +8,4 @@
 [/] Allow onlyoffice opening => add converting
 [x] Redirect to login on auth failure
 [x] Allow masking of Connect with OAuth2 button
-[ ] Correct pdf display
+[x] Correct pdf display

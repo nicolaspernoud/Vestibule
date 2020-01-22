@@ -192,7 +192,7 @@ function displayDavs(davs) {
 async function firstShowDavs() {
   try {
     const response = await fetch("/api/common/davs", {
-      method: "get",
+      method: "GET",
       headers: new Headers({
         "XSRF-Token": user.xsrftoken
       })
@@ -332,7 +332,7 @@ async function postDav() {
 async function reloadDavsOnServer() {
   try {
     const response = await fetch("/api/admin/reload", {
-      method: "get",
+      method: "GET",
       headers: new Headers({
         "XSRF-Token": user.xsrftoken
       })

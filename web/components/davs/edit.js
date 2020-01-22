@@ -25,7 +25,7 @@ export class Edit {
     let content;
     try {
       const response = await fetch(this.url, {
-        method: "get",
+        method: "GET",
         headers: new Headers({
           "XSRF-Token": this.user.xsrftoken
         }),

@@ -8,10 +8,10 @@ let menu;
 
 export function mount(mountpoint) {
   const where = document.getElementById(mountpoint);
-  window.document.title = brand.title;
+  window.document.title = brand.windowTitle;
   where.innerHTML = /* HTML */ `
     <div class="navbar-brand">
-      <a class="navbar-item is-size-4" href="/"><img src="assets/brand/logo.svg" alt="logo" />${brand.title}</a>
+      <a class="navbar-item is-size-4" href="/"><img src="assets/brand/logo.svg" alt="logo" />${brand.navTitle}</a>
       <a role="button" id="navbar-burger" class="navbar-burger burger" aria-label="menu" aria-expanded="false">
         <span aria-hidden="true"></span>
         <span aria-hidden="true"></span>

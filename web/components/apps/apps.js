@@ -217,7 +217,7 @@ function displayApps(apps) {
 async function firstShowApps() {
   try {
     const response = await fetch("/api/common/apps", {
-      method: "get",
+      method: "GET",
       headers: new Headers({
         "XSRF-Token": user.xsrftoken
       })
@@ -378,7 +378,7 @@ async function postApp() {
 async function reloadAppsOnServer() {
   try {
     const response = await fetch("/api/admin/reload", {
-      method: "get",
+      method: "GET",
       headers: new Headers({
         "XSRF-Token": user.xsrftoken
       })

@@ -3,7 +3,6 @@ import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString, GetType, GID } from "/services/common/common.js";
 import { Share } from "/components/davs/share.js";
 import * as Auth from "/services/auth/auth.js";
-import { LoadImage } from "/components/davs/explorer.js";
 
 export class Open {
   constructor(hostname, files, file) {
@@ -42,10 +41,11 @@ export class Open {
     this.openModal.classList.add("modal", "is-active");
     if (animated) this.openModal.classList.add("animated", "fadeIn", "faster");
     let content;
+    let token;
     if (this.type == "text") {
       try {
         const response = await fetch(this.url, {
-          method: "get",
+          method: "GET",
           headers: new Headers({
             "XSRF-Token": this.user.xsrftoken
           }),
@@ -59,12 +59,32 @@ export class Open {
         Messages.Show("is-warning", e.message);
         console.error(e);
       }
+    } else {
+      try {
+        const response = await fetch(location.origin + "/api/common/Share", {
+          method: "POST",
+          headers: new Headers({
+            "XSRF-Token": this.user.xsrftoken
+          }),
+          credentials: "include",
+          body: JSON.stringify({
+            sharedfor: "file_preview",
+            lifespan: 1,
+            url: this.url,
+            readonly: true
+          })
+        });
+        if (response.status !== 200) {
+          throw new Error(`Share token could not be made (status ${response.status})`);
+        }
+        token = await response.text();
+      } catch (e) {
+        Messages.Show("is-warning", e.message);
+        console.error(e);
+      }
     }
-    this.openModal.innerHTML = this.computeTemplate(content);
+    this.openModal.innerHTML = this.computeTemplate(content, token);
     document.body.appendChild(this.openModal);
-    if (this.type === "image") {
-      LoadImage(this.gid("open-image"), this.url, this.user);
-    }
     this.gid("open-close").addEventListener("click", () => {
       AnimateCSS(this.openModal, "fadeOut", () => {
         this.openModal.parentNode.removeChild(this.openModal);
@@ -82,7 +102,7 @@ export class Open {
     });
   }
 
-  computeTemplate(content) {
+  computeTemplate(content, token) {
     return /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-card">
@@ -90,21 +110,21 @@ export class Open {
           <p class="modal-card-title">${this.file.name}</p>
           <button class="delete" aria-label="close" id="${this.prefix}open-close"></button>
         </header>
-        <section class="modal-card-body">
+        <section class="modal-card-body is-paddingless">
           ${this.type == "other"
             ? /* HTML */ `
-                <object data="${this.url}"></object>
+                <embed src="${this.url}?token=${token}&inline" type="application/pdf" width="100%" style="height: 75vh;" />
               `
             : ""}
-          ${this.type == "image" ? `<img id="${this.prefix}open-image" src="assets/spinner.svg" alt="Previewed image" />` : ""}
+          ${this.type == "image" ? `<img id="${this.prefix}open-image" src="${this.url}?token=${token}" alt="Previewed image" />` : ""}
           ${this.type == "audio"
             ? /* HTML */ `
-                <audio controls autoplay><source src="${this.url}" /></audio>
+                <audio controls autoplay><source src="${this.url}?token=${token}" /></audio>
               `
             : ""}
           ${this.type == "video"
             ? /* HTML */ `
-                <video controls autoplay><source src="${this.url}" /></video>
+                <video controls autoplay><source src="${this.url}?token=${token}" /></video>
               `
             : ""}
           ${this.type == "text"
