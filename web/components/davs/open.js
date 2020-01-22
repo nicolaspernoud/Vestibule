@@ -5,13 +5,14 @@ import { Share } from "/components/davs/share.js";
 import * as Auth from "/services/auth/auth.js";
 
 export class Open {
-  constructor(hostname, files, file) {
+  constructor(hostname, fullHostname, files, file) {
     this.hostname = hostname;
+    this.fullHostname = fullHostname;
     this.files = files;
     this.file = file;
     this.index = files.findIndex(element => element.name === file.name);
     this.type = GetType(this.file);
-    this.url = `${hostname}${file.path}`;
+    this.url = `${fullHostname}${file.path}`;
     // Random id seed
     this.prefix = RandomString(8);
   }
@@ -28,7 +29,7 @@ export class Open {
         this.index = idx;
         this.file = this.files[idx];
         this.type = type;
-        this.url = `${this.hostname}${this.file.path}`;
+        this.url = `${this.fullHostname}${this.file.path}`;
         this.openModal.parentNode.removeChild(this.openModal);
         this.show(false);
       }
@@ -70,7 +71,7 @@ export class Open {
           body: JSON.stringify({
             sharedfor: "file_preview",
             lifespan: 1,
-            url: this.url,
+            url: this.hostname + this.file.path,
             readonly: true
           })
         });
@@ -78,6 +79,7 @@ export class Open {
           throw new Error(`Share token could not be made (status ${response.status})`);
         }
         token = await response.text();
+        token = encodeURIComponent(token);
       } catch (e) {
         Messages.Show("is-warning", e.message);
         console.error(e);
@@ -97,7 +99,7 @@ export class Open {
       this.update(true);
     });
     this.gid("open-share").addEventListener("click", () => {
-      const shareModal = new Share(this.hostname, this.file);
+      const shareModal = new Share(this.fullHostname, this.file);
       shareModal.show();
     });
   }

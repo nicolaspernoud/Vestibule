@@ -40,7 +40,7 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 		log.Logger.Fatal(err)
 	}
 	// Put the two handler together
-	adH := &appDavHandler{as: appServer, ds: davServer, dsCORSAllowOrigin: fullHostname}
+	adH := &appDavHandler{as: appServer, ds: davServer, dsCORSAllowOrigin: fullHostname, cspSrc: "*." + hostname + ":*"}
 	policy := CreateHostPolicy(hostname, adH)
 	// Create the main handler
 	mainMux := http.NewServeMux()
@@ -82,7 +82,7 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 	mainMux.Handle("/", http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)}))
 	// Put it together into the main handler
 	mux := http.NewServeMux()
-	mux.Handle(hostname+"/", mainMux)
+	mux.Handle(hostname+"/", security.WebSecurityMiddleware(mainMux, "*."+hostname+":*"))
 	mux.Handle("/", adH)
 	return RootMux{mux, policy, &m}
 }
@@ -91,6 +91,7 @@ type appDavHandler struct {
 	as                *appserver.Server
 	ds                *davserver.Server
 	dsCORSAllowOrigin string
+	cspSrc            string
 }
 
 func (h *appDavHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -107,7 +108,7 @@ func (h *appDavHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, d := range h.ds.Davs {
 		if host == d.Host {
-			security.CorsMiddleware(h.ds, h.dsCORSAllowOrigin).ServeHTTP(w, r)
+			security.CorsMiddleware(security.WebSecurityMiddleware(h.ds, h.cspSrc), h.dsCORSAllowOrigin).ServeHTTP(w, r)
 			return
 		}
 	}

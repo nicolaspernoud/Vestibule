@@ -197,7 +197,7 @@ export class Explorer {
           console.error(e);
         }
       } else if (GetType(file)) {
-        const openModal = new Open(this.fullHostname, this.files, file);
+        const openModal = new Open(this.hostname, this.fullHostname, this.files, file);
         openModal.show(true);
       }
     });

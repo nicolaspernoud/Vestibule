@@ -115,15 +115,15 @@ func (m manager) CreateToken(data interface{}, expiration time.Time) (string, er
 // ExtractAndValidateToken extracts the token from the request, validates it, and return the data n the value pointed to by v
 func (m manager) ExtractAndValidateToken(r *http.Request, cookieName string, v interface{}, checkXSRF bool) (bool, error) {
 	becsToken, checkXSRF, err := func(r *http.Request, checkXSRF bool) (string, bool, error) {
-		// Try to extract from the cookie
-		cookie, err := r.Cookie(cookieName)
-		if err == nil {
-			return cookie.Value, checkXSRF, err
-		}
 		// Try to extract from the query
 		query := r.URL.Query().Get("token")
 		if query != "" {
 			return query, false, nil
+		}
+		// Try to extract from the cookie
+		cookie, err := r.Cookie(cookieName)
+		if err == nil {
+			return cookie.Value, checkXSRF, err
 		}
 		// Try to get an auth token from the header
 		authHeader := strings.Split(r.Header.Get("Authorization"), " ")
