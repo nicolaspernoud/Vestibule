@@ -19,7 +19,7 @@ async function openDocument() {
     editorConfig: {
       lang: "fr-FR",
       mode: `${fileExtension === "docx" || fileExtension === "xlsx" || fileExtension === "pptx" ? "edit" : "view"}`,
-      callbackUrl: `{{.Hostname}}/onlyoffice/save?file=${file}&token=${token}`,
+      callbackUrl: `${document.getElementById("hostname").innerText}/onlyoffice/save?file=${file}&token=${token}`,
       customization: {
         autosave: false
       },
