@@ -45,7 +45,7 @@ export async function CreateMenu() {
               ? ``
               : /* HTML */ `
                   <a class="navbar-item" href="#apps"> Apps </a>
-                  <a class="navbar-item" href="#davs"> Webdavs </a>
+                  <a class="navbar-item" href="#davs"> Files </a>
                   ${user.isAdmin
                     ? /* HTML */ `
                         <a class="navbar-item" href="#users"> Users </a>

@@ -24,7 +24,7 @@ func WebSecurityMiddleware(next http.Handler, source string) http.Handler {
 		w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", source))
 		w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		w.Header().Set("X-XSS-Protection", "1; mode=block")
-		w.Header().Set("Referrer-Policy", "same-origin")
+		w.Header().Set("Referrer-Policy", "origin-when-cross-origin")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		next.ServeHTTP(w, req)
 	})
