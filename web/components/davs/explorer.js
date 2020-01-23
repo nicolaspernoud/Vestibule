@@ -109,14 +109,14 @@ export class Explorer {
 
   fileTemplate(file) {
     return /* HTML */ `
-      <article class="media animated fadeIn faster">
+      <article id="file-${file.id}-content" class="media animated fadeIn faster">
         <figure class="media-left">
           ${file.type.includes("image")
             ? `<p class="image is-48x48"><img id="file-${file.id}-image" src="assets/spinner.svg"/></p>`
             : `<span class="icon is-large"><i class="fas fa-3x fa-${file.isDir ? "folder" : "file"}"></i></span>`}
         </figure>
         <div class="media-content">
-          <div id="file-${file.id}-content" class="content">
+          <div class="content">
             <p><strong>${file.name}</strong> <small>(${file.isDir ? "" : sizeToHuman(file.size) + " - "}${intToLocaleDate(file.lastModified)})</small></p>
           </div>
           <nav class="level is-mobile">
@@ -203,29 +203,36 @@ export class Explorer {
     });
 
     if (this.readwrite) {
-      document.getElementById(`file-${file.id}-rename`).addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-rename`).addEventListener("click", event => {
+        event.stopPropagation();
         this.rename(file);
       });
-      document.getElementById(`file-${file.id}-cut`).addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-cut`).addEventListener("click", event => {
+        event.stopPropagation();
         this.moveOrCopy(file, false);
       });
-      document.getElementById(`file-${file.id}-copy`).addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-copy`).addEventListener("click", event => {
+        event.stopPropagation();
         this.moveOrCopy(file, true);
       });
       if (GetType(file) === "text") {
-        document.getElementById(`file-${file.id}-edit`).addEventListener("click", () => {
+        document.getElementById(`file-${file.id}-edit`).addEventListener("click", event => {
+          event.stopPropagation();
           const editModal = new Edit(this.fullHostname, file);
           editModal.show(true);
         });
       }
-      document.getElementById(`file-${file.id}-delete`).addEventListener("click", () => {
+      document.getElementById(`file-${file.id}-delete`).addEventListener("click", event => {
+        event.stopPropagation();
         this.delete(file);
       });
     }
-    document.getElementById(`file-${file.id}-download`).addEventListener("click", () => {
+    document.getElementById(`file-${file.id}-download`).addEventListener("click", event => {
+      event.stopPropagation();
       this.download(file);
     });
-    document.getElementById(`file-${file.id}-share`).addEventListener("click", () => {
+    document.getElementById(`file-${file.id}-share`).addEventListener("click", event => {
+      event.stopPropagation();
       const shareModal = new Share(this.hostname, file);
       shareModal.show(true);
     });

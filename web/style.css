@@ -70,3 +70,11 @@ img {
 .image.is-48x48 {
   overflow: hidden;
 }
+
+.media {
+  cursor: pointer;
+}
+
+.media a {
+  cursor: auto;
+}

@@ -86,7 +86,7 @@ async function doLogin() {
     if (response.status !== 200) {
       throw new Error(`Login error (status ${response.status})`);
     }
-    location.hash = "#apps";
+    location.hash = "#davs";
     Navbar.CreateMenu();
   } catch (e) {
     Messages.Show("is-warning", e.message);
