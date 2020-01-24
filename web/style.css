@@ -10,17 +10,19 @@
 .notification {
   z-index: 100;
   position: fixed;
-  right: 1rem;
+  left: 45vw;
   bottom: 1rem;
   width: 50vw;
+  transition: all 0.5s ease;
 }
 
 .notification:hover {
   z-index: 200;
+  left: 25vw !important;
 }
 
 .uploader {
-  left: 1rem;
+  left: 5vw;
 }
 
 .spinner {
