@@ -10,8 +10,8 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/appserver"
 	"github.com/nicolaspernoud/vestibule/pkg/auth"
 	"github.com/nicolaspernoud/vestibule/pkg/davserver"
+	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 	"github.com/nicolaspernoud/vestibule/pkg/onlyoffice"
-	"github.com/nicolaspernoud/vestibule/pkg/security"
 	"golang.org/x/crypto/acme/autocert"
 
 	"github.com/nicolaspernoud/vestibule/pkg/common"
@@ -28,9 +28,9 @@ type RootMux struct {
 // CreateRootMux creates a RootMux
 func CreateRootMux(port int, appsFile string, davsFile string, staticDir string) RootMux {
 	hostname := os.Getenv("HOSTNAME")
-	fullHostname := security.GetFullHostname(hostname, port)
+	fullHostname := middlewares.GetFullHostname(hostname, port)
 	// Create the app handler
-	appServer, err := appserver.NewServer(appsFile, port, fullHostname, auth.ValidateAuthMiddleware)
+	appServer, err := appserver.NewServer(appsFile, port, "*."+hostname+":*", auth.ValidateAuthMiddleware)
 	if err != nil {
 		log.Logger.Fatal(err)
 	}
@@ -79,10 +79,10 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 	adminMux.HandleFunc("/users/", auth.ProcessUsers)
 	mainMux.Handle("/api/admin/", http.StripPrefix("/api/admin", auth.ValidateAuthMiddleware(adminMux, []string{os.Getenv("ADMIN_ROLE")}, true)))
 	// Serve static files falling back to serving index.html
-	mainMux.Handle("/", http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)}))
+	mainMux.Handle("/", middlewares.NoCache(http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)})))
 	// Put it together into the main handler
 	mux := http.NewServeMux()
-	mux.Handle(hostname+"/", security.WebSecurityMiddleware(mainMux, "*."+hostname+":*"))
+	mux.Handle(hostname+"/", middlewares.WebSecurity(mainMux, "*."+hostname+":*"))
 	mux.Handle("/", adH)
 	return RootMux{mux, policy, &m}
 }
@@ -108,7 +108,7 @@ func (h *appDavHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, d := range h.ds.Davs {
 		if host == d.Host {
-			security.CorsMiddleware(security.WebSecurityMiddleware(h.ds, h.cspSrc), h.dsCORSAllowOrigin).ServeHTTP(w, r)
+			middlewares.Cors(middlewares.WebSecurity(h.ds, h.cspSrc), h.dsCORSAllowOrigin).ServeHTTP(w, r)
 			return
 		}
 	}

@@ -1,6 +1,7 @@
 // Imports
 import * as Auth from "/services/auth/auth.js";
 import * as brand from "/assets/brand/brand.js";
+import { AnimateCSS } from "/services/common/common.js";
 
 // local variables
 let user;
@@ -23,16 +24,22 @@ export function mount(mountpoint) {
   // Hamburger menu
   const burger = document.getElementById("navbar-burger");
   menu = document.getElementById("navbar-menu");
-  burger.addEventListener("click", () => {
-    burger.classList.toggle("is-active");
-    menu.classList.toggle("is-active");
-  });
-  menu.addEventListener("click", () => {
+  const openClose = e => {
     if (burger.classList.contains("is-active")) {
-      burger.classList.toggle("is-active");
-      menu.classList.toggle("is-active");
+      AnimateCSS(menu, "slideOutRight", function() {
+        menu.classList.remove("is-active");
+        burger.classList.remove("is-active");
+      });
+    } else {
+      if (e.srcElement == burger) {
+        menu.classList.add("is-active");
+        burger.classList.add("is-active");
+        AnimateCSS(menu, "slideInRight");
+      }
     }
-  });
+  };
+  burger.addEventListener("click", openClose);
+  menu.addEventListener("click", openClose);
   CreateMenu();
 }
 

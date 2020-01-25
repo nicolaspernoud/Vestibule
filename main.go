@@ -11,7 +11,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/nicolaspernoud/vestibule/pkg/security"
+	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 
 	"github.com/nicolaspernoud/vestibule/internal/mocks"
@@ -50,7 +50,7 @@ func main() {
 		}()
 	}
 	log.Logger.Println("--- Server is starting ---")
-	fullHostname := security.GetFullHostname(os.Getenv("HOSTNAME"), *httpsPort)
+	fullHostname := middlewares.GetFullHostname(os.Getenv("HOSTNAME"), *httpsPort)
 	log.Logger.Println("Main hostname is ", fullHostname)
 
 	// Initializations

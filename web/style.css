@@ -1,3 +1,7 @@
+.navbar {
+  height: 3.25rem;
+}
+
 .navbar-item img {
   max-height: 2.5rem;
   margin-right: 10px;

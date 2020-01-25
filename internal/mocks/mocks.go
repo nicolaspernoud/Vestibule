@@ -7,7 +7,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/nicolaspernoud/vestibule/pkg/security"
+	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 )
 
 var (
@@ -80,7 +80,7 @@ func CreateMockAPI() *http.ServeMux {
 	mux := http.NewServeMux()
 	// Returns authorization code back to the user
 	frameSource := "https://static." + hostname + ":" + port
-	mux.Handle("/", security.CorsMiddleware(func() http.Handler {
+	mux.Handle("/", middlewares.Cors(func() http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(`{
