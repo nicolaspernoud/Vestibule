@@ -30,7 +30,7 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 	hostname := os.Getenv("HOSTNAME")
 	fullHostname := middlewares.GetFullHostname(hostname, port)
 	// Create the app handler
-	appServer, err := appserver.NewServer(appsFile, port, "*."+hostname+":*", auth.ValidateAuthMiddleware)
+	appServer, err := appserver.NewServer(appsFile, port, hostname, auth.ValidateAuthMiddleware)
 	if err != nil {
 		log.Logger.Fatal(err)
 	}

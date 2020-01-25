@@ -10,6 +10,7 @@ import (
 	"crypto/tls"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -160,7 +161,7 @@ func makeHandler(app *app, authz authzFunc) http.Handler {
 					}
 					res.Header.Set("Location", u.String())
 				}
-				res.Header.Set("Content-Security-Policy", "frame-ancestors "+frameSource)
+				res.Header.Set("Content-Security-Policy", fmt.Sprintf("frame-ancestors %[1]v:* *.%[1]v:*", frameSource))
 				res.Header.Set("X-Frame-Options", "DENY")
 				return nil
 			},
