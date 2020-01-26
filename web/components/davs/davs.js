@@ -124,6 +124,19 @@ export async function mount(where) {
 
 function davTemplate(dav) {
   cleanDav(dav);
+  const du = dav.usedgb / dav.totalgb;
+  let duType;
+  switch (true) {
+    case du < 0.75:
+      duType = "success";
+      break;
+    case du >= 0.75 && du < 0.9:
+      duType = "warning";
+      break;
+    default:
+      duType = "danger";
+  }
+  const free = dav.totalgb - dav.usedgb;
   return /* HTML */ `
     <div id="davs-dav-${dav.id}" class="card icon-card">
       <div class="card-content has-text-centered">
@@ -150,10 +163,12 @@ function davTemplate(dav) {
               ${user.isAdmin ? '<a class="dropdown-item has-text-danger" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
               <hr class="dropdown-divider" />
               <div class="dropdown-item">
+                <p><progress class="progress is-${duType}" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${free} GB free</p>
+                <hr class="dropdown-divider" />
                 <p><strong>${dav.host}</strong></p>
                 <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
                 <p>${dav.secured ? "Restricted access to user with roles <strong>" + dav.roles + "</strong>" : "Unrestricted access"}</p>
-                <p><strong>${dav.id}</strong></p>
+                <p class="has-text-centered"><strong>-${dav.id}-</strong></p>
               </div>
             </div>
           </div>

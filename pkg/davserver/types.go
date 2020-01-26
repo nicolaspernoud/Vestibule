@@ -9,6 +9,11 @@ import (
 	"sort"
 
 	"github.com/nicolaspernoud/vestibule/pkg/common"
+	"github.com/nicolaspernoud/vestibule/pkg/du"
+)
+
+const (
+	gB = 1 << (10 * 3)
 )
 
 // Dav represents a webdav file service
@@ -22,6 +27,8 @@ type Dav struct {
 	Color    string   `json:"color,omitempty"`    // icon's color
 	Secured  bool     `json:"secured"`            // true if the handler is secured with auth
 	Roles    []string `json:"roles,omitempty"`    // Roles allowed to access the file service
+	UsedGB   uint64   `json:"usedgb"`
+	TotalGB  uint64   `json:"totalgb"`
 }
 
 type dav struct {
@@ -57,6 +64,16 @@ func (s *Server) SendDavs(w http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
+	}
+	for i, dav := range davs {
+		usage, err := du.NewDiskUsage(dav.Root)
+		if err != nil {
+			http.Error(w, "error getting disk usage", 400)
+			return
+		}
+		dav.UsedGB = usage.Used() / gB
+		dav.TotalGB = usage.Size() / gB
+		davs[i] = dav
 	}
 	json.NewEncoder(w).Encode(davs)
 }

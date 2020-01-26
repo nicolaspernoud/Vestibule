@@ -7,6 +7,10 @@
   margin-right: 10px;
 }
 
+.navbar a svg {
+  margin-right: 5px;
+}
+
 .has-reduced-padding {
   padding: 0.5rem;
 }
