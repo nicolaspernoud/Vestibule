@@ -27,8 +27,8 @@ type Dav struct {
 	Color    string   `json:"color,omitempty"`    // icon's color
 	Secured  bool     `json:"secured"`            // true if the handler is secured with auth
 	Roles    []string `json:"roles,omitempty"`    // Roles allowed to access the file service
-	UsedGB   uint64   `json:"usedgb"`
-	TotalGB  uint64   `json:"totalgb"`
+	UsedGB   uint64   `json:"usedgb,omitempty"`
+	TotalGB  uint64   `json:"totalgb,omitempty"`
 }
 
 type dav struct {

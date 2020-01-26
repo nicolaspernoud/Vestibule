@@ -31,7 +31,7 @@ var (
 	newUser                = `{"id":"3","login":"new_user","memberOf":["USERS"],"password":"test"}`
 	initialDavsBuff, _     = ioutil.ReadFile("./testdata/davs.json")
 	initialDavs            = reg.ReplaceAllString(string(initialUsersBuff), "")
-	newDav                 = `{"id": 4,"host":"writableadmindav.vestibule.io","root":"./data/mydata","secured":true,"writable":true,"roles":["ADMINS"]}`
+	newDav                 = `{"id": 4,"host":"writableadmindav.vestibule.io","root":"./testdata/data","secured":true,"writable":true,"roles":["ADMINS"]}`
 	noH                    = tester.Header{Key: "", Value: ""}
 )
 
