@@ -82,6 +82,7 @@ export class Explorer {
   }
 
   async navigate(path) {
+    if (!path.endsWith("/")) path += "/";
     this.path = path;
     this.progress.classList.remove("is-hidden");
     try {
@@ -291,7 +292,7 @@ export class Explorer {
           throw new Error(`File could not be renamed (status ${response.status})`);
         }
         file.name = renameModal.getElementsByTagName("input")[0].value;
-        file.path = goUp(file.path) + file.name;
+        file.path = goUp(file.path) + encodeURIComponent(file.name);
         this.displayFiles();
       } catch (e) {
         Messages.Show("is-warning", e.message);
@@ -430,7 +431,7 @@ export class Explorer {
     let offset = 0;
     let id = this.files.length + 1;
     for (const file of files) {
-      file.path = this.path + file.name;
+      file.path = this.path + encodeURIComponent(file.name);
       // Create a message to allow progress tracking and cancellation
       let msg = document.createElement("div");
       msg.innerHTML = /* HTML */ `
