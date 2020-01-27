@@ -4,6 +4,7 @@ import * as Auth from "/services/auth/auth.js";
 import { Icons } from "/services/common/icons.js";
 import { AnimateCSS } from "/services/common/common.js";
 import { Explorer } from "./explorer.js";
+import { Delete } from "/services/common/delete.js";
 
 // DOM elements
 let mountpoint;
@@ -127,14 +128,14 @@ function davTemplate(dav) {
   const du = dav.usedgb / dav.totalgb;
   let duType;
   switch (true) {
-    case du < 0.75:
-      duType = "success";
+    case du >= 0.9:
+      duType = "danger";
       break;
     case du >= 0.75 && du < 0.9:
       duType = "warning";
       break;
     default:
-      duType = "danger";
+      duType = "success";
   }
   const free = dav.totalgb - dav.usedgb;
   return /* HTML */ `
@@ -163,7 +164,7 @@ function davTemplate(dav) {
               ${user.isAdmin ? '<a class="dropdown-item has-text-danger" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
               <hr class="dropdown-divider" />
               <div class="dropdown-item">
-                <p><progress class="progress is-${duType}" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${free} GB free</p>
+                <p><progress class="progress is-${duType}" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${dav.usedgb !== undefined ? free + " GB free" : ""}</p>
                 <hr class="dropdown-divider" />
                 <p><strong>${dav.host}</strong></p>
                 <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
@@ -193,7 +194,9 @@ function displayDavs(davs) {
         editDav(dav);
       });
       document.getElementById(`davs-dav-delete-${dav.id}`).addEventListener("click", function() {
-        deleteDav(dav);
+        new Delete(() => {
+          deleteDav(dav);
+        });
       });
     }
     if (user.isAdmin || !dav.secured || dav.roles.some(r => user.memberOf.includes(r))) {

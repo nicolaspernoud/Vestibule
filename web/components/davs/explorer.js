@@ -5,6 +5,7 @@ import { AnimateCSS, GetType } from "/services/common/common.js";
 import { Open } from "/components/davs/open.js";
 import { Edit } from "/components/davs/edit.js";
 import { Share } from "/components/davs/share.js";
+import { Delete } from "/services/common/delete.js";
 
 export class Explorer {
   constructor(hostname) {
@@ -38,6 +39,11 @@ export class Explorer {
                     <i class="fas fa-folder-plus"></i>
                   </span>
                 </button>
+                <button id="explorer-modal-newtxt" class="button">
+                  <span class="icon is-small">
+                    <i class="fas fa-file-medical"></i>
+                  </span>
+                </button>
                 <div class="button" style="padding: 0 7px;">
                   <span class="icon is-small" style="margin: 0;">
                     <i class="fas fa-upload"></i>
@@ -63,6 +69,9 @@ export class Explorer {
     if (this.readwrite) {
       document.getElementById(`explorer-modal-newfolder`).addEventListener("click", () => {
         this.newFolder();
+      });
+      document.getElementById(`explorer-modal-newtxt`).addEventListener("click", () => {
+        this.newTxt();
       });
       document.getElementById(`explorer-modal-upload`).addEventListener("change", e => {
         this.upload(e.srcElement.files);
@@ -349,7 +358,7 @@ export class Explorer {
   }
 
   async newFolder() {
-    const folder = { name: "New Folder", isDir: true, type: "dir", size: 0, lastModified: new Date(), path: this.path + "New Folder" };
+    const folder = { name: "New Folder", isDir: true, type: "dir", size: 0, lastModified: new Date(), path: this.path + "New Folder", id: this.files.length + 1 };
     try {
       const response = await fetch(this.fullHostname + folder.path, {
         method: "MKCOL",
@@ -369,32 +378,33 @@ export class Explorer {
     }
   }
 
+  async newTxt() {
+    const newTxtName = "New Text.txt";
+    const txt = { name: newTxtName, isDir: false, type: "text", size: 0, lastModified: new Date(), path: this.path + newTxtName, id: this.files.length + 1 };
+    try {
+      if (this.files.some(file => file.name === newTxtName)) {
+        throw new Error(`Text document already exists`);
+      }
+      const response = await fetch(this.fullHostname + txt.path, {
+        method: "PUT",
+        headers: new Headers({
+          "XSRF-Token": this.user.xsrftoken
+        }),
+        credentials: "include"
+      });
+      if (response.status !== 201) {
+        throw new Error(`Text document could not be created (status ${response.status})`);
+      }
+      this.files.push(txt);
+      this.displayFiles();
+    } catch (e) {
+      Messages.Show("is-warning", e.message);
+      console.error(e);
+    }
+  }
+
   delete(file) {
-    let deleteModal = document.createElement("div");
-    deleteModal.classList.add("modal", "animated", "fadeIn", "faster", "is-active");
-    deleteModal.innerHTML = /* HTML */ `
-      <div class="modal-background"></div>
-      <div class="modal-content">
-        <div class="box" style="margin: 2rem;">
-          <div class="field">
-            <label class="label">Confirm</label>
-          </div>
-          <div class="field is-grouped">
-            <div class="control">
-              <button id="explorer-delete-ok" class="button is-danger">
-                <span class="icon"><i class="fas fa-check"></i></span><span>Delete</span>
-              </button>
-            </div>
-            <div class="control">
-              <button id="explorer-delete-cancel" class="button">
-                <span class="icon"><i class="fas fa-times-circle"></i></span><span>Cancel</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-    deleteModal.querySelector("#" + "explorer-delete-ok").addEventListener("click", async () => {
+    new Delete(async () => {
       try {
         const response = await fetch(this.fullHostname + file.path, {
           method: "DELETE",
@@ -412,21 +422,13 @@ export class Explorer {
         Messages.Show("is-warning", e.message);
         console.error(e);
       }
-      AnimateCSS(deleteModal, "fadeOut", function() {
-        deleteModal.parentNode.removeChild(deleteModal);
-      });
     });
-    deleteModal.querySelector("#" + "explorer-delete-cancel").addEventListener("click", () => {
-      AnimateCSS(deleteModal, "fadeOut", function() {
-        deleteModal.parentNode.removeChild(deleteModal);
-      });
-    });
-    document.body.appendChild(deleteModal);
   }
 
   upload(files) {
     const onStartPath = this.path;
     let offset = 0;
+    let id = this.files.length + 1;
     for (const file of files) {
       file.path = this.path + file.name;
       // Create a message to allow progress tracking and cancellation
@@ -459,9 +461,11 @@ export class Explorer {
               isDir: file.isDir,
               type: file.type,
               size: file.size,
-              lastModified: file.lastModified
+              lastModified: file.lastModified,
+              id: id
             });
             this.displayFiles();
+            id++;
           }
         } else {
           const message = `Error uploading ${file.name} (status ${xhr.status})`;

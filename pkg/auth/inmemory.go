@@ -52,8 +52,6 @@ func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 	tokens.Manager.StoreData(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
 	// Log the connexion
 	log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
-	// Redirect
-	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 // ByID implements sort.Interface for []User based on the ID field

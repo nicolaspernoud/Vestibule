@@ -217,7 +217,7 @@ func createUserTests(t *testing.T) func(wg *sync.WaitGroup) {
 		// Try to access an authorized app after logout (must fail)
 		do("GET", "api.vestibule.io", noH, "", 401, "error extracting token")
 		// Do a in memory login with an known user
-		do("POST", "/Login", noH, `{"login": "user","password": "password"}`, 200, "<!DOCTYPE html>")
+		do("POST", "/Login", noH, `{"login": "user","password": "password"}`, 200, "")
 		// Run the tests
 		tests()
 		// Try to logout (must pass)
@@ -282,7 +282,7 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 		// Try to get the apps again (must fail)
 		do("GET", "/api/admin/apps", noH, "", 401, "error extracting token")
 		// Do a in memory login with an known admin
-		do("POST", "/Login", noH, `{"login": "admin","password": "password"}`, 200, "<!DOCTYPE html>")
+		do("POST", "/Login", noH, `{"login": "admin","password": "password"}`, 200, "")
 		tests()
 		// Try to logout (must pass)
 		do("GET", "/Logout", noH, "", 200, "Logout OK")

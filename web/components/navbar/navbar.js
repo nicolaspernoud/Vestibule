@@ -51,11 +51,11 @@ export async function CreateMenu() {
             user === undefined
               ? ``
               : /* HTML */ `
-                  <a class="navbar-item" href="#apps"><i class="fas fa-home"></i>Apps</a>
-                  <a class="navbar-item" href="#davs"><i class="fas fa-folder-open"></i>Files</a>
+                  <a class="navbar-item" href="#apps"><i class="navbar-menu-icon fas fa-home"></i>Apps</a>
+                  <a class="navbar-item" href="#davs"><i class="navbar-menu-icon fas fa-folder-open"></i>Files</a>
                   ${user.isAdmin
                     ? /* HTML */ `
-                        <a class="navbar-item" href="#users"><i class="fas fa-users"></i>Users</a>
+                        <a class="navbar-item" href="#users"><i class="navbar-menu-icon fas fa-users"></i>Users</a>
                       `
                     : ""}
                 `
@@ -65,10 +65,10 @@ export async function CreateMenu() {
           ${
             user === undefined
               ? /* HTML */ `
-                  <a class="navbar-item" href="#login"><i class="fas fa-sign-in-alt"></i>Log in</a>
+                  <a class="navbar-item" href="#login"><i class="navbar-menu-icon fas fa-sign-in-alt"></i>Log in</a>
                 `
               : /* HTML */ `
-                  <a class="navbar-item" href="/Logout"><i class="fas fa-sign-out-alt"></i>Log out</a>
+                  <a class="navbar-item" href="/Logout"><i class="navbar-menu-icon fas fa-sign-out-alt"></i>Log out</a>
                 `
           }
         </div>

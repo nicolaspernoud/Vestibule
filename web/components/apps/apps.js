@@ -3,6 +3,7 @@ import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
 import { Icons } from "/services/common/icons.js";
 import { AnimateCSS } from "/services/common/common.js";
+import { Delete } from "/services/common/delete.js";
 
 // DOM elements
 let mountpoint;
@@ -203,7 +204,9 @@ function displayApps(apps) {
         editApp(app);
       });
       document.getElementById(`apps-app-delete-${app.id}`).addEventListener("click", function() {
-        deleteApp(app);
+        new Delete(() => {
+          deleteApp(app);
+        });
       });
     }
     if (user.isAdmin || !app.secured || app.roles.some(r => user.memberOf.includes(r))) {

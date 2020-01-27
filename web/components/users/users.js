@@ -2,6 +2,7 @@
 import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString } from "/services/common/common.js";
 import * as Auth from "/services/auth/auth.js";
+import { Delete } from "/services/common/delete.js";
 
 // DOM elements
 let mountpoint;
@@ -150,7 +151,9 @@ function displayUsers() {
       editUser(user);
     });
     document.getElementById(`users-user-delete-${user.id}`).addEventListener("click", function() {
-      deleteUser(user);
+      new Delete(() => {
+        deleteUser(user);
+      });
     });
   });
 }

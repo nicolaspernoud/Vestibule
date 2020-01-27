@@ -2,6 +2,7 @@
 import * as Messages from "/services/messages/messages.js";
 import * as Navbar from "/components/navbar/navbar.js";
 import { loginModes } from "/assets/brand/brand.js";
+import * as Auth from "/services/auth/auth.js";
 
 // DOM elements
 let mountpoint;
@@ -86,6 +87,7 @@ async function doLogin() {
     if (response.status !== 200) {
       throw new Error(`Login error (status ${response.status})`);
     }
+    await Auth.GetUser();
     location.hash = "#davs";
     Navbar.CreateMenu();
   } catch (e) {
