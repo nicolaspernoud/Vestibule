@@ -99,7 +99,7 @@ export class Open {
       this.update(true);
     });
     this.gid("open-share").addEventListener("click", () => {
-      const shareModal = new Share(this.fullHostname, this.file);
+      const shareModal = new Share(this.hostname, this.file);
       shareModal.show();
     });
   }
