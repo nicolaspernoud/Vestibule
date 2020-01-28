@@ -283,7 +283,7 @@ export class Explorer {
         const response = await fetch(this.fullHostname + file.path, {
           method: "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + this.path + encodeURIComponent(renameModal.getElementsByTagName("input")[0].value),
+            Destination: this.fullHostname + path(this.path, renameModal.getElementsByTagName("input")[0].value),
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
@@ -333,7 +333,7 @@ export class Explorer {
         const response = await fetch(this.fullHostname + file.path, {
           method: isCopy ? "COPY" : "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + this.path + encodeURIComponent(file.name),
+            Destination: this.fullHostname + path(this.path, file.name),
             "XSRF-Token": this.user.xsrftoken
           }),
           credentials: "include"
@@ -359,7 +359,8 @@ export class Explorer {
   }
 
   async newFolder() {
-    const folder = { name: "New Folder", isDir: true, type: "dir", size: 0, lastModified: new Date(), path: this.path + "New Folder", id: this.files.length + 1 };
+    const newFolderName = "New Folder";
+    const folder = { name: newFolderName, isDir: true, type: "dir", size: 0, lastModified: new Date(), path: path(this.path, newFolderName), id: this.files.length + 1 };
     try {
       const response = await fetch(this.fullHostname + folder.path, {
         method: "MKCOL",
@@ -381,7 +382,7 @@ export class Explorer {
 
   async newTxt() {
     const newTxtName = "New Text.txt";
-    const txt = { name: newTxtName, isDir: false, type: "text", size: 0, lastModified: new Date(), path: this.path + newTxtName, id: this.files.length + 1 };
+    const txt = { name: newTxtName, isDir: false, type: "text", size: 0, lastModified: new Date(), path: path(this.path, newTxtName), id: this.files.length + 1 };
     try {
       if (this.files.some(file => file.name === newTxtName)) {
         throw new Error(`Text document already exists`);
@@ -431,7 +432,7 @@ export class Explorer {
     let offset = 0;
     let id = this.files.length + 1;
     for (const file of files) {
-      file.path = this.path + encodeURIComponent(file.name);
+      file.path = path(this.path, file.name);
       // Create a message to allow progress tracking and cancellation
       let msg = document.createElement("div");
       msg.innerHTML = /* HTML */ `
@@ -604,4 +605,8 @@ export async function LoadImage(image, url, user) {
     Messages.Show("is-warning", e.message);
     console.error(e);
   }
+}
+
+function path(path, name) {
+  return path + encodeURIComponent(name);
 }
