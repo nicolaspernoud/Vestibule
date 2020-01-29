@@ -52,7 +52,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 		// Handle CORS preflight requests
 		if err != nil && r.Method == "OPTIONS" {
 			// Handle GIO preflight requests
-			if strings.Contains(r.UserAgent(), "gvfs") {
+			if strings.Contains(r.UserAgent(), "vfs") {
 				w.Header().Set("WWW-Authenticate", `Basic realm="server"`)
 				http.Error(w, "gio authentication", 401)
 			}
