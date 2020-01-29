@@ -18,6 +18,7 @@ let root_field;
 let secured_field;
 let roles_field;
 let roles_container;
+let passphrase_field;
 
 // local variables
 let davs;
@@ -96,6 +97,13 @@ export async function mount(where) {
               <input class="input" type="text" id="davs-modal-roles" />
             </div>
           </div>
+          <div class="field">
+            <label class="label">Passphrase to encrypt files (leave empty to disable encryption)</label>
+            <div class="control">
+              <input class="input" type="text" id="davs-modal-passphrase" />
+            </div>
+          </div>
+          <br />
         </section>
         <footer class="modal-card-foot">
           <button id="davs-modal-save" class="button is-success">Save changes</button>
@@ -201,7 +209,7 @@ function displayDavs(davs) {
     }
     if (user.isAdmin || !dav.secured || dav.roles.some(r => user.memberOf.includes(r))) {
       document.getElementById(`davs-dav-open-${dav.id}`).addEventListener("click", function() {
-        openExplorerModal(dav.host, dav.writable);
+        openExplorerModal(dav.host, dav.writable, dav.passphrase != null && dav.passphrase !== "");
       });
     }
   });
@@ -256,6 +264,7 @@ function registerModalFields() {
   secured_field = document.getElementById("davs-modal-secured");
   roles_field = document.getElementById("davs-modal-roles");
   roles_container = document.getElementById("davs-modal-roles-container");
+  passphrase_field = document.getElementById("davs-modal-passphrase");
   document.getElementById(`davs-modal-close`).addEventListener("click", function() {
     toggleModal();
   });
@@ -287,11 +296,12 @@ async function editDav(dav) {
   root_field.value = dav.root;
   secured_field.checked = dav.secured;
   roles_field.value = dav.roles;
+  passphrase_field.value = dav.passphrase;
   toggleModal();
 }
 
 function cleanDav(dav) {
-  let props = ["writable", "name", "roles"];
+  let props = ["writable", "name", "roles", "passphrase"];
   for (const prop of props) {
     dav[prop] = dav[prop] === undefined ? "" : dav[prop];
   }
@@ -312,6 +322,7 @@ async function newDav() {
   root_field.value = "";
   secured_field.checked = false;
   roles_field.value = "";
+  passphrase_field.value = "";
   toggleModal();
 }
 
@@ -331,7 +342,8 @@ async function postDav() {
         writable: writable_field.checked,
         root: root_field.value,
         secured: secured_field.checked,
-        roles: secured_field.checked ? roles_field.value.split(",") : ""
+        roles: secured_field.checked ? roles_field.value.split(",") : "",
+        passphrase: passphrase_field.value
       })
     });
     if (response.status !== 200) {
@@ -417,11 +429,11 @@ async function pickIcon() {
   document.getElementById("davs-icons-modal").classList.toggle("is-active");
 }
 
-function openExplorerModal(hostname, readwrite) {
+function openExplorerModal(hostname, readwrite, encrypted) {
   const modal = document.getElementById("davs-explorer-modal");
   const card = document.getElementById("davs-explorer-modal-card");
   const explorer = new Explorer(hostname);
-  explorer.mount("davs-explorer-modal-card", readwrite);
+  explorer.mount("davs-explorer-modal-card", readwrite, encrypted);
   modal.classList.add("is-active");
   AnimateCSS(modal, "fadeIn");
   AnimateCSS(card, "zoomIn");

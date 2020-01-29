@@ -2,6 +2,7 @@ package davserver
 
 import (
 	"archive/zip"
+	"crypto/sha256"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -17,6 +18,7 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/auth"
 	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/log"
+	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 	"golang.org/x/net/webdav"
 )
 
@@ -113,7 +115,7 @@ func parseDavs(file string, authz authzFunc) ([]*dav, error) {
 
 // makeHandler constructs the appropriate Handler for the given dav.
 func makeHandler(dav *dav, authz authzFunc) http.Handler {
-	handler := NewWebDavAug("", dav.Root, dav.Writable)
+	handler := NewWebDavAug("", dav.Root, dav.Writable, dav.EncryptionPassphrase)
 	if !dav.Secured {
 		return handler
 	}
@@ -122,14 +124,16 @@ func makeHandler(dav *dav, authz authzFunc) http.Handler {
 
 // WebdavAug represents an augmented webdav which enable download of directories as streamed zip files
 type WebdavAug struct {
-	prefix     string
-	directory  string
-	methodMux  map[string]http.Handler
-	zipHandler http.Handler
+	prefix      string
+	directory   string
+	methodMux   map[string]http.Handler
+	zipHandler  http.Handler
+	isEncrypted bool
+	key         []byte
 }
 
 // NewWebDavAug create an initialized WebdavAug instance
-func NewWebDavAug(prefix string, directory string, canWrite bool) WebdavAug {
+func NewWebDavAug(prefix string, directory string, canWrite bool, passphrase string) WebdavAug {
 	zipH := http.StripPrefix(prefix, &zipHandler{directory})
 	davH := &webdav.Handler{
 		Prefix:     prefix,
@@ -138,6 +142,16 @@ func NewWebDavAug(prefix string, directory string, canWrite bool) WebdavAug {
 		Logger:     webdavLogger,
 	}
 	var mMux map[string]http.Handler
+	var key []byte
+	var isEncrypted bool
+
+	// Handle encryption
+	if passphrase != "" {
+		h := sha256.New()
+		h.Write([]byte(passphrase))
+		key = h.Sum(nil)
+		isEncrypted = true
+	}
 
 	if canWrite {
 		mMux = map[string]http.Handler{
@@ -162,38 +176,54 @@ func NewWebDavAug(prefix string, directory string, canWrite bool) WebdavAug {
 	}
 
 	return WebdavAug{
-		prefix:     prefix,
-		directory:  directory,
-		methodMux:  mMux,
-		zipHandler: zipH,
+		prefix:      prefix,
+		directory:   directory,
+		methodMux:   mMux,
+		zipHandler:  zipH,
+		isEncrypted: isEncrypted,
+		key:         key,
 	}
 
 }
 
 func (wdaug WebdavAug) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if h, ok := wdaug.methodMux[r.Method]; ok {
-		if r.Method == "GET" {
-			// Work out if trying to serve a directory
-			ressource := strings.TrimPrefix(r.URL.Path, wdaug.prefix)
-			fullName := filepath.Join(wdaug.directory, filepath.FromSlash(path.Clean("/"+ressource)))
-			info, err := os.Stat(fullName)
-			if err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
+		if wdaug.isEncrypted { // Zip download disabled if wdaug is encrypted
+			if r.Method == "GET" {
+				setContentDisposition(w, r)
+				h = middlewares.Decrypt(h, wdaug.key)
 			}
-			if !info.IsDir() { // The file will be handled by webdav server
-				filename := url.PathEscape(filepath.Base(r.URL.Path))
-				_, inline := r.URL.Query()["inline"]
-				if !inline {
-					w.Header().Set("Content-Disposition", "attachment; filename*="+filename)
+			if r.Method == "PUT" {
+				h = middlewares.Encrypt(h, wdaug.key)
+			}
+		} else {
+			if r.Method == "GET" {
+				// Work out if trying to serve a directory
+				ressource := strings.TrimPrefix(r.URL.Path, wdaug.prefix)
+				fullName := filepath.Join(wdaug.directory, filepath.FromSlash(path.Clean("/"+ressource)))
+				info, err := os.Stat(fullName)
+				if err != nil {
+					http.Error(w, err.Error(), http.StatusBadRequest)
+					return
 				}
-			} else {
-				h = wdaug.zipHandler
+				if info.IsDir() {
+					h = wdaug.zipHandler
+				} else { // The file will be handled by webdav server
+					setContentDisposition(w, r)
+				}
 			}
 		}
 		h.ServeHTTP(w, r)
 	} else {
 		http.Error(w, "method not allowed : dav is read only", http.StatusMethodNotAllowed)
+	}
+}
+
+func setContentDisposition(w http.ResponseWriter, r *http.Request) {
+	filename := url.PathEscape(filepath.Base(r.URL.Path))
+	_, inline := r.URL.Query()["inline"]
+	if !inline {
+		w.Header().Set("Content-Disposition", "attachment; filename*="+filename)
 	}
 }
 

@@ -34,11 +34,11 @@ type manager struct {
 
 // Init inits the main token manager
 func Init(keyfile string, debug bool) {
-	Manager = NewManager(keyfile, debug)
+	Manager = newManager(keyfile, debug)
 }
 
-// NewManager creates a manager
-func NewManager(keyfile string, debug bool) manager {
+// newManager creates a manager
+func newManager(keyfile string, debug bool) manager {
 	var keyConfig struct {
 		Key []byte
 	}
@@ -105,7 +105,7 @@ func (m manager) CreateToken(data interface{}, expiration time.Time) (string, er
 	if err := c.Close(); err != nil {
 		return "", err
 	}
-	ecsToken, err := encrypt(csToken.Bytes(), m.key)
+	ecsToken, err := Encrypt(csToken.Bytes(), m.key)
 	if err != nil {
 		return "", err
 	}
@@ -155,7 +155,7 @@ func (m manager) unstoreData(becsToken string, v interface{}) error {
 		return fmt.Errorf("failed to unbase64 token")
 
 	}
-	csToken, err := decrypt(ecsToken, m.key)
+	csToken, err := Decrypt(ecsToken, m.key)
 	if err != nil {
 		return fmt.Errorf("failed to decrypt token")
 
@@ -185,7 +185,8 @@ func (m manager) unstoreData(becsToken string, v interface{}) error {
 	return nil
 }
 
-func encrypt(data []byte, key []byte) ([]byte, error) {
+// Encrypt a byte array with AES
+func Encrypt(data []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return []byte{}, err
@@ -202,7 +203,8 @@ func encrypt(data []byte, key []byte) ([]byte, error) {
 	return cipherData, nil
 }
 
-func decrypt(data []byte, key []byte) ([]byte, error) {
+// Decrypt a byte array with AES
+func Decrypt(data []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return []byte{}, err

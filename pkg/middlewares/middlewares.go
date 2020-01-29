@@ -1,9 +1,13 @@
 package middlewares
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+
+	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 )
 
 // Cors enables CORS Request on server (for development purposes)
@@ -36,6 +40,65 @@ func NoCache(next http.Handler) http.Handler {
 		w.Header().Set("Cache-Control", "no-store, must-revalidate")
 		next.ServeHTTP(w, req)
 	})
+}
+
+// Encrypt enables body encryption
+func Encrypt(next http.Handler, key []byte) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		readBody, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		encryptedBody, err := tokens.Encrypt(readBody, key)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		newBody := ioutil.NopCloser(bytes.NewBuffer(encryptedBody))
+		r.Body = newBody
+		next.ServeHTTP(w, r)
+	})
+}
+
+// Decrypt enables body decryption
+func Decrypt(next http.Handler, key []byte) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		wbuff := newDecryptWriter()
+		next.ServeHTTP(wbuff, r)
+		decryptedData, err := tokens.Decrypt(wbuff.body, key)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		w.Write(decryptedData)
+		return
+	})
+}
+
+type decryptWriter struct {
+	headers http.Header
+	body    []byte
+	status  int
+}
+
+func newDecryptWriter() *decryptWriter {
+	return &decryptWriter{
+		headers: make(http.Header),
+	}
+}
+
+func (r *decryptWriter) Header() http.Header {
+	return r.headers
+}
+
+func (r *decryptWriter) Write(p []byte) (int, error) {
+	r.body = append(r.body, p...)
+	return len(p), nil
+}
+
+func (r *decryptWriter) WriteHeader(status int) {
+	r.status = status
 }
 
 // GetFullHostname returns the full hostname of the server

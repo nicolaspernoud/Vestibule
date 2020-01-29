@@ -15,8 +15,9 @@ export class Explorer {
     this.path = "/";
   }
 
-  async mount(mountpoint, readwrite) {
+  async mount(mountpoint, readwrite, encrypted) {
     this.readwrite = readwrite;
+    this.encrypted = encrypted;
     const card = document.getElementById(mountpoint);
     card.innerHTML = /* HTML */ `
       <header class="modal-card-head">
@@ -131,9 +132,13 @@ export class Explorer {
           </div>
           <nav class="level is-mobile">
             <div class="level-left">
-              <a class="level-item" id="file-${file.id}-download">
-                <span class="icon is-small"><i class="fas fa-download"></i></span>
-              </a>
+              ${this.encrypted && file.isDir
+                ? ""
+                : /* HTML */ `
+                    <a class="level-item" id="file-${file.id}-download">
+                      <span class="icon is-small"><i class="fas fa-download"></i></span>
+                    </a>
+                  `}
               ${this.readwrite
                 ? /* HTML */ `
                     <a id="file-${file.id}-rename" class="level-item">
@@ -237,10 +242,12 @@ export class Explorer {
         this.delete(file);
       });
     }
-    document.getElementById(`file-${file.id}-download`).addEventListener("click", event => {
-      event.stopPropagation();
-      this.download(file);
-    });
+    if (!(this.encrypted && file.isDir)) {
+      document.getElementById(`file-${file.id}-download`).addEventListener("click", event => {
+        event.stopPropagation();
+        this.download(file);
+      });
+    }
     document.getElementById(`file-${file.id}-share`).addEventListener("click", event => {
       event.stopPropagation();
       const shareModal = new Share(this.hostname, file);
