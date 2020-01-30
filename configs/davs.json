@@ -7,7 +7,8 @@
 		"name": "Unsecured Webdav",
 		"icon": "box",
 		"color": "#2ce027",
-		"secured": false
+		"secured": false,
+		"passphrase": "very secret passphrase"
 	},
 	{
 		"id": 2,

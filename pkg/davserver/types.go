@@ -8,6 +8,7 @@ import (
 
 	"sort"
 
+	"github.com/nicolaspernoud/vestibule/pkg/auth"
 	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/du"
 )
@@ -19,17 +20,17 @@ const (
 // Dav represents a webdav file service
 type Dav struct {
 	ID                   int      `json:"id"`
-	Host                 string   `json:"host"`               // to match against request Host header
-	Root                 string   `json:"root"`               // the file system directory to serve the webdav from
-	Writable             bool     `json:"writable,omitempty"` // whether if the webdav is writable (default to read only)
-	Name                 string   `json:"name,omitempty"`     // name of the file service
-	Icon                 string   `json:"icon,omitempty"`     // icon to display
-	Color                string   `json:"color,omitempty"`    // icon's color
-	Secured              bool     `json:"secured"`            // true if the handler is secured with auth
-	Roles                []string `json:"roles,omitempty"`    // Roles allowed to access the file service
+	Host                 string   `json:"host"`                 // to match against request Host header
+	Root                 string   `json:"root"`                 // the file system directory to serve the webdav from
+	Writable             bool     `json:"writable,omitempty"`   // whether if the webdav is writable (default to read only)
+	Name                 string   `json:"name,omitempty"`       // name of the file service
+	Icon                 string   `json:"icon,omitempty"`       // icon to display
+	Color                string   `json:"color,omitempty"`      // icon's color
+	Secured              bool     `json:"secured"`              // true if the handler is secured with auth
+	Roles                []string `json:"roles,omitempty"`      // Roles allowed to access the file service
+	EncryptionPassphrase string   `json:"passphrase,omitempty"` // passphrase to encrypt data
 	UsedGB               uint64   `json:"usedgb,omitempty"`
 	TotalGB              uint64   `json:"totalgb,omitempty"`
-	EncryptionPassphrase string   `json:"passphrase,omitempty"` // passphrase to encrypt data
 }
 
 type dav struct {
@@ -60,8 +61,14 @@ func (s *Server) ProcessDavs(w http.ResponseWriter, req *http.Request) {
 
 // SendDavs send davs as response from an http requests
 func (s *Server) SendDavs(w http.ResponseWriter, req *http.Request) {
+	// Get user from request
+	user, err := auth.GetTokenData(req)
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
 	var davs []Dav
-	err := common.Load(s.file, &davs)
+	err = common.Load(s.file, &davs)
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
@@ -71,6 +78,10 @@ func (s *Server) SendDavs(w http.ResponseWriter, req *http.Request) {
 		if err == nil {
 			dav.UsedGB = usage.Used() / gB
 			dav.TotalGB = usage.Size() / gB
+		}
+		// Do not leak encryption passphrase to non admins users
+		if !user.IsAdmin {
+			dav.EncryptionPassphrase = ""
 		}
 		davs[i] = dav
 	}
