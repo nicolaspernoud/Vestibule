@@ -1,13 +1,15 @@
 package middlewares
 
 import (
-	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"strconv"
 
-	"github.com/nicolaspernoud/vestibule/pkg/tokens"
+	"github.com/secure-io/sio-go"
 )
 
 // Cors enables CORS Request on server (for development purposes)
@@ -42,63 +44,59 @@ func NoCache(next http.Handler) http.Handler {
 	})
 }
 
-// Encrypt enables body encryption
+// Encrypt enables body encryption (to be used with webdav PUT requests)
 func Encrypt(next http.Handler, key []byte) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		readBody, err := ioutil.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		encryptedBody, err := tokens.Encrypt(readBody, key)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		newBody := ioutil.NopCloser(bytes.NewBuffer(encryptedBody))
-		r.Body = newBody
+		block, _ := aes.NewCipher(key)
+		gcm, _ := cipher.NewGCM(block)
+		stream := sio.NewStream(gcm, sio.BufSize)
+		nonce := make([]byte, stream.NonceSize())
+		encBody := stream.EncryptReader(r.Body, nonce, nil)
+		r.Body = ioutil.NopCloser(encBody)
 		next.ServeHTTP(w, r)
 	})
 }
 
-// Decrypt enables body decryption
+// Decrypt enables body decryption (to be used with webdav GET requests)
 func Decrypt(next http.Handler, key []byte) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		wbuff := newDecryptWriter()
-		next.ServeHTTP(wbuff, r)
-		decryptedData, err := tokens.Decrypt(wbuff.body, key)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Write(decryptedData)
-		return
+		decryptWriter := newDecryptWriter(w, key)
+		next.ServeHTTP(decryptWriter, r)
+		decryptWriter.encWriter.Close()
 	})
 }
 
 type decryptWriter struct {
-	headers http.Header
-	body    []byte
-	status  int
+	writer    http.ResponseWriter
+	encWriter io.WriteCloser
 }
 
-func newDecryptWriter() *decryptWriter {
+func newDecryptWriter(w http.ResponseWriter, key []byte) *decryptWriter {
+	block, _ := aes.NewCipher(key)
+	gcm, _ := cipher.NewGCM(block)
+	stream := sio.NewStream(gcm, sio.BufSize)
+	nonce := make([]byte, stream.NonceSize())
+	encWriter := stream.DecryptWriter(w, nonce, nil)
 	return &decryptWriter{
-		headers: make(http.Header),
+		writer:    w,
+		encWriter: encWriter,
 	}
 }
 
 func (r *decryptWriter) Header() http.Header {
-	return r.headers
+	return r.writer.Header()
 }
 
 func (r *decryptWriter) Write(p []byte) (int, error) {
-	r.body = append(r.body, p...)
-	return len(p), nil
+	l, err := r.encWriter.Write(p)
+	if err != nil {
+		panic(err)
+	}
+	return l, err
 }
 
 func (r *decryptWriter) WriteHeader(status int) {
-	r.status = status
+	r.writer.WriteHeader(status)
 }
 
 // GetFullHostname returns the full hostname of the server

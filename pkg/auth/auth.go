@@ -186,7 +186,7 @@ func GetShareToken(w http.ResponseWriter, r *http.Request) {
 func GetTokenData(r *http.Request) (TokenData, error) {
 	user, ok := r.Context().Value(ContextData).(TokenData)
 	if !ok {
-		return user, errors.New("user could be got from context")
+		return user, errors.New("user could not be got from context")
 	}
 	return user, nil
 }

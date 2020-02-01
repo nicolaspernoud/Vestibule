@@ -1,19 +1,29 @@
 [
 	{
 		"id": 1,
-		"host": "unsecureddav.vestibule.127.0.0.1.nip.io",
-		"root": "./data",
+		"host": "encrypteddav.vestibule.127.0.0.1.nip.io",
+		"root": "./data/cipherdata",
 		"writable": true,
-		"name": "Unsecured Webdav",
-		"icon": "box",
-		"color": "#2ce027",
+		"name": "Encrypted dav",
+		"icon": "lock",
+		"color": "#d91d19",
 		"secured": false,
 		"passphrase": "very secret passphrase"
 	},
 	{
+		"id": 4,
+		"host": "unsecureddav.vestibule.127.0.0.1.nip.io",
+		"root": "./data/plaindata",
+		"writable": true,
+		"name": "Unsecured Webdav",
+		"icon": "box",
+		"color": "#2ce027",
+		"secured": false
+	},
+	{
 		"id": 2,
 		"host": "userdav.vestibule.127.0.0.1.nip.io",
-		"root": "./data",
+		"root": "./data/plaindata",
 		"name": "Reserved to users",
 		"icon": "book-reader",
 		"color": "#5779cc",
@@ -26,7 +36,7 @@
 	{
 		"id": 3,
 		"host": "admindav.vestibule.127.0.0.1.nip.io",
-		"root": "./data",
+		"root": "./data/plaindata",
 		"writable": true,
 		"name": "Only for admins",
 		"icon": "user-graduate",

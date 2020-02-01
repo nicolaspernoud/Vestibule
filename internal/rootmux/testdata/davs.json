@@ -1,8 +1,8 @@
 [
 	{
 		"id": 1,
-		"host": "unsecureddav.vestibule.io",
-		"root": "./testdata/data",
+		"host": "encrypteddav.vestibule.io",
+		"root": "./testdata/data/cipherdata",
 		"writable": true,
 		"secured": false,
 		"passphrase": "very secret passphrase"
@@ -10,20 +10,28 @@
 	{
 		"id": 2,
 		"host": "userdav.vestibule.io",
-		"root": "./testdata/data",
+		"root": "./testdata/data/plaindata",
 		"secured": true,
 		"roles": [
-			"USERS"
+			"USERS",
+			"ADMINS"
 		]
 	},
 	{
 		"id": 3,
 		"host": "admindav.vestibule.io",
-		"root": "./testdata/data",
+		"root": "./testdata/data/plaindata",
 		"writable": true,
 		"secured": true,
 		"roles": [
 			"ADMINS"
 		]
+	},
+	{
+		"id": 4,
+		"host": "unsecureddav.vestibule.io",
+		"root": "./testdata/data/plaindata",
+		"writable": true,
+		"secured": false
 	}
 ]

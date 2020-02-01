@@ -77,10 +77,7 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 	if err != nil {
 		t.Fatal(err)
 	}
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
+	body, _ := ioutil.ReadAll(res.Body)
 	bodyString := string(body)
 	if status := res.StatusCode; status != expectedStatus {
 		t.Errorf("Tested %v %v %v ; handler returned wrong status code: got %v want %v", method, testURL, payload, status, expectedStatus)
