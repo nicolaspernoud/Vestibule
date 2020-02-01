@@ -61,6 +61,8 @@ func Encrypt(next http.Handler, key []byte) http.Handler {
 func Decrypt(next http.Handler, key []byte) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		decryptWriter := newDecryptWriter(w, key)
+		// Force write header to disable content length writing (which will be wrong as it will be the encrypted one)
+		w.WriteHeader(200)
 		next.ServeHTTP(decryptWriter, r)
 		decryptWriter.encWriter.Close()
 	})
