@@ -1,15 +1,9 @@
 package middlewares
 
 import (
-	"crypto/aes"
-	"crypto/cipher"
 	"fmt"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"strconv"
-
-	"github.com/secure-io/sio-go"
 )
 
 // Cors enables CORS Request on server (for development purposes)
@@ -42,63 +36,6 @@ func NoCache(next http.Handler) http.Handler {
 		w.Header().Set("Cache-Control", "no-store, must-revalidate")
 		next.ServeHTTP(w, req)
 	})
-}
-
-// Encrypt enables body encryption (to be used with webdav PUT requests)
-func Encrypt(next http.Handler, key []byte) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		block, _ := aes.NewCipher(key)
-		gcm, _ := cipher.NewGCM(block)
-		stream := sio.NewStream(gcm, sio.BufSize)
-		nonce := make([]byte, stream.NonceSize())
-		encBody := stream.EncryptReader(r.Body, nonce, nil)
-		r.Body = ioutil.NopCloser(encBody)
-		next.ServeHTTP(w, r)
-	})
-}
-
-// Decrypt enables body decryption (to be used with webdav GET requests)
-func Decrypt(next http.Handler, key []byte) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		decryptWriter := newDecryptWriter(w, key)
-		// Force write header to disable content length writing (which will be wrong as it will be the encrypted one)
-		w.WriteHeader(200)
-		next.ServeHTTP(decryptWriter, r)
-		decryptWriter.encWriter.Close()
-	})
-}
-
-type decryptWriter struct {
-	writer    http.ResponseWriter
-	encWriter io.WriteCloser
-}
-
-func newDecryptWriter(w http.ResponseWriter, key []byte) *decryptWriter {
-	block, _ := aes.NewCipher(key)
-	gcm, _ := cipher.NewGCM(block)
-	stream := sio.NewStream(gcm, sio.BufSize)
-	nonce := make([]byte, stream.NonceSize())
-	encWriter := stream.DecryptWriter(w, nonce, nil)
-	return &decryptWriter{
-		writer:    w,
-		encWriter: encWriter,
-	}
-}
-
-func (r *decryptWriter) Header() http.Header {
-	return r.writer.Header()
-}
-
-func (r *decryptWriter) Write(p []byte) (int, error) {
-	l, err := r.encWriter.Write(p)
-	if err != nil {
-		panic(err)
-	}
-	return l, err
-}
-
-func (r *decryptWriter) WriteHeader(status int) {
-	r.writer.WriteHeader(status)
 }
 
 // GetFullHostname returns the full hostname of the server

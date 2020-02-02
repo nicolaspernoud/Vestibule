@@ -107,6 +107,8 @@ Uses :
 - Bulma : https://bulma.io/, https://github.com/jgthms/bulma (MIT Licence)
 - Bulma Fluent : https://mubaidr.js.org/bulma-fluent/#/, https://github.com/mubaidr/bulma-fluent (MIT Licence)
 - Animate.css : https://daneden.github.io/animate.css/, https://github.com/daneden/animate.css (MIT Licence)
+- Secure IO : https://secure-io.org, https://github.com/secure-io/sio-go (MIT Licence), lots of thanks to @aead (Andreas Auernhammer) who has been a great help in understanding the library and for his cryptography insights
+- MaxMind DB Reader for Go : https://github.com/oschwald/maxminddb-golang (ISC License)
 
 ## Licence
 

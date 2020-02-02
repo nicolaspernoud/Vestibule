@@ -15,11 +15,18 @@ import (
 	"sync"
 	"time"
 
+	"bytes"
+	"crypto/hmac"
+	"fmt"
+	"io/ioutil"
+
 	"github.com/nicolaspernoud/vestibule/pkg/auth"
 	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/log"
-	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 	"golang.org/x/net/webdav"
+
+	"github.com/secure-io/sio-go"
+	"github.com/secure-io/sio-go/sioutil"
 )
 
 // authzFunc creates a middleware to allow access according to a role array
@@ -188,20 +195,20 @@ func NewWebDavAug(prefix string, directory string, canWrite bool, passphrase str
 
 func (wdaug WebdavAug) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if h, ok := wdaug.methodMux[r.Method]; ok {
+		// Work out if trying to serve a directory
+		ressource := strings.TrimPrefix(r.URL.Path, wdaug.prefix)
+		fPath := filepath.Join(wdaug.directory, filepath.FromSlash(path.Clean("/"+ressource)))
 		if wdaug.isEncrypted { // Zip download disabled if wdaug is encrypted
 			if r.Method == "GET" {
 				setContentDisposition(w, r)
-				h = middlewares.Decrypt(h, wdaug.key)
+				h = decryptFile(fPath, wdaug.key)
 			}
 			if r.Method == "PUT" {
-				h = middlewares.Encrypt(h, wdaug.key)
+				h = encrypt(h, wdaug.key)
 			}
 		} else {
 			if r.Method == "GET" {
-				// Work out if trying to serve a directory
-				ressource := strings.TrimPrefix(r.URL.Path, wdaug.prefix)
-				fullName := filepath.Join(wdaug.directory, filepath.FromSlash(path.Clean("/"+ressource)))
-				info, err := os.Stat(fullName)
+				info, err := os.Stat(fPath)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusBadRequest)
 					return
@@ -321,4 +328,127 @@ func maxZipSize(path string) (int64, error) {
 		return err
 	})
 	return size, err
+}
+
+type streamHeader struct {
+	Algorithm sio.Algorithm
+	Random    []byte
+}
+
+func (h *streamHeader) binarySize() int { return 1 + 32 }
+
+func (h *streamHeader) marshalBinary() ([]byte, error) {
+	if x := len(h.Random); x != 32 {
+		return nil, fmt.Errorf("invalid randomness: want %d bytes - got %d bytes", 32, x)
+	}
+
+	var algorithmID byte
+	switch h.Algorithm {
+	case sio.AES_256_GCM:
+		algorithmID = 0x00
+	case sio.ChaCha20Poly1305:
+		algorithmID = 0x01
+	default:
+		return nil, fmt.Errorf("unknown encryption algorithm: %s", h.Algorithm)
+	}
+
+	data := make([]byte, h.binarySize())
+	data[0] = algorithmID
+	copy(data[1:], h.Random)
+	return data, nil
+}
+
+func (h *streamHeader) unmarshalBinary(data []byte) error {
+	if len(data) != h.binarySize() {
+		return fmt.Errorf("invalid header size: %d", len(data))
+	}
+
+	switch data[0] {
+	case 0x00:
+		h.Algorithm = sio.AES_256_GCM
+	case 0x01:
+		h.Algorithm = sio.ChaCha20Poly1305
+	default:
+		return fmt.Errorf("unknown encryption algorithm ID: %x", data[0])
+	}
+
+	h.Random = make([]byte, 32)
+	copy(h.Random, data[1:])
+	return nil
+}
+
+// encrypt wraps the webdav PUT handler to store encrypted content in place of plain content
+func encrypt(next http.Handler, key []byte) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		header := streamHeader{
+			Random: sioutil.MustRandom(32),
+		}
+		if sioutil.NativeAES() {
+			header.Algorithm = sio.AES_256_GCM
+		} else {
+			header.Algorithm = sio.ChaCha20Poly1305
+		}
+
+		prf := hmac.New(sha256.New, key)
+		prf.Write(header.Random)
+		dataKey := prf.Sum(nil)
+
+		stream, _ := header.Algorithm.Stream(dataKey)
+		nonce := make([]byte, stream.NonceSize())
+
+		h, err := header.marshalBinary()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		content := stream.EncryptReader(r.Body, nonce, nil)
+		contentHeader := bytes.NewReader(h)
+
+		r.Body = ioutil.NopCloser(io.MultiReader(contentHeader, content))
+		next.ServeHTTP(w, r)
+	})
+}
+
+// decryptFile decrypt a file and write it to the response (to be used in place of webdav GET handler)
+func decryptFile(filePath string, key []byte) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		f, err := os.Open(filePath)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		defer f.Close()
+		fi, err := f.Stat()
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusNotFound)
+			return
+		}
+		if fi.IsDir() {
+			http.Error(w, "file is a directory", http.StatusMethodNotAllowed)
+			return
+		}
+		var header streamHeader
+		binaryHeader := make([]byte, header.binarySize())
+		if _, err := io.ReadFull(f, binaryHeader); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		if err := header.unmarshalBinary(binaryHeader); err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		prf := hmac.New(sha256.New, key)
+		prf.Write(header.Random)
+		dataKey := prf.Sum(nil)
+		stream, _ := header.Algorithm.Stream(dataKey)
+		nonce := make([]byte, stream.NonceSize())
+
+		// Todo : Write content-length header removing the overhead and the header lengths
+
+		_, err = io.Copy(w, ioutil.NopCloser(stream.DecryptReader(f, nonce, nil)))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	})
 }
