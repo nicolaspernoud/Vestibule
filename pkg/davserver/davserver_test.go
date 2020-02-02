@@ -26,5 +26,8 @@ func TestEncryption(t *testing.T) {
 	do("GET", "/test.txt", noH, "", 500, "unexpected EOF")
 	// Try to access a crypted file with the wrong key
 	davAug = NewWebDavAug("", "./testdata", true, "wrong key")
-	do("GET", "/test-ciphered.txt", noH, "", 500, "sio: data is not authentic")
+	body := do("GET", "/test-ciphered.txt", noH, "", 500, "")
+	if body != "" { // Check that the body is really empty
+		t.Errorf("body must be empty")
+	}
 }

@@ -443,7 +443,17 @@ func decryptFile(filePath string, key []byte) http.Handler {
 		stream, _ := header.Algorithm.Stream(dataKey)
 		nonce := make([]byte, stream.NonceSize())
 
-		// Todo : Write content-length header removing the overhead and the header lengths
+		// Write content-length header removing the overhead and the header lengths
+		overhead := stream.Overhead(0)
+		size := fi.Size() / int64(sio.BufSize+overhead) * int64(sio.BufSize)
+		if mod := fi.Size() % int64(sio.BufSize+overhead); mod > 0 {
+			if mod < overhead {
+				http.Error(w, "the ciphertextSize cannot be valid", http.StatusInternalServerError)
+			}
+			size += mod - overhead
+		}
+		size -= int64(header.binarySize())
+		w.Header().Set("content-length", strconv.FormatInt(size, 10))
 
 		_, err = io.Copy(w, ioutil.NopCloser(stream.DecryptReader(f, nonce, nil)))
 		if err != nil {
