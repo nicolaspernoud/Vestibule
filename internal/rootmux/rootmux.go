@@ -40,7 +40,7 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 		log.Logger.Fatal(err)
 	}
 	// Put the two handler together
-	adH := &appDavHandler{as: appServer, ds: davServer, dsCORSAllowOrigin: fullHostname, cspSrc: "*." + hostname + ":*"}
+	adH := &appDavHandler{as: appServer, ds: davServer, dsCORSAllowOrigin: fullHostname, cspSrc: fmt.Sprintf("*.%[1]v:* %[1]v:*", hostname)}
 	policy := CreateHostPolicy(hostname, adH)
 	// Create the main handler
 	mainMux := http.NewServeMux()
