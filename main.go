@@ -85,6 +85,7 @@ func main() {
 			Handler: rootMux.Mux,
 			TLSConfig: &tls.Config{
 				GetCertificate: certManager.GetCertificate,
+				MinVersion:     tls.VersionTLS12,
 			},
 			ReadTimeout:  30 * time.Minute, // in case of upload
 			WriteTimeout: 5 * time.Hour,    // in case of download
