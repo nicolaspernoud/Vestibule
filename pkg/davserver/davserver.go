@@ -4,12 +4,14 @@ import (
 	"archive/zip"
 	"crypto/sha256"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -206,6 +208,9 @@ func (wdaug WebdavAug) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			if r.Method == "PUT" {
 				h = encrypt(h, wdaug.key)
 			}
+			if r.Method == "PROPFIND" {
+				h = rewritePropfindSizes(h, wdaug.key)
+			}
 		} else {
 			if r.Method == "GET" {
 				info, err := os.Stat(fPath)
@@ -377,23 +382,28 @@ func (h *streamHeader) unmarshalBinary(data []byte) error {
 	return nil
 }
 
+func createHeaderAndStream(key []byte) (streamHeader, *sio.Stream) {
+	header := streamHeader{
+		Random: sioutil.MustRandom(32),
+	}
+	if sioutil.NativeAES() {
+		header.Algorithm = sio.AES_256_GCM
+	} else {
+		header.Algorithm = sio.ChaCha20Poly1305
+	}
+
+	prf := hmac.New(sha256.New, key)
+	prf.Write(header.Random)
+	dataKey := prf.Sum(nil)
+
+	stream, _ := header.Algorithm.Stream(dataKey)
+	return header, stream
+}
+
 // encrypt wraps the webdav PUT handler to store encrypted content in place of plain content
 func encrypt(next http.Handler, key []byte) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		header := streamHeader{
-			Random: sioutil.MustRandom(32),
-		}
-		if sioutil.NativeAES() {
-			header.Algorithm = sio.AES_256_GCM
-		} else {
-			header.Algorithm = sio.ChaCha20Poly1305
-		}
-
-		prf := hmac.New(sha256.New, key)
-		prf.Write(header.Random)
-		dataKey := prf.Sum(nil)
-
-		stream, _ := header.Algorithm.Stream(dataKey)
+		header, stream := createHeaderAndStream(key)
 		nonce := make([]byte, stream.NonceSize())
 
 		h, err := header.marshalBinary()
@@ -444,21 +454,71 @@ func decryptFile(filePath string, key []byte) http.Handler {
 		nonce := make([]byte, stream.NonceSize())
 
 		// Write content-length header removing the overhead and the header lengths
-		overhead := stream.Overhead(0)
-		size := fi.Size() / int64(sio.BufSize+overhead) * int64(sio.BufSize)
-		if mod := fi.Size() % int64(sio.BufSize+overhead); mod > 0 {
-			if mod < overhead {
-				http.Error(w, "the ciphertextSize cannot be valid", http.StatusInternalServerError)
-			}
-			size += mod - overhead
+		size, err := getTrueSize(stream, header, fi.Size())
+		if err == nil {
+			w.Header().Set("content-length", strconv.FormatInt(size, 10))
 		}
-		size -= int64(header.binarySize())
-		w.Header().Set("content-length", strconv.FormatInt(size, 10))
 
 		_, err = io.Copy(w, ioutil.NopCloser(stream.DecryptReader(f, nonce, nil)))
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
 		}
 	})
+}
+
+func getTrueSize(stream *sio.Stream, header streamHeader, encSize int64) (int64, error) {
+	overhead := stream.Overhead(0)
+	size := encSize / int64(sio.BufSize+overhead) * int64(sio.BufSize)
+	if mod := encSize % int64(sio.BufSize+overhead); mod > 0 {
+		if mod < overhead {
+			return -1, errors.New("the ciphertext size cannot be valid")
+		}
+		size += mod - overhead
+	}
+	size -= int64(header.binarySize())
+	return size, nil
+}
+
+// rewritePropfindSizes enables body decryption (to be used with webdav GET requests)
+func rewritePropfindSizes(next http.Handler, key []byte) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		header, stream := createHeaderAndStream(key)
+		bw := &bufferWriter{
+			writer: w,
+		}
+		// Dummy write the response to fill the buffer
+		next.ServeHTTP(bw, r)
+		// Recover the buffer
+		body := string(bw.buff)
+		// Alter it
+		regex := regexp.MustCompile(`(<D:getcontentlength>)(\d+)(</D:getcontentlength>)`)
+		// Send it to the response
+		fmt.Fprint(w, regex.ReplaceAllStringFunc(body, func(m string) string {
+			parts := regex.FindStringSubmatch(m)
+			encSize, _ := strconv.Atoi(parts[2])
+			size, err := getTrueSize(stream, header, int64(encSize))
+			if size < 0 || err != nil {
+				return m
+			}
+			return parts[1] + strconv.FormatInt(size, 10) + parts[3]
+		}))
+	})
+}
+
+type bufferWriter struct {
+	writer http.ResponseWriter
+	buff   []byte
+}
+
+func (b *bufferWriter) Header() http.Header {
+	return b.writer.Header()
+}
+
+func (b *bufferWriter) Write(p []byte) (int, error) {
+	b.buff = append(b.buff, p...)
+	return len(p), nil
+}
+
+func (b *bufferWriter) WriteHeader(status int) {
+	b.writer.WriteHeader(status)
 }
