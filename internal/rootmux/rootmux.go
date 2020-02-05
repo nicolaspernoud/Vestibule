@@ -82,7 +82,7 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 	mainMux.Handle("/", middlewares.NoCache(http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)})))
 	// Put it together into the main handler
 	mux := http.NewServeMux()
-	mux.Handle(hostname+"/", middlewares.WebSecurity(mainMux, "*."+hostname+":*"))
+	mux.Handle(hostname+"/", middlewares.WebSecurity(mainMux, "*."+hostname+":*", false))
 	mux.Handle("/", adH)
 	return RootMux{mux, policy, &m}
 }
@@ -108,7 +108,7 @@ func (h *appDavHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 	for _, d := range h.ds.Davs {
 		if host == d.Host {
-			middlewares.Cors(middlewares.WebSecurity(h.ds, h.cspSrc), h.dsCORSAllowOrigin).ServeHTTP(w, r)
+			middlewares.Cors(middlewares.WebSecurity(h.ds, h.cspSrc, false), h.dsCORSAllowOrigin).ServeHTTP(w, r)
 			return
 		}
 	}

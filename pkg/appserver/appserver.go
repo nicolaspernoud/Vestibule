@@ -170,7 +170,7 @@ func makeHandler(app *app, authz authzFunc) http.Handler {
 		handler = http.FileServer(http.Dir(d))
 	}
 	if app.SecurityHeaders {
-		handler = middlewares.WebSecurity(handler, fmt.Sprintf("%[1]v:* *.%[1]v:*", frameSource))
+		handler = middlewares.WebSecurity(handler, fmt.Sprintf("%[1]v:* *.%[1]v:*", frameSource), true)
 	}
 	if !app.Secured || handler == nil {
 		return handler

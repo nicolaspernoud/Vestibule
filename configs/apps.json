@@ -37,6 +37,7 @@
 		"isProxy": false,
 		"host": "static.vestibule.127.0.0.1.nip.io",
 		"serve": "./testdata/static",
-		"secured": false
+		"secured": false,
+		"securityheaders": true
 	}
 ]

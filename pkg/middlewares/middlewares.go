@@ -18,10 +18,14 @@ func Cors(next http.Handler, allowedOrigin string) http.Handler {
 }
 
 // WebSecurity adds good practices security headers on http responses
-func WebSecurity(next http.Handler, source string) http.Handler {
+func WebSecurity(next http.Handler, source string, allowEvalInlineScript bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		w.Header().Set("Strict-Transport-Security", "max-age=63072000")
-		w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self' %[1]v; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", source))
+		var inline string
+		if allowEvalInlineScript {
+			inline = "'unsafe-inline' 'unsafe-eval'"
+		}
+		w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", source, inline))
 		//w.Header().Set("X-Frame-Options", "SAMEORIGIN") // Works fine with chrome but is not obsoleted by frame-src in firefox 72.0.2
 		w.Header().Set("X-XSS-Protection", "1; mode=block")
 		w.Header().Set("Referrer-Policy", "strict-origin")
