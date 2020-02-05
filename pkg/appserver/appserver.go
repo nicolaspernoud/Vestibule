@@ -19,6 +19,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 )
 
 var (
@@ -161,13 +163,14 @@ func makeHandler(app *app, authz authzFunc) http.Handler {
 					}
 					res.Header.Set("Location", u.String())
 				}
-				res.Header.Set("Content-Security-Policy", fmt.Sprintf("frame-ancestors %[1]v:* *.%[1]v:*", frameSource))
-				res.Header.Set("X-Frame-Options", "DENY")
 				return nil
 			},
 		}
 	} else if d := app.Serve; !app.IsProxy && d != "" {
 		handler = http.FileServer(http.Dir(d))
+	}
+	if app.SecurityHeaders {
+		handler = middlewares.WebSecurity(handler, fmt.Sprintf("%[1]v:* *.%[1]v:*", frameSource))
 	}
 	if !app.Secured || handler == nil {
 		return handler

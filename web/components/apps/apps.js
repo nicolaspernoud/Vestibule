@@ -23,6 +23,7 @@ let roles_field;
 let forwardto_container;
 let serve_container;
 let roles_container;
+let securityheaders_field;
 
 // local variables
 let apps;
@@ -122,6 +123,11 @@ export async function mount(where) {
             <label class="label">Path on iframe opening</label>
             <div class="control">
               <input class="input" type="text" id="apps-modal-openpath" />
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <label class="label"><input id="apps-modal-securityheaders" type="checkbox" />Inject security headers (CSP, STS, etc.)</label>
             </div>
           </div>
           <br />
@@ -272,6 +278,7 @@ function registerModalFields() {
   forwardto_container = document.getElementById("apps-modal-forwardto-container");
   serve_container = document.getElementById("apps-modal-serve-container");
   roles_container = document.getElementById("apps-modal-roles-container");
+  securityheaders_field = document.getElementById("apps-modal-securityheaders");
   document.getElementById(`apps-modal-close`).addEventListener("click", function() {
     toggleModal();
   });
@@ -310,6 +317,7 @@ async function editApp(app) {
   login_field.value = app.login;
   password_field.value = app.password;
   openpath_field.value = app.openpath;
+  securityheaders_field.checked = app.securityheaders;
   toggleModal();
 }
 
@@ -339,6 +347,7 @@ async function newApp() {
   login_field.value = "";
   password_field.value = "";
   openpath_field.value = "";
+  securityheaders_field.checked = false;
   toggleModal();
 }
 
@@ -362,7 +371,8 @@ async function postApp() {
         roles: secured_field.checked ? roles_field.value.split(",") : "",
         login: login_field.value,
         password: password_field.value,
-        openpath: openpath_field.value
+        openpath: openpath_field.value,
+        securityheaders: securityheaders_field.checked
       })
     });
     if (response.status !== 200) {

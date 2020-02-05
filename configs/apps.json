@@ -12,7 +12,8 @@
 		"roles": [
 			"USERS",
 			"ADMINS"
-		]
+		],
+		"securityheaders": true
 	},
 	{
 		"id": 2,
@@ -25,7 +26,8 @@
 		"secured": true,
 		"roles": [
 			"ADMINS"
-		]
+		],
+		"securityheaders": true
 	},
 	{
 		"id": 3,

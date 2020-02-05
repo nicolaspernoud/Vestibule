@@ -13,19 +13,20 @@ import (
 
 // App represents a app serving static content proxying a web server
 type App struct {
-	ID        int      `json:"id"`
-	Name      string   `json:"name,omitempty"`      // name of the app
-	Icon      string   `json:"icon,omitempty"`      // icon to display
-	Color     string   `json:"color,omitempty"`     // icon's color
-	IsProxy   bool     `json:"isProxy"`             // true if reverse proxy
-	Host      string   `json:"host"`                // to match against request Host header
-	ForwardTo string   `json:"forwardTo,omitempty"` // non-empty if reverse proxy
-	Serve     string   `json:"serve,omitempty"`     // non-empty if static server
-	Secured   bool     `json:"secured"`             // true if the handler is secured with auth
-	Login     string   `json:"login,omitempty"`     // Basic auth login for automatic login
-	Password  string   `json:"password,omitempty"`  // Basic auth password for automatic login
-	OpenPath  string   `json:"openpath,omitempty"`  // Opened path on iframe preview
-	Roles     []string `json:"roles,omitempty"`     // Roles allowed to access the app
+	ID              int      `json:"id"`
+	Name            string   `json:"name,omitempty"`            // name of the app
+	Icon            string   `json:"icon,omitempty"`            // icon to display
+	Color           string   `json:"color,omitempty"`           // icon's color
+	IsProxy         bool     `json:"isProxy"`                   // true if reverse proxy
+	Host            string   `json:"host"`                      // to match against request Host header
+	ForwardTo       string   `json:"forwardTo,omitempty"`       // non-empty if reverse proxy
+	Serve           string   `json:"serve,omitempty"`           // non-empty if static server
+	Secured         bool     `json:"secured"`                   // true if the handler is secured with auth
+	Login           string   `json:"login,omitempty"`           // Basic auth login for automatic login
+	Password        string   `json:"password,omitempty"`        // Basic auth password for automatic login
+	OpenPath        string   `json:"openpath,omitempty"`        // Opened path on iframe preview
+	Roles           []string `json:"roles,omitempty"`           // Roles allowed to access the app
+	SecurityHeaders bool     `json:"securityheaders,omitempty"` // Inject security headers (CSP, STS, etc.)
 }
 
 type app struct {
