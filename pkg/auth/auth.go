@@ -52,9 +52,9 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 		// Handle CORS preflight requests
 		if err != nil && r.Method == "OPTIONS" {
 			// Handle GIO preflight requests
-			if strings.Contains(r.UserAgent(), "vfs") {
+			if strings.Contains(r.UserAgent(), "vfs") || strings.Contains(r.UserAgent(), "Microsoft-WebDAV") {
 				w.Header().Set("WWW-Authenticate", `Basic realm="server"`)
-				http.Error(w, "gio authentication", 401)
+				http.Error(w, "webdav client authentication", 401)
 			}
 			return
 		}
