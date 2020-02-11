@@ -3,7 +3,6 @@ package davserver
 import (
 	"net/http/httptest"
 	"net/url"
-	"os"
 	"strings"
 	"testing"
 
@@ -17,7 +16,7 @@ func TestEncryption(t *testing.T) {
 	url, _ := url.Parse(ts.URL)
 	port := url.Port()
 	// wrap the testing function
-	do := tester.CreateServerTester(t, port, os.Getenv("HOSTNAME"), nil)
+	do := tester.CreateServerTester(t, port, "vestibule.io", nil)
 	noH := tester.Header{Key: "", Value: ""}
 	// Try to access a crypted file on a encrypted unsecured dav (must pass)
 	do("PUT", "/test-ciphered.txt", noH, "content is encrypted !", 201, "")
