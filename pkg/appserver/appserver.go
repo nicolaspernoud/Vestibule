@@ -11,7 +11,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"os"
@@ -20,13 +19,29 @@ import (
 	"sync"
 	"time"
 
+	cache "github.com/nicolaspernoud/vestibule/pkg/cache"
+	"github.com/nicolaspernoud/vestibule/pkg/cache/memory"
+	"github.com/nicolaspernoud/vestibule/pkg/log"
 	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 )
 
 var (
 	port        int
 	frameSource string
+	cacheStore  cache.Adapter
 )
+
+func init() {
+	// Cache memory store
+	var err error
+	cacheStore, err = memory.NewAdapter(
+		memory.AdapterWithAlgorithm(memory.LRU),
+		memory.AdapterWithCapacity(10000000),
+	)
+	if err != nil {
+		log.Logger.Fatal(err)
+	}
+}
 
 // authzFunc creates a middleware to allow access according to a role array
 type authzFunc func(http.Handler, []string, bool) http.Handler
@@ -120,7 +135,7 @@ func parseApps(file string, authz authzFunc) ([]*app, error) {
 	for _, r := range apps {
 		r.handler = makeHandler(r, authz)
 		if r.handler == nil {
-			log.Printf("bad app: %#v", r)
+			log.Logger.Printf("bad app: %#v", r)
 		}
 	}
 	return apps, nil
@@ -171,6 +186,16 @@ func makeHandler(app *app, authz authzFunc) http.Handler {
 	}
 	if app.SecurityHeaders {
 		handler = middlewares.WebSecurity(handler, fmt.Sprintf("%[1]v:* *.%[1]v:*", frameSource), true)
+	}
+	if app.CacheDuration > 0 {
+		cacheClient, err := cache.NewClient(
+			cache.ClientWithAdapter(cacheStore),
+			cache.ClientWithTTL(time.Duration(app.CacheDuration)*time.Second),
+			cache.ClientWithRefreshKey("nocache"),
+		)
+		if err == nil {
+			handler = cacheClient.Middleware(handler)
+		}
 	}
 	if !app.Secured || handler == nil {
 		return handler

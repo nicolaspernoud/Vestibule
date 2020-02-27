@@ -24,6 +24,7 @@ let forwardto_container;
 let serve_container;
 let roles_container;
 let securityheaders_field;
+let cacheduration_field;
 
 // local variables
 let apps;
@@ -130,6 +131,12 @@ export async function mount(where) {
               <label class="label"><input id="apps-modal-securityheaders" type="checkbox" />Inject security headers (CSP, STS, etc.)</label>
             </div>
           </div>
+          <div class="field">
+            <label class="label">Cache GET requests for seconds (0 to disable) :</label>
+            <div class="control">
+              <input class="input" type="number" id="apps-modal-cacheduration" />
+            </div>
+          </div>
           <br />
         </section>
         <footer class="modal-card-foot">
@@ -185,6 +192,7 @@ function appTemplate(app) {
                 <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
                 <p>${app.secured ? "Restricted access to users with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}</p>
                 ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
+                ${app.cacheduration > 0 ? "<p>Cache GET requests for <strong>" + app.cacheduration + "</strong> seconds</p>" : ""}
                 <p class="has-text-centered"><strong>-${app.id}-</strong></p>
               </div>
             </div>
@@ -279,6 +287,7 @@ function registerModalFields() {
   serve_container = document.getElementById("apps-modal-serve-container");
   roles_container = document.getElementById("apps-modal-roles-container");
   securityheaders_field = document.getElementById("apps-modal-securityheaders");
+  cacheduration_field = document.getElementById("apps-modal-cacheduration");
   document.getElementById(`apps-modal-close`).addEventListener("click", function() {
     toggleModal();
   });
@@ -318,11 +327,12 @@ async function editApp(app) {
   password_field.value = app.password;
   openpath_field.value = app.openpath;
   securityheaders_field.checked = app.securityheaders;
+  cacheduration_field.value = app.cacheduration;
   toggleModal();
 }
 
 function cleanApp(app) {
-  let props = ["name", "forwardTo", "serve", "roles", "login", "password", "openpath"];
+  let props = ["name", "forwardTo", "serve", "roles", "login", "password", "openpath", "cacheduration"];
   for (const prop of props) {
     app[prop] = app[prop] === undefined ? "" : app[prop];
   }
@@ -348,6 +358,7 @@ async function newApp() {
   password_field.value = "";
   openpath_field.value = "";
   securityheaders_field.checked = false;
+  cacheduration_field.value = 0;
   toggleModal();
 }
 
@@ -372,7 +383,8 @@ async function postApp() {
         login: login_field.value,
         password: password_field.value,
         openpath: openpath_field.value,
-        securityheaders: securityheaders_field.checked
+        securityheaders: securityheaders_field.checked,
+        cacheduration: cacheduration_field.value > 0 ? parseInt(cacheduration_field.value) : ""
       })
     });
     if (response.status !== 200) {
