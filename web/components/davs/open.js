@@ -109,10 +109,10 @@ export class Open {
       <div class="modal-background"></div>
       <div class="modal-card">
         <header class="modal-card-head">
-          <button class="delete" aria-label="close" id="${this.prefix}open-close"></button>
+          <button class="delete navbar-menu-icon" aria-label="close" id="${this.prefix}open-close"></button>
           <p class="modal-card-title has-text-centered">${this.file.name}</p>
         </header>
-        <section class="modal-card-body is-paddingless">
+        <section class="modal-card-body is-paddingless flex-container">
           ${this.type == "other"
             ? /* HTML */ `
                 <embed src="${this.url}?token=${token}&inline" type="application/pdf" width="100%" style="height: 75vh;" />

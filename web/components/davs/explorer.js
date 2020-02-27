@@ -434,63 +434,27 @@ export class Explorer {
     });
   }
 
-  upload(files) {
+  async upload(files) {
     const onStartPath = this.path;
-    let offset = 0;
-    let id = this.files.length + 1;
+    let id = this.files.length;
+    let fileIdx = 0;
     for (const file of files) {
+      id++;
+      fileIdx++;
       file.path = path(this.path, file.name);
       // Create a message to allow progress tracking and cancellation
       let msg = document.createElement("div");
       msg.innerHTML = /* HTML */ `
-        <div class="content"><p>${file.name}</p></div>
+        <div class="content"><p>${file.name} (file: ${fileIdx}/${files.length})</p></div>
         <progress class="progress is-primary" value="0" max="100" style="margin-bottom: 0px;"></progress>
       `;
       msg.classList.add("is-info", "notification", "uploader", "animated", "fadeInUp", "faster");
-      msg.style.marginBottom = offset.toString() + "px";
       const delBtn = document.createElement("button");
-      delBtn.classList.add("delete");
-      msg.appendChild(delBtn);
-      // Perform the request
       let xhr = new XMLHttpRequest();
-      xhr.withCredentials = true;
       // track upload progress
       xhr.upload.onprogress = function(e) {
         msg.getElementsByTagName("progress")[0].value = (e.loaded / e.total) * 100;
       };
-      // track completion: both successful or not
-      xhr.onloadend = () => {
-        if (xhr.status === 0) {
-          console.log(`Upload of ${file.name} cancelled`);
-        } else if (xhr.status == 201) {
-          if (this.path === onStartPath) {
-            this.files.push({
-              name: file.name,
-              path: file.path,
-              isDir: file.isDir,
-              type: file.type,
-              size: file.size,
-              lastModified: file.lastModified,
-              id: id
-            });
-            this.displayFiles();
-            id++;
-          }
-        } else {
-          const message = `Error uploading ${file.name} (status ${xhr.status})`;
-          Messages.Show("is-warning", message);
-          console.error(message);
-        }
-        AnimateCSS(msg, "fadeOutDown", function() {
-          msg.parentNode.removeChild(msg);
-        });
-      };
-      xhr.onerror = function(e) {
-        Messages.Show("is-warning", e.message);
-      };
-      xhr.open("PUT", this.fullHostname + file.path);
-      xhr.setRequestHeader("XSRF-Token", this.user.xsrftoken);
-      xhr.send(file);
       delBtn.addEventListener("click", async () => {
         xhr.abort();
         try {
@@ -508,9 +472,62 @@ export class Explorer {
           console.error(e);
         }
       });
+      delBtn.classList.add("delete");
+      msg.appendChild(delBtn);
       document.body.appendChild(msg);
-      offset = offset + 50;
+      try {
+        await this.uploadFile(xhr, file);
+        if (this.path === onStartPath) {
+          this.files.push({
+            name: file.name,
+            path: file.path,
+            isDir: file.isDir,
+            type: file.type,
+            size: file.size,
+            lastModified: file.lastModified,
+            id: id
+          });
+          this.displayFiles();
+        }
+      } catch (e) {
+        console.error(e.statusText);
+        Messages.Show("is-warning", e.statusText);
+      }
+      AnimateCSS(msg, "fadeOutDown", function() {
+        msg.parentNode.removeChild(msg);
+      });
     }
+  }
+
+  uploadFile(xhr, file) {
+    return new Promise((resolve, reject) => {
+      xhr.withCredentials = true;
+      // track completion: both successful or not
+      xhr.onloadend = () => {
+        if (xhr.status === 0) {
+          reject({
+            status: xhr.status,
+            statusText: `Upload of ${file.name} cancelled`
+          });
+        } else if (xhr.status == 201) {
+          resolve(xhr.status);
+        } else {
+          reject({
+            status: xhr.status,
+            statusText: `Error uploading ${file.name} (status ${xhr.status})`
+          });
+        }
+      };
+      xhr.onerror = function(e) {
+        reject({
+          status: this.status,
+          statusText: `Error uploading ${file.name} (status ${xhr.status})`
+        });
+      };
+      xhr.open("PUT", this.fullHostname + file.path);
+      xhr.setRequestHeader("XSRF-Token", this.user.xsrftoken);
+      xhr.send(file);
+    });
   }
 
   async download(file) {
