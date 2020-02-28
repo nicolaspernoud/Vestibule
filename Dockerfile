@@ -7,6 +7,7 @@ WORKDIR /vestibule
 RUN apk update && apk upgrade && \
     apk add --no-cache bash git openssh build-base
 ADD . .
+RUN go version
 RUN go get -d -v && \
     go test ./... && \
     go build
