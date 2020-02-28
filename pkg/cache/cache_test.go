@@ -79,7 +79,7 @@ func TestMiddleware(t *testing.T) {
 		ClientWithMethods([]string{http.MethodGet, http.MethodPost}),
 	)
 
-	handler := client.Middleware(httpTestHandler)
+	handler := client.Middleware(httpTestHandler, []string{"*"})
 
 	tests := []struct {
 		name     string

@@ -27,6 +27,7 @@ type App struct {
 	OpenPath        string   `json:"openpath,omitempty"`        // Opened path on iframe preview
 	Roles           []string `json:"roles,omitempty"`           // Roles allowed to access the app
 	SecurityHeaders bool     `json:"securityheaders,omitempty"` // Inject security headers (CSP, STS, etc.)
+	CachePattern    []string `json:"cachepattern,omitempty"`    // Cache routes corresponding to that pattern
 	CacheDuration   int      `json:"cacheduration,omitempty"`   // Cache routes for seconds
 }
 

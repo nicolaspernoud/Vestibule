@@ -26,7 +26,6 @@
 
 .notification:hover {
   z-index: 200;
-  left: 25vw !important;
 }
 
 .uploader {

@@ -38,6 +38,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/nicolaspernoud/vestibule/pkg/glob"
 )
 
 // Response is the cached response data structure.
@@ -85,9 +87,17 @@ type Adapter interface {
 }
 
 // Middleware is the HTTP cache middleware handler.
-func (c *Client) Middleware(next http.Handler) http.Handler {
+func (c *Client) Middleware(next http.Handler, patterns []string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if c.cacheableMethod(r.Method) {
+		// Check pattern matching
+		var patternMatched bool
+		for _, p := range patterns {
+			if glob.Glob(p, r.URL.Path) {
+				patternMatched = true
+				break
+			}
+		}
+		if c.cacheableMethod(r.Method) && patternMatched {
 			sortURLParams(r.URL)
 			key := generateKey(r.URL.String())
 			if r.Method == http.MethodPost && r.Body != nil {

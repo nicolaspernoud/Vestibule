@@ -36,7 +36,7 @@ func init() {
 	var err error
 	cacheStore, err = memory.NewAdapter(
 		memory.AdapterWithAlgorithm(memory.LRU),
-		memory.AdapterWithCapacity(10000000),
+		memory.AdapterWithCapacity(10000),
 	)
 	if err != nil {
 		log.Logger.Fatal(err)
@@ -194,7 +194,7 @@ func makeHandler(app *app, authz authzFunc) http.Handler {
 			cache.ClientWithRefreshKey("nocache"),
 		)
 		if err == nil {
-			handler = cacheClient.Middleware(handler)
+			handler = cacheClient.Middleware(handler, app.CachePattern)
 		}
 	}
 	if !app.Secured || handler == nil {

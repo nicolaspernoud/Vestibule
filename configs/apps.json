@@ -14,6 +14,9 @@
 			"ADMINS"
 		],
 		"securityheaders": true,
+		"cachepattern": [
+			"/api/*"
+		],
 		"cacheduration": 10
 	},
 	{

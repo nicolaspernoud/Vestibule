@@ -25,6 +25,7 @@ let serve_container;
 let roles_container;
 let securityheaders_field;
 let cacheduration_field;
+let cachepattern_field;
 
 // local variables
 let apps;
@@ -132,7 +133,13 @@ export async function mount(where) {
             </div>
           </div>
           <div class="field">
-            <label class="label">Cache GET requests for seconds (0 to disable) :</label>
+            <label class="label">Cache GET requests for url path matching<br />(separated with commas - * replaces anything - empty: no cache - example: /api/*,*/admin)</label>
+            <div class="control">
+              <input class="input" type="text" id="apps-modal-cachepattern" />
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Server cache GET requests for seconds (0/empty to disable)</label>
             <div class="control">
               <input class="input" type="number" id="apps-modal-cacheduration" />
             </div>
@@ -192,7 +199,7 @@ function appTemplate(app) {
                 <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
                 <p>${app.secured ? "Restricted access to users with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}</p>
                 ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
-                ${app.cacheduration > 0 ? "<p>Cache GET requests for <strong>" + app.cacheduration + "</strong> seconds</p>" : ""}
+                ${app.cacheduration > 0 ? `<p>Server cache GET requests for <strong>${app.cachepattern}</strong> for <strong>${app.cacheduration}</strong> seconds</p>` : ""}
                 <p class="has-text-centered"><strong>-${app.id}-</strong></p>
               </div>
             </div>
@@ -288,6 +295,7 @@ function registerModalFields() {
   roles_container = document.getElementById("apps-modal-roles-container");
   securityheaders_field = document.getElementById("apps-modal-securityheaders");
   cacheduration_field = document.getElementById("apps-modal-cacheduration");
+  cachepattern_field = document.getElementById("apps-modal-cachepattern");
   document.getElementById(`apps-modal-close`).addEventListener("click", function() {
     toggleModal();
   });
@@ -328,11 +336,12 @@ async function editApp(app) {
   openpath_field.value = app.openpath;
   securityheaders_field.checked = app.securityheaders;
   cacheduration_field.value = app.cacheduration;
+  cachepattern_field.value = app.cachepattern;
   toggleModal();
 }
 
 function cleanApp(app) {
-  let props = ["name", "forwardTo", "serve", "roles", "login", "password", "openpath", "cacheduration"];
+  let props = ["name", "forwardTo", "serve", "roles", "login", "password", "openpath", "cacheduration", "cachepattern"];
   for (const prop of props) {
     app[prop] = app[prop] === undefined ? "" : app[prop];
   }
@@ -359,33 +368,39 @@ async function newApp() {
   openpath_field.value = "";
   securityheaders_field.checked = false;
   cacheduration_field.value = 0;
+  cachepattern_field.value = "";
   toggleModal();
 }
 
 async function postApp() {
   try {
+    let bdy = {
+      id: parseInt(id_field.value),
+      name: name_field.value,
+      icon: icon_field.value,
+      color: color_field.value,
+      host: host_field.value,
+      isProxy: isproxy_field.checked,
+      forwardTo: forwardto_field.value,
+      serve: serve_field.value,
+      secured: secured_field.checked,
+      roles: secured_field.checked ? roles_field.value.split(",") : "",
+      login: login_field.value,
+      password: password_field.value,
+      openpath: openpath_field.value,
+      securityheaders: securityheaders_field.checked
+    };
+    const cachepattern = cachepattern_field.value.split(",");
+    if (cachepattern.length > 1 || cachepattern[0] !== "") {
+      bdy.cachepattern = cachepattern;
+      bdy.cacheduration = cacheduration_field.value > 0 ? parseInt(cacheduration_field.value) : "";
+    }
     const response = await fetch("/api/admin/apps/", {
       method: "post",
       headers: new Headers({
         "XSRF-Token": user.xsrftoken
       }),
-      body: JSON.stringify({
-        id: parseInt(id_field.value),
-        name: name_field.value,
-        icon: icon_field.value,
-        color: color_field.value,
-        host: host_field.value,
-        isProxy: isproxy_field.checked,
-        forwardTo: forwardto_field.value,
-        serve: serve_field.value,
-        secured: secured_field.checked,
-        roles: secured_field.checked ? roles_field.value.split(",") : "",
-        login: login_field.value,
-        password: password_field.value,
-        openpath: openpath_field.value,
-        securityheaders: securityheaders_field.checked,
-        cacheduration: cacheduration_field.value > 0 ? parseInt(cacheduration_field.value) : ""
-      })
+      body: JSON.stringify(bdy)
     });
     if (response.status !== 200) {
       throw new Error(`Apps could not be updated (status ${response.status})`);
