@@ -147,7 +147,7 @@ func (c *Client) Middleware(next http.Handler, patterns []string) http.Handler {
 
 			statusCode := result.StatusCode
 			value := rec.Body.Bytes()
-			if statusCode < 400 {
+			if statusCode < 300 {
 				now := time.Now()
 
 				response := Response{
