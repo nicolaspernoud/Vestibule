@@ -1,3 +1,18 @@
+/*
+HOW TO UPDATE THAT LIST :
+Go to https://fontawesome.com/cheatsheet
+Paste the following code into the developper console :
+---
+var names = new Set();
+var icons = document.getElementsByClassName("icon");
+for (const icon of icons) {
+  const name = icon.getElementsByTagName("dd")[0].innerText;
+  names.add(name);
+}
+console.log(JSON.stringify(Array.from(names)));
+---
+*/
+
 export const Icons = [
   "ad",
   "address-book",

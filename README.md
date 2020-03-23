@@ -107,10 +107,12 @@ Uses :
 - Bulma : https://bulma.io/, https://github.com/jgthms/bulma (MIT Licence)
 - Bulma Fluent : https://mubaidr.js.org/bulma-fluent/#/, https://github.com/mubaidr/bulma-fluent (MIT Licence)
 - Animate.css : https://daneden.github.io/animate.css/, https://github.com/daneden/animate.css (MIT Licence)
+- Font Awesome : https://fontawesome.com, https://github.com/FortAwesome/Font-Awesome (Font Awesome Free License)
 - Secure IO : https://secure-io.org, https://github.com/secure-io/sio-go (MIT Licence), lots of thanks to @aead (Andreas Auernhammer) who has been a great help in understanding the library and for his cryptography insights
 - MaxMind DB Reader for Go : https://github.com/oschwald/maxminddb-golang (ISC License)
 - HTTP Cache by Victor Springer : https://github.com/victorspringer/http-cache (MIT Licence), parts are included in pkg/cache directory (to avoid getting unwanted redis dependencies)
 - Go-Glob by Ryan Uber : https://github.com/ryanuber/go-glob (MIT Licence)
+- go-disk-usage by ricochet2200 : https://github.com/ricochet2200/go-disk-usage (The Unlicense)
 
 ## Licence
 
