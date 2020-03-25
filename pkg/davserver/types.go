@@ -13,10 +13,6 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/du"
 )
 
-const (
-	gB = 1 << (10 * 3)
-)
-
 // Dav represents a webdav file service
 type Dav struct {
 	ID                   int      `json:"id"`
@@ -76,8 +72,8 @@ func (s *Server) SendDavs(w http.ResponseWriter, req *http.Request) {
 	for i, dav := range davs {
 		usage, err := du.NewDiskUsage(dav.Root)
 		if err == nil {
-			dav.UsedGB = usage.Used() / gB
-			dav.TotalGB = usage.Size() / gB
+			dav.UsedGB = usage.Used() / du.GB
+			dav.TotalGB = usage.Size() / du.GB
 		}
 		// Do not leak encryption passphrase to non admins users
 		if !user.IsAdmin {

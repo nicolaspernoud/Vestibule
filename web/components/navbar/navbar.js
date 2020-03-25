@@ -56,6 +56,7 @@ export async function CreateMenu() {
                   ${user.isAdmin
                     ? /* HTML */ `
                         <a class="navbar-item" href="#users"><i class="navbar-menu-icon fas fa-users"></i>Users</a>
+                        <a class="navbar-item" href="#sysinfo"><i class="navbar-menu-icon fas fa-stethoscope"></i>System information</a>
                       `
                     : ""}
                 `

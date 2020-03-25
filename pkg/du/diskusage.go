@@ -9,6 +9,11 @@ import (
 	"golang.org/x/sys/unix"
 )
 
+const (
+	// GB is one GB
+	GB = 1 << (10 * 3)
+)
+
 //DiskUsage is an object holding a disk usage
 type DiskUsage struct {
 	stat *unix.Statfs_t

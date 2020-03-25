@@ -2,11 +2,13 @@ import * as Apps from "/components/apps/apps.js";
 import * as Davs from "/components/davs/davs.js";
 import * as Users from "/components/users/users.js";
 import * as Login from "/components/login/login.js";
+import * as Sysinfo from "/components/sysinfo/sysinfo.js";
 import * as Navbar from "/components/navbar/navbar.js";
 import { AnimateCSS } from "/services/common/common.js";
 
 const mountPoint = document.getElementById("main");
 const spinner = document.getElementById("spinner");
+let sysInfoInterval;
 
 document.addEventListener("DOMContentLoaded", function() {
   Navbar.mount("navbar");
@@ -15,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 async function navigate() {
+  clearInterval(sysInfoInterval);
   switch (location.hash) {
     case "#apps":
       load(mountPoint, async function() {
@@ -34,6 +37,11 @@ async function navigate() {
     case "#login":
       load(mountPoint, async function() {
         await Login.mount("main");
+      });
+      break;
+    case "#sysinfo":
+      load(mountPoint, async function() {
+        sysInfoInterval = await Sysinfo.mount("main");
       });
       break;
     default:

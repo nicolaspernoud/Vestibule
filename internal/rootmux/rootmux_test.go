@@ -278,6 +278,8 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 			do("PUT", "admindav.vestibule.io/mydata/test2.txt", xsrfHeader, "This is a write test", 201, "")
 			// Try to delete a resource on an authorized dav (must pass)
 			do("DELETE", "admindav.vestibule.io/mydata/test2.txt", xsrfHeader, "", 204, "")
+			// Try to get the system information (must pass)
+			do("GET", "/api/admin/sysinfo/", xsrfHeader, "", 200, `{"uptime"`)
 		}
 		// Try to login (must pass)
 		do("GET", "/OAuth2Login", noH, "", 200, "<!DOCTYPE html>")

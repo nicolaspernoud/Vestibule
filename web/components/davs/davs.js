@@ -5,6 +5,7 @@ import { Icons } from "/services/common/icons.js";
 import { AnimateCSS } from "/services/common/common.js";
 import { Explorer } from "./explorer.js";
 import { Delete } from "/services/common/delete.js";
+import { GetColor } from "../sysinfo/sysinfo.js";
 
 // DOM elements
 let mountpoint;
@@ -134,17 +135,6 @@ export async function mount(where) {
 function davTemplate(dav) {
   cleanDav(dav);
   const du = dav.usedgb / dav.totalgb;
-  let duType;
-  switch (true) {
-    case du >= 0.9:
-      duType = "danger";
-      break;
-    case du >= 0.75 && du < 0.9:
-      duType = "warning";
-      break;
-    default:
-      duType = "success";
-  }
   const free = dav.totalgb - dav.usedgb;
   return /* HTML */ `
     <div id="davs-dav-${dav.id}" class="card icon-card">
@@ -172,7 +162,7 @@ function davTemplate(dav) {
               ${user.isAdmin ? '<a class="dropdown-item has-text-danger" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
               <hr class="dropdown-divider" />
               <div class="dropdown-item">
-                <p><progress class="progress is-${duType}" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${dav.usedgb !== undefined ? free + " GB free" : ""}</p>
+                <p><progress class="progress is-${GetColor(du)}" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${dav.usedgb !== undefined ? free + " GB free" : ""}</p>
                 <hr class="dropdown-divider" />
                 <p><strong>${dav.host}</strong></p>
                 <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>

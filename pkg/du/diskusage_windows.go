@@ -7,6 +7,11 @@ import (
 	"unsafe"
 )
 
+const (
+	// GB is one GB
+	GB = 1 << (10 * 3)
+)
+
 //DiskUsage is an object holding the disk usage
 type DiskUsage struct {
 	freeBytes  int64
