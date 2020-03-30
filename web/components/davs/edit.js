@@ -1,6 +1,6 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString, GID } from "/services/common/common.js";
+import { HandleError } from "/services/common/errors.js";
 import { Share } from "/components/davs/share.js";
 import * as Auth from "/services/auth/auth.js";
 
@@ -36,8 +36,7 @@ export class Edit {
       }
       content = await response.text();
     } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
+      HandleError(e);
     }
     this.editModal.innerHTML = this.computeTemplate(content);
     document.body.appendChild(this.editModal);
@@ -92,8 +91,7 @@ export class Edit {
         throw new Error(`Text content could not be updated (status ${response.status})`);
       }
     } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
+      HandleError(e);
     }
   }
 }

@@ -1,11 +1,11 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
 import { Icons } from "/services/common/icons.js";
 import { AnimateCSS } from "/services/common/common.js";
 import { Explorer } from "./explorer.js";
 import { Delete } from "/services/common/delete.js";
 import { GetColor } from "../sysinfo/sysinfo.js";
+import { HandleError } from "/services/common/errors.js";
 
 // DOM elements
 let mountpoint;
@@ -125,11 +125,11 @@ export async function mount(where) {
     </div>
   `;
   user = await Auth.GetUser();
-  if (user !== undefined && user.isAdmin) {
-    document.getElementById("davs-new").classList.toggle("is-hidden");
+  if (user !== undefined) {
+    if (user.isAdmin) document.getElementById("davs-new").classList.toggle("is-hidden");
+    registerModalFields();
+    await firstShowDavs();
   }
-  registerModalFields();
-  await firstShowDavs();
 }
 
 function davTemplate(dav) {
@@ -219,8 +219,7 @@ async function firstShowDavs() {
     davs = await response.json();
     displayDavs(davs);
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 
@@ -238,8 +237,7 @@ async function deleteDav(dav) {
     reloadDavsOnServer();
     document.getElementById(`davs-dav-${dav.id}`).remove();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 
@@ -343,8 +341,7 @@ async function postDav() {
     await displayDavs(davs);
     await reloadDavsOnServer();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
   toggleModal();
 }
@@ -361,8 +358,7 @@ async function reloadDavsOnServer() {
       throw new Error(`Dav could not be reloaded (status ${response.status})`);
     }
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 

@@ -1,8 +1,8 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString, GetType, GID } from "/services/common/common.js";
 import { Share } from "/components/davs/share.js";
 import * as Auth from "/services/auth/auth.js";
+import { HandleError } from "/services/common/errors.js";
 
 export class Open {
   constructor(hostname, fullHostname, files, file) {
@@ -57,8 +57,7 @@ export class Open {
         }
         content = await response.text();
       } catch (e) {
-        Messages.Show("is-warning", e.message);
-        console.error(e);
+        HandleError(e);
       }
     } else {
       try {
@@ -81,8 +80,7 @@ export class Open {
         token = await response.text();
         token = encodeURIComponent(token);
       } catch (e) {
-        Messages.Show("is-warning", e.message);
-        console.error(e);
+        HandleError(e);
       }
     }
     this.openModal.innerHTML = this.computeTemplate(content, token);

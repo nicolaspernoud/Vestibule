@@ -1,7 +1,7 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import { RandomString } from "/services/common/common.js";
 import * as Auth from "/services/auth/auth.js";
+import { HandleError } from "/services/common/errors.js";
 
 export async function mount(where) {
   const infoComponent = new Sysinfo();
@@ -44,8 +44,7 @@ class Sysinfo {
       const info = await response.json();
       content.innerHTML = this.computeTemplate(info);
     } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
+      HandleError(e);
     }
   }
 

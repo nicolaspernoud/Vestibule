@@ -1,7 +1,7 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString, GID } from "/services/common/common.js";
 import * as Auth from "/services/auth/auth.js";
+import { HandleError } from "/services/common/errors.js";
 
 export class Share {
   constructor(hostname, file) {
@@ -106,8 +106,7 @@ export class Share {
           });
         });
       } catch (e) {
-        Messages.Show("is-warning", e.message);
-        console.error(e);
+        HandleError(e);
       }
       AnimateCSS(shareModal, "fadeOut", function() {
         shareModal.parentNode.removeChild(shareModal);

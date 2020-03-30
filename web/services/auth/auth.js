@@ -1,5 +1,5 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
+import { HandleError } from "/services/common/errors.js";
 
 // Local variables
 let user;
@@ -14,10 +14,12 @@ export async function GetUser() {
       throw new Error(`Not authenticated (status ${response.status})`);
     }
     user = await response.json();
-    return user;
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
-    location.hash = "#login";
+    HandleError(e);
   }
+  return user;
+}
+
+export function DeleteUser() {
+  user = undefined;
 }

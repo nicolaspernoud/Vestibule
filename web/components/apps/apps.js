@@ -1,9 +1,9 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
 import { Icons } from "/services/common/icons.js";
 import { AnimateCSS } from "/services/common/common.js";
 import { Delete } from "/services/common/delete.js";
+import { HandleError } from "/services/common/errors.js";
 
 // DOM elements
 let mountpoint;
@@ -160,11 +160,11 @@ export async function mount(where) {
     </div>
   `;
   user = await Auth.GetUser();
-  if (user !== undefined && user.isAdmin) {
-    document.getElementById("apps-new").classList.toggle("is-hidden");
+  if (user !== undefined) {
+    if (user.isAdmin) document.getElementById("apps-new").classList.toggle("is-hidden");
+    registerModalFields();
+    await firstShowApps();
   }
-  registerModalFields();
-  await firstShowApps();
 }
 
 function appTemplate(app) {
@@ -252,8 +252,7 @@ async function firstShowApps() {
     apps = await response.json();
     displayApps(apps);
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 
@@ -271,8 +270,7 @@ async function deleteApp(app) {
     reloadAppsOnServer();
     document.getElementById(`apps-app-${app.id}`).remove();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 
@@ -409,8 +407,7 @@ async function postApp() {
     await displayApps(apps);
     await reloadAppsOnServer();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
   toggleModal();
 }
@@ -427,8 +424,7 @@ async function reloadAppsOnServer() {
       throw new Error(`App could not be reloaded (status ${response.status})`);
     }
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 

@@ -1,8 +1,8 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import * as Navbar from "/components/navbar/navbar.js";
 import { loginModes } from "/assets/brand/brand.js";
 import * as Auth from "/services/auth/auth.js";
+import { HandleError } from "/services/common/errors.js";
 
 // DOM elements
 let mountpoint;
@@ -12,6 +12,7 @@ let login_inmemory;
 let login_icon;
 
 export function mount(where) {
+  Navbar.CreateMenu();
   mountpoint = where;
   document.getElementById(mountpoint).innerHTML = /* HTML */ `
     <div class="columns">
@@ -91,8 +92,7 @@ async function doLogin() {
     location.hash = "#davs";
     Navbar.CreateMenu();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
     login_icon.classList.remove("fa-pulse");
   }
 }

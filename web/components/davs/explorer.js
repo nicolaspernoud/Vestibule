@@ -6,6 +6,7 @@ import { Open } from "/components/davs/open.js";
 import { Edit } from "/components/davs/edit.js";
 import { Share } from "/components/davs/share.js";
 import { Delete } from "/services/common/delete.js";
+import { HandleError } from "/services/common/errors.js";
 
 export class Explorer {
   constructor(hostname) {
@@ -103,8 +104,7 @@ export class Explorer {
       this.displayFiles();
       this.progress.classList.add("is-hidden");
     } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
+      HandleError(e);
     }
   }
 
@@ -208,8 +208,7 @@ export class Explorer {
             this.user.login
           }&token=${encodeURIComponent(token)}`;
         } catch (e) {
-          Messages.Show("is-warning", e.message);
-          console.error(e);
+          HandleError(e);
         }
       } else if (GetType(file)) {
         const openModal = new Open(this.hostname, this.fullHostname, this.files, file);
@@ -302,8 +301,7 @@ export class Explorer {
         file.path = goUp(file.path) + encodeURIComponent(file.name);
         this.displayFiles();
       } catch (e) {
-        Messages.Show("is-warning", e.message);
-        console.error(e);
+        HandleError(e);
       }
       AnimateCSS(renameModal, "fadeOut", function() {
         renameModal.parentNode.removeChild(renameModal);
@@ -350,8 +348,7 @@ export class Explorer {
         }
         this.navigate(this.path);
       } catch (e) {
-        Messages.Show("is-warning", e.message);
-        console.error(e);
+        HandleError(e);
       }
       AnimateCSS(pasteControl, "zoomOut", function() {
         pasteControl.parentNode.removeChild(pasteControl);
@@ -382,8 +379,7 @@ export class Explorer {
       this.files.push(folder);
       this.displayFiles();
     } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
+      HandleError(e);
     }
   }
 
@@ -407,8 +403,7 @@ export class Explorer {
       this.files.push(txt);
       this.displayFiles();
     } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
+      HandleError(e);
     }
   }
 
@@ -428,8 +423,7 @@ export class Explorer {
         this.files = this.files.filter(el => el.name !== file.name);
         this.displayFiles();
       } catch (e) {
-        Messages.Show("is-warning", e.message);
-        console.error(e);
+        HandleError(e);
       }
     });
   }
@@ -555,8 +549,7 @@ export class Explorer {
       //document.body.appendChild(link); // required in FF (?), optional for Chrome
       link.click();
     } catch (e) {
-      Messages.Show("is-warning", e.message);
-      console.error(e);
+      HandleError(e);
     }
   }
 }
@@ -626,8 +619,7 @@ export async function LoadImage(image, url, user) {
     const objectURL = URL.createObjectURL(blob);
     image.src = objectURL;
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 

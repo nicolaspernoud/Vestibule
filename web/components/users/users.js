@@ -1,8 +1,8 @@
 // Imports
-import * as Messages from "/services/messages/messages.js";
 import { AnimateCSS, RandomString } from "/services/common/common.js";
 import * as Auth from "/services/auth/auth.js";
 import { Delete } from "/services/common/delete.js";
+import { HandleError } from "/services/common/errors.js";
 
 // DOM elements
 let mountpoint;
@@ -172,8 +172,7 @@ async function firstShowUsers() {
     users = await response.json();
     displayUsers();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 
@@ -190,8 +189,7 @@ async function deleteUser(user) {
     }
     document.getElementById(`users-user-${user.id}`).remove();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
 }
 
@@ -271,8 +269,7 @@ async function postUser() {
     users = await response.json();
     displayUsers();
   } catch (e) {
-    Messages.Show("is-warning", e.message);
-    console.error(e);
+    HandleError(e);
   }
   toggleModal();
 }
