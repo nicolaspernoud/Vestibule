@@ -83,6 +83,7 @@ func CreateMockAPI() *http.ServeMux {
 	mux.Handle("/", middlewares.Cors(func() http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
+			w.Header().Set("X-XSS-Protection", "1; mode=block")
 			w.Write([]byte(`{
 				"foo": "bar",
 				"bar": "foo"

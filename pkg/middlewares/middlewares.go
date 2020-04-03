@@ -17,20 +17,54 @@ func Cors(next http.Handler, allowedOrigin string) http.Handler {
 	})
 }
 
+/*
+**
+Indirection layer to manage headers for WebSecurity middleware
+**
+*/
+
+type webSecurityWriter struct {
+	w                     http.ResponseWriter
+	source                string
+	allowEvalInlineScript bool
+	wroteHeader           bool
+}
+
+func (s webSecurityWriter) WriteHeader(code int) {
+	if s.wroteHeader == false {
+		s.w.Header().Set("Strict-Transport-Security", "max-age=63072000")
+		var inline string
+		if s.allowEvalInlineScript {
+			inline = "'unsafe-inline' 'unsafe-eval'"
+		}
+		s.w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", s.source, inline))
+		//s.w.Header().Set("X-Frame-Options", "SAMEORIGIN") // Works fine with chrome but is not obsoleted by frame-src in firefox 72.0.2
+		s.w.Header().Set("X-XSS-Protection", "1; mode=block")
+		s.w.Header().Set("Referrer-Policy", "strict-origin")
+		s.w.Header().Set("X-Content-Type-Options", "nosniff")
+		s.wroteHeader = true
+	}
+	s.w.WriteHeader(code)
+}
+
+func (s webSecurityWriter) Write(b []byte) (int, error) {
+	return s.w.Write(b)
+}
+
+func (s webSecurityWriter) Header() http.Header {
+	return s.w.Header()
+}
+
 // WebSecurity adds good practices security headers on http responses
 func WebSecurity(next http.Handler, source string, allowEvalInlineScript bool) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Strict-Transport-Security", "max-age=63072000")
-		var inline string
-		if allowEvalInlineScript {
-			inline = "'unsafe-inline' 'unsafe-eval'"
+		sw := webSecurityWriter{
+			w:                     w,
+			source:                source,
+			allowEvalInlineScript: allowEvalInlineScript,
+			wroteHeader:           false,
 		}
-		w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", source, inline))
-		//w.Header().Set("X-Frame-Options", "SAMEORIGIN") // Works fine with chrome but is not obsoleted by frame-src in firefox 72.0.2
-		w.Header().Set("X-XSS-Protection", "1; mode=block")
-		w.Header().Set("Referrer-Policy", "strict-origin")
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		next.ServeHTTP(w, req)
+		next.ServeHTTP(sw, req)
 	})
 }
 
