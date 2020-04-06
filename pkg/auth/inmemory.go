@@ -124,7 +124,9 @@ func AddUser(w http.ResponseWriter, req *http.Request) {
 		if val.ID == newUser.ID {
 			users[idx] = newUser
 			isNew = false
-			break
+		} else if val.Login == newUser.Login { // Check for already existing login
+			http.Error(w, "login already exists", 400)
+			return
 		}
 	}
 	if isNew {
@@ -139,7 +141,7 @@ func AddUser(w http.ResponseWriter, req *http.Request) {
 	SendUsers(w, req)
 }
 
-// DeleteUser adds an user
+// DeleteUser deletes an user
 func DeleteUser(w http.ResponseWriter, req *http.Request) {
 	var users []User
 	err := common.Load(UsersFile, &users)
@@ -153,7 +155,7 @@ func DeleteUser(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "please provide an user index", 400)
 		return
 	}
-	// Add the user only if the name doesn't exists yet
+	// Recreate the user list without the deleted user
 	newUsers := users[:0]
 	for _, user := range users {
 		id, err := strconv.Atoi(user.ID)
