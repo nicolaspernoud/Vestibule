@@ -29,6 +29,7 @@ async function openDocument() {
       },
     },
   };
+  new DocsAPI.DocEditor("placeholder", config);
 }
 
 async function digestMessage(message) {
