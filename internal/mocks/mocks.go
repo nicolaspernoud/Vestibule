@@ -84,6 +84,7 @@ func CreateMockAPI() *http.ServeMux {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set("X-XSS-Protection", "1; mode=block")
+			w.Header().Set("Content-Security-Policy", "default-src 'self'; frame-ancestors http://www.example.com")
 			w.Write([]byte(`{
 				"foo": "bar",
 				"bar": "foo"

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 // Cors enables CORS Request on server (for development purposes)
@@ -37,7 +38,19 @@ func (s webSecurityWriter) WriteHeader(code int) {
 		if s.allowEvalInlineScript {
 			inline = "'unsafe-inline' 'unsafe-eval'"
 		}
-		s.w.Header().Set("Content-Security-Policy", fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", s.source, inline))
+		// Get existing CSP Header
+		cspHeader := s.w.Header().Get("Content-Security-Policy")
+		if cspHeader != "" { // If it exists, alter it to inject the vestibule main hostname in authorized frame ancestors
+			if strings.Contains(cspHeader, "frame-ancestors") {
+				cspHeader = strings.Replace(cspHeader, "frame-ancestors", fmt.Sprintf("frame-ancestors %v", s.source), 1)
+			} else {
+				cspHeader = cspHeader + fmt.Sprintf("; frame-ancestors %v", s.source)
+			}
+		} else { // If not, forge a default CSP Header
+			cspHeader = fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", s.source, inline)
+		}
+		// Set the resulting CSP Header
+		s.w.Header().Set("Content-Security-Policy", cspHeader)
 		//s.w.Header().Set("X-Frame-Options", "SAMEORIGIN") // Works fine with chrome but is not obsoleted by frame-src in firefox 72.0.2
 		s.w.Header().Set("X-XSS-Protection", "1; mode=block")
 		s.w.Header().Set("Referrer-Policy", "strict-origin")
