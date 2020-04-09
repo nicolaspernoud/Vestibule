@@ -2,6 +2,17 @@
 
 Vestibule is an HTTP server, reverse proxy and webdav server, with OIDC/OAuth2 and local users file authentication, and a _Single Page Application_ GUI to configure everything.
 
+[![Maintainability Rating](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=sqale_rating)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Security Rating](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=security_rating)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Reliability Rating](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=reliability_rating)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Quality Gate Status](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=alert_status)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Bugs](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=bugs)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Vulnerabilities](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=vulnerabilities)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Code Smells](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=code_smells)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Technical Debt](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=sqale_index)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Lines of Code](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=ncloc)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Duplicated Lines (%)](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=duplicated_lines_density)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+
 ## Features
 
 - Reverse proxy any website (internal or external), with GUI configuration

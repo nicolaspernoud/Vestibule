@@ -210,28 +210,28 @@ function appTemplate(app) {
   `;
 }
 
-function displayApps(apps) {
-  const markup = apps
-    .map(app => {
-      if (user.isAdmin || !app.secured || app.roles.some(r => user.memberOf.includes(r))) {
+function displayApps(inApps) {
+  const markup = inApps
+    .map((app) => {
+      if (user.isAdmin || !app.secured || app.roles.some((r) => user.memberOf.includes(r))) {
         return appTemplate(app);
       }
     })
     .join("");
   document.getElementById("apps-list").innerHTML = markup;
-  apps.map(app => {
+  inApps.map((app) => {
     if (user.isAdmin) {
-      document.getElementById(`apps-app-edit-${app.id}`).addEventListener("click", function() {
+      document.getElementById(`apps-app-edit-${app.id}`).addEventListener("click", function () {
         editApp(app);
       });
-      document.getElementById(`apps-app-delete-${app.id}`).addEventListener("click", function() {
+      document.getElementById(`apps-app-delete-${app.id}`).addEventListener("click", function () {
         new Delete(() => {
           deleteApp(app);
         });
       });
     }
-    if (user.isAdmin || !app.secured || app.roles.some(r => user.memberOf.includes(r))) {
-      document.getElementById(`apps-app-open-${app.id}`).addEventListener("click", function() {
+    if (user.isAdmin || !app.secured || app.roles.some((r) => user.memberOf.includes(r))) {
+      document.getElementById(`apps-app-open-${app.id}`).addEventListener("click", function () {
         openWebview(app);
       });
     }
@@ -243,8 +243,8 @@ async function firstShowApps() {
     const response = await fetch("/api/common/apps", {
       method: "GET",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
-      })
+        "XSRF-Token": user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Apps could not be fetched (status ${response.status})`);
@@ -261,8 +261,8 @@ async function deleteApp(app) {
     const response = await fetch("/api/admin/apps/" + app.id, {
       method: "delete",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
-      })
+        "XSRF-Token": user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`App could not be deleted (status ${response.status})`);
@@ -294,25 +294,25 @@ function registerModalFields() {
   securityheaders_field = document.getElementById("apps-modal-securityheaders");
   cacheduration_field = document.getElementById("apps-modal-cacheduration");
   cachepattern_field = document.getElementById("apps-modal-cachepattern");
-  document.getElementById(`apps-modal-close`).addEventListener("click", function() {
+  document.getElementById(`apps-modal-close`).addEventListener("click", function () {
     toggleModal();
   });
-  document.getElementById(`apps-modal-cancel`).addEventListener("click", function() {
+  document.getElementById(`apps-modal-cancel`).addEventListener("click", function () {
     toggleModal();
   });
-  document.getElementById(`apps-modal-save`).addEventListener("click", function() {
+  document.getElementById(`apps-modal-save`).addEventListener("click", function () {
     postApp();
   });
-  document.getElementById(`apps-new`).addEventListener("click", function() {
+  document.getElementById(`apps-new`).addEventListener("click", function () {
     newApp();
   });
-  icon_field.addEventListener("click", function() {
+  icon_field.addEventListener("click", function () {
     pickIcon();
   });
-  isproxy_field.addEventListener("click", function() {
+  isproxy_field.addEventListener("click", function () {
     toggleForwardServe();
   });
-  secured_field.addEventListener("click", function() {
+  secured_field.addEventListener("click", function () {
     toggleRoles();
   });
 }
@@ -348,7 +348,7 @@ function cleanApp(app) {
 
 async function newApp() {
   let maxid = 0;
-  apps.map(function(app) {
+  apps.map(function (app) {
     if (app.id > maxid) maxid = app.id;
   });
   id_field.value = maxid + 1;
@@ -386,7 +386,7 @@ async function postApp() {
       login: login_field.value,
       password: password_field.value,
       openpath: openpath_field.value,
-      securityheaders: securityheaders_field.checked
+      securityheaders: securityheaders_field.checked,
     };
     const cachepattern = cachepattern_field.value.split(",");
     if (cachepattern.length > 1 || cachepattern[0] !== "") {
@@ -396,9 +396,9 @@ async function postApp() {
     const response = await fetch("/api/admin/apps/", {
       method: "post",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
+        "XSRF-Token": user.xsrftoken,
       }),
-      body: JSON.stringify(bdy)
+      body: JSON.stringify(bdy),
     });
     if (response.status !== 200) {
       throw new Error(`Apps could not be updated (status ${response.status})`);
@@ -417,8 +417,8 @@ async function reloadAppsOnServer() {
     const response = await fetch("/api/admin/reload", {
       method: "GET",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
-      })
+        "XSRF-Token": user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`App could not be reloaded (status ${response.status})`);
@@ -436,7 +436,7 @@ function toggleModal() {
   const card = document.getElementById("apps-modal-card");
   if (modal.classList.contains("is-active")) {
     AnimateCSS(modal, "fadeOut");
-    AnimateCSS(card, "zoomOut", function() {
+    AnimateCSS(card, "zoomOut", function () {
       modal.classList.remove("is-active");
     });
   } else {
@@ -472,7 +472,7 @@ async function pickIcon() {
   const iconsTemplate =
     '<div class="buttons">' +
     Icons.map(
-      icon => /* HTML */ `
+      (icon) => /* HTML */ `
         <button class="button${icon_field.value == icon ? " is-primary" : ""}" id="apps-icon-modal-list-${icon}">
           <span class="icon">
             <i class="fas fa-${icon}"></i>
@@ -482,8 +482,8 @@ async function pickIcon() {
     ).join("") +
     "</div>";
   document.getElementById("apps-icons-modal-list").innerHTML = iconsTemplate;
-  Icons.map(icon =>
-    document.getElementById(`apps-icon-modal-list-${icon}`).addEventListener("click", function() {
+  Icons.map((icon) =>
+    document.getElementById(`apps-icon-modal-list-${icon}`).addEventListener("click", function () {
       icon_field.value = icon;
       updateIcon();
       document.getElementById("apps-icons-modal").classList.toggle("is-active");
@@ -510,7 +510,7 @@ function openWebview(app) {
     </div>
   `;
   webview.querySelector("#" + "apps-webview-close").addEventListener("click", () => {
-    AnimateCSS(webview.getElementsByClassName("modal-background")[0], "fadeOut", function() {
+    AnimateCSS(webview.getElementsByClassName("modal-background")[0], "fadeOut", function () {
       webview.parentNode.removeChild(webview);
     });
     AnimateCSS(webview.getElementsByClassName("modal-content")[0], "zoomOut");

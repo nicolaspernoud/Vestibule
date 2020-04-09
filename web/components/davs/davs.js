@@ -177,28 +177,28 @@ function davTemplate(dav) {
   `;
 }
 
-function displayDavs(davs) {
-  const markup = davs
-    .map(dav => {
-      if (user.isAdmin || !dav.secured || dav.roles.some(r => user.memberOf.includes(r))) {
+function displayDavs(inDavs) {
+  const markup = inDavs
+    .map((dav) => {
+      if (user.isAdmin || !dav.secured || dav.roles.some((r) => user.memberOf.includes(r))) {
         return davTemplate(dav);
       }
     })
     .join("");
   document.getElementById("davs-list").innerHTML = markup;
-  davs.map(dav => {
+  inDavs.map((dav) => {
     if (user.isAdmin) {
-      document.getElementById(`davs-dav-edit-${dav.id}`).addEventListener("click", function() {
+      document.getElementById(`davs-dav-edit-${dav.id}`).addEventListener("click", function () {
         editDav(dav);
       });
-      document.getElementById(`davs-dav-delete-${dav.id}`).addEventListener("click", function() {
+      document.getElementById(`davs-dav-delete-${dav.id}`).addEventListener("click", function () {
         new Delete(() => {
           deleteDav(dav);
         });
       });
     }
-    if (user.isAdmin || !dav.secured || dav.roles.some(r => user.memberOf.includes(r))) {
-      document.getElementById(`davs-dav-open-${dav.id}`).addEventListener("click", function() {
+    if (user.isAdmin || !dav.secured || dav.roles.some((r) => user.memberOf.includes(r))) {
+      document.getElementById(`davs-dav-open-${dav.id}`).addEventListener("click", function () {
         openExplorerModal(dav.host, dav.writable, dav.passphrase != null && dav.passphrase !== "");
       });
     }
@@ -210,8 +210,8 @@ async function firstShowDavs() {
     const response = await fetch("/api/common/davs", {
       method: "GET",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
-      })
+        "XSRF-Token": user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Davs could not be fetched (status ${response.status})`);
@@ -228,8 +228,8 @@ async function deleteDav(dav) {
     const response = await fetch("/api/admin/davs/" + dav.id, {
       method: "delete",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
-      })
+        "XSRF-Token": user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Dav could not be deleted (status ${response.status})`);
@@ -253,22 +253,22 @@ function registerModalFields() {
   roles_field = document.getElementById("davs-modal-roles");
   roles_container = document.getElementById("davs-modal-roles-container");
   passphrase_field = document.getElementById("davs-modal-passphrase");
-  document.getElementById(`davs-modal-close`).addEventListener("click", function() {
+  document.getElementById(`davs-modal-close`).addEventListener("click", function () {
     toggleModal();
   });
-  document.getElementById(`davs-modal-cancel`).addEventListener("click", function() {
+  document.getElementById(`davs-modal-cancel`).addEventListener("click", function () {
     toggleModal();
   });
-  document.getElementById(`davs-modal-save`).addEventListener("click", function() {
+  document.getElementById(`davs-modal-save`).addEventListener("click", function () {
     postDav();
   });
-  document.getElementById(`davs-new`).addEventListener("click", function() {
+  document.getElementById(`davs-new`).addEventListener("click", function () {
     newDav();
   });
-  icon_field.addEventListener("click", function() {
+  icon_field.addEventListener("click", function () {
     pickIcon();
   });
-  secured_field.addEventListener("click", function() {
+  secured_field.addEventListener("click", function () {
     toggleRoles();
   });
 }
@@ -298,7 +298,7 @@ function cleanDav(dav) {
 
 async function newDav() {
   let maxid = 0;
-  davs.map(function(dav) {
+  davs.map(function (dav) {
     if (dav.id > maxid) maxid = dav.id;
   });
   id_field.value = maxid + 1;
@@ -319,7 +319,7 @@ async function postDav() {
     const response = await fetch("/api/admin/davs/", {
       method: "post",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
+        "XSRF-Token": user.xsrftoken,
       }),
       body: JSON.stringify({
         id: parseInt(id_field.value),
@@ -331,8 +331,8 @@ async function postDav() {
         root: root_field.value,
         secured: secured_field.checked,
         roles: secured_field.checked ? roles_field.value.split(",") : "",
-        passphrase: passphrase_field.value
-      })
+        passphrase: passphrase_field.value,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Davs could not be updated (status ${response.status})`);
@@ -351,8 +351,8 @@ async function reloadDavsOnServer() {
     const response = await fetch("/api/admin/reload", {
       method: "GET",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
-      })
+        "XSRF-Token": user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Dav could not be reloaded (status ${response.status})`);
@@ -369,7 +369,7 @@ function toggleModal() {
   const card = document.getElementById("davs-modal-card");
   if (modal.classList.contains("is-active")) {
     AnimateCSS(modal, "fadeOut");
-    AnimateCSS(card, "zoomOut", function() {
+    AnimateCSS(card, "zoomOut", function () {
       modal.classList.remove("is-active");
     });
   } else {
@@ -395,7 +395,7 @@ async function pickIcon() {
   const iconsTemplate =
     '<div class="buttons">' +
     Icons.map(
-      icon => /* HTML */ `
+      (icon) => /* HTML */ `
         <button class="button${icon_field.value == icon ? " is-primary" : ""}" id="davs-icon-modal-list-${icon}">
           <span class="icon">
             <i class="fas fa-${icon}"></i>
@@ -405,8 +405,8 @@ async function pickIcon() {
     ).join("") +
     "</div>";
   document.getElementById("davs-icons-modal-list").innerHTML = iconsTemplate;
-  Icons.map(icon =>
-    document.getElementById(`davs-icon-modal-list-${icon}`).addEventListener("click", function() {
+  Icons.map((icon) =>
+    document.getElementById(`davs-icon-modal-list-${icon}`).addEventListener("click", function () {
       icon_field.value = icon;
       updateIcon();
       document.getElementById("davs-icons-modal").classList.toggle("is-active");
