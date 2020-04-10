@@ -1,7 +1,10 @@
 package middlewares
 
 import (
+	"bufio"
+	"errors"
 	"fmt"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -47,7 +50,7 @@ func (s webSecurityWriter) WriteHeader(code int) {
 				cspHeader = cspHeader + fmt.Sprintf("; frame-ancestors %v", s.source)
 			}
 		} else { // If not, forge a default CSP Header
-			cspHeader = fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v blob: 'self'; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src %[1]v; frame-ancestors %[1]v", s.source, inline)
+			cspHeader = fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v 'self' blob: ; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src http: %[1]v; frame-ancestors %[1]v", s.source, inline)
 		}
 		// Set the resulting CSP Header
 		s.w.Header().Set("Content-Security-Policy", cspHeader)
@@ -66,6 +69,14 @@ func (s webSecurityWriter) Write(b []byte) (int, error) {
 
 func (s webSecurityWriter) Header() http.Header {
 	return s.w.Header()
+}
+
+func (s webSecurityWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	hj, ok := s.w.(http.Hijacker)
+	if !ok {
+		return nil, nil, errors.New("response writer is not an hijacker")
+	}
+	return hj.Hijack()
 }
 
 // WebSecurity adds good practices security headers on http responses
