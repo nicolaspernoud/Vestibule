@@ -54,7 +54,7 @@ func (s webSecurityWriter) WriteHeader(code int) {
 		}
 		// Set the resulting CSP Header
 		s.w.Header().Set("Content-Security-Policy", cspHeader)
-		//s.w.Header().Set("X-Frame-Options", "SAMEORIGIN") // Works fine with chrome but is not obsoleted by frame-src in firefox 72.0.2
+		s.w.Header().Set("X-Frame-Options", "SAMEORIGIN")
 		s.w.Header().Set("X-XSS-Protection", "1; mode=block")
 		s.w.Header().Set("Referrer-Policy", "strict-origin")
 		s.w.Header().Set("X-Content-Type-Options", "nosniff")
