@@ -50,7 +50,7 @@ func (s webSecurityWriter) WriteHeader(code int) {
 				cspHeader = cspHeader + fmt.Sprintf("; frame-ancestors %v", s.source)
 			}
 		} else { // If not, forge a default CSP Header
-			cspHeader = fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v 'self' blob: ; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src http: %[1]v; frame-ancestors %[1]v", s.source, inline)
+			cspHeader = fmt.Sprintf("default-src %[1]v 'self'; img-src %[1]v 'self' blob: data: ; script-src 'self' %[1]v %[2]v; style-src 'self' 'unsafe-inline'; frame-src http: %[1]v; frame-ancestors %[1]v", s.source, inline)
 		}
 		// Set the resulting CSP Header
 		s.w.Header().Set("Content-Security-Policy", cspHeader)
