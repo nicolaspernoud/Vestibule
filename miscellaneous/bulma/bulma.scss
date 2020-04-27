@@ -1,0 +1,71 @@
+@charset "utf-8";
+
+// Brand colors
+$deep-blue: #0d47a1;
+$nice-red: #c2185b;
+$grey: #78909c;
+$light-grey: #b0bec5;
+$very-light-grey: #eceff1;
+
+// Bulma's global variables
+$primary: $deep-blue;
+$dark: $grey;
+$light: $light-grey;
+
+// Bulma's component variables
+$body-background-color: $very-light-grey;
+$card-content-padding: 2rem;
+$navbar-item-img-max-height: 2.5rem;
+$navbar-background-color: $light-grey;
+$navbar-item-hover-color: $nice-red;
+$navbar-item-hover-background-color: $dark;
+$navbar-item-active-color: $nice-red;
+$navbar-item-active-background-color: $very-light-grey;
+$progress-border-radius: 0px;
+$progress-indeterminate-duration: 1s;
+
+// Bulma imports
+@import "node_modules/bulma/sass/utilities/_all.sass";
+@import "node_modules/bulma/sass/base/_all.sass";
+
+//@import "node_modules/bulma/sass/components/breadcrumb.sass";
+@import "node_modules/bulma/sass/components/card.sass";
+@import "node_modules/bulma/sass/components/dropdown.sass";
+//@import "node_modules/bulma/sass/components/level.sass";
+//@import "node_modules/bulma/sass/components/list.sass";
+@import "node_modules/bulma/sass/components/media.sass";
+//@import "node_modules/bulma/sass/components/menu.sass";
+//@import "node_modules/bulma/sass/components/message.sass";
+@import "node_modules/bulma/sass/components/modal.sass";
+@import "node_modules/bulma/sass/components/navbar.sass";
+//@import "node_modules/bulma/sass/components/pagination.sass";
+//@import "node_modules/bulma/sass/components/panel.sass";
+//@import "node_modules/bulma/sass/components/tabs.sass";
+
+//@import "node_modules/bulma/sass/elements/box.sass";
+@import "node_modules/bulma/sass/elements/button.sass";
+@import "node_modules/bulma/sass/elements/container.sass";
+@import "node_modules/bulma/sass/elements/content.sass";
+@import "node_modules/bulma/sass/elements/form.sass";
+@import "node_modules/bulma/sass/elements/icon.sass";
+@import "node_modules/bulma/sass/elements/image.sass";
+@import "node_modules/bulma/sass/elements/notification.sass";
+@import "node_modules/bulma/sass/elements/other.sass";
+@import "node_modules/bulma/sass/elements/progress.sass";
+@import "node_modules/bulma/sass/elements/table.sass";
+//@import "node_modules/bulma/sass/elements/tag.sass";
+@import "node_modules/bulma/sass/elements/title.sass";
+
+@import "node_modules/bulma/sass/form/shared.sass";
+//@import "node_modules/bulma/sass/form/checkbox-radio.sass";
+@import "node_modules/bulma/sass/form/file.sass";
+@import "node_modules/bulma/sass/form/input-textarea.sass";
+@import "node_modules/bulma/sass/form/select.sass";
+@import "node_modules/bulma/sass/form/tools.sass";
+
+@import "node_modules/bulma/sass/grid/columns.sass";
+//@import "node_modules/bulma/sass/grid/tiles.sass";
+
+@import "node_modules/bulma/sass/layout/footer.sass";
+//@import "node_modules/bulma/sass/layout/hero.sass";
+@import "node_modules/bulma/sass/layout/section.sass";

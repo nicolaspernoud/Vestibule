@@ -24,9 +24,9 @@ export function mount(mountpoint) {
   // Hamburger menu
   const burger = document.getElementById("navbar-burger");
   menu = document.getElementById("navbar-menu");
-  const openClose = e => {
+  const openClose = (e) => {
     if (burger.classList.contains("is-active")) {
-      AnimateCSS(menu, "slideOutRight", function() {
+      AnimateCSS(menu, "slideOutRight", function () {
         menu.classList.remove("is-active");
         burger.classList.remove("is-active");
       });
@@ -51,12 +51,12 @@ export async function CreateMenu() {
             user === undefined
               ? ``
               : /* HTML */ `
-                  <a class="navbar-item" href="#apps"><i class="navbar-menu-icon fas fa-home"></i>Apps</a>
-                  <a class="navbar-item" href="#davs"><i class="navbar-menu-icon fas fa-folder-open"></i>Files</a>
+                  <a id="navbar-apps" class="navbar-item" href="#apps"><i class="navbar-menu-icon fas fa-home"></i>Apps</a>
+                  <a id="navbar-davs" class="navbar-item" href="#davs"><i class="navbar-menu-icon fas fa-folder-open"></i>Files</a>
                   ${user.isAdmin
                     ? /* HTML */ `
-                        <a class="navbar-item" href="#users"><i class="navbar-menu-icon fas fa-users"></i>Users</a>
-                        <a class="navbar-item" href="#sysinfo"><i class="navbar-menu-icon fas fa-stethoscope"></i>System information</a>
+                        <a id="navbar-users" class="navbar-item" href="#users"><i class="navbar-menu-icon fas fa-users"></i>Users</a>
+                        <a id="navbar-sysinfo" class="navbar-item" href="#sysinfo"><i class="navbar-menu-icon fas fa-stethoscope"></i>System information</a>
                       `
                     : ""}
                 `
@@ -65,13 +65,20 @@ export async function CreateMenu() {
         <div class="navbar-end">
           ${
             user === undefined
-              ? /* HTML */ `
-                  <a class="navbar-item" href="#login"><i class="navbar-menu-icon fas fa-sign-in-alt"></i>Log in</a>
-                `
-              : /* HTML */ `
-                  <a class="navbar-item" href="/Logout"><i class="navbar-menu-icon fas fa-sign-out-alt"></i>Log out</a>
-                `
+              ? /* HTML */ ` <a class="navbar-item" href="#login"><i class="navbar-menu-icon fas fa-sign-in-alt"></i>Log in</a> `
+              : /* HTML */ ` <a class="navbar-item" href="/Logout"><i class="navbar-menu-icon fas fa-sign-out-alt"></i>Log out</a> `
           }
         </div>
      `;
+  SetActiveItem();
+}
+
+export function SetActiveItem() {
+  const items = document.getElementsByClassName("navbar-item");
+  for (const i of items) {
+    i.classList.remove("is-active");
+    if (i.id == "navbar-" + location.hash.substring(1)) {
+      i.classList.add("is-active");
+    }
+  }
 }

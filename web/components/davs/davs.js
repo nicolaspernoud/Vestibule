@@ -138,12 +138,10 @@ function davTemplate(dav) {
   const free = dav.totalgb - dav.usedgb;
   return /* HTML */ `
     <div id="davs-dav-${dav.id}" class="card icon-card">
-      <div class="card-content has-text-centered">
-        <button id="davs-dav-open-${dav.id}" class="button is-large is-white">
-          <span class="icon is-medium" style="color:${dav.color};">
-            <i class="fas fa-2x fa-${dav.icon ? dav.icon : "file"}"></i>
-          </span>
-        </button>
+      <div id="davs-dav-open-${dav.id}" class="card-content has-text-centered">
+        <span class="icon is-medium" style="color:${dav.color};">
+          <i class="fas fa-3x fa-${dav.icon ? dav.icon : "file"}"></i>
+        </span>
       </div>
       <p class="has-text-centered"><strong>${dav.name ? dav.name : dav.id}</strong></p>
       <div class="card-footer">
@@ -162,7 +160,9 @@ function davTemplate(dav) {
               ${user.isAdmin ? '<a class="dropdown-item has-text-danger" id="davs-dav-delete-' + dav.id + '"><i class="fas fa-trash-alt"></i><strong> Delete</strong></a>' : ""}
               <hr class="dropdown-divider" />
               <div class="dropdown-item">
-                <p><progress class="progress is-${GetColor(du)}" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${dav.usedgb !== undefined ? free + " GB free" : ""}</p>
+                <p>
+                  <progress class="progress is-${GetColor(du)} is-small" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${dav.usedgb !== undefined ? free + " GB free" : ""}
+                </p>
                 <hr class="dropdown-divider" />
                 <p><strong>${dav.host}</strong></p>
                 <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>

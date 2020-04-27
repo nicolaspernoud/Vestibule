@@ -171,12 +171,10 @@ function appTemplate(app) {
   cleanApp(app);
   return /* HTML */ `
     <div id="apps-app-${app.id}" class="card icon-card">
-      <div class="card-content has-text-centered">
-        <button id="apps-app-open-${app.id}" class="button is-large is-white">
-          <span class="icon is-medium" style="color:${app.color};">
-            <i class="fas fa-2x fa-${app.icon ? app.icon : "file"}"></i>
-          </span>
-        </button>
+      <div class="card-content has-text-centered" id="apps-app-open-${app.id}">
+        <span class="icon is-medium" style="color:${app.color};">
+          <i class="fas fa-3x fa-${app.icon ? app.icon : "file"}"></i>
+        </span>
       </div>
       <p class="has-text-centered"><strong>${app.name ? app.name : app.id}</strong></p>
       <div class="card-footer">

@@ -26,7 +26,7 @@ export class Explorer {
         <button class="delete" aria-label="close" id="explorer-modal-close"></button>
       </header>
       <section id="explorer-modal-content" class="modal-card-body"></section>
-      <progress id="explorer-modal-progress" class="progress is-primary" style="margin-bottom:0px;"></progress>
+      <progress id="explorer-modal-progress" class="progress is-primary is-small" style="margin-bottom:0px;"></progress>
       <footer id="explorer-modal-footer" class="modal-card-foot">
         <div class="buttons" id="explorer-modal-footer-buttons">
           <button id="explorer-modal-back" class="button is-success">
@@ -58,10 +58,10 @@ export class Explorer {
       </footer>
     `;
     this.user = await Auth.GetUser();
-    document.getElementById(`explorer-modal-close`).addEventListener("click", function() {
+    document.getElementById(`explorer-modal-close`).addEventListener("click", function () {
       const modal = card.parentNode;
       AnimateCSS(modal, "fadeOut");
-      AnimateCSS(card, "zoomOut", function() {
+      AnimateCSS(card, "zoomOut", function () {
         modal.classList.remove("is-active");
       });
     });
@@ -75,7 +75,7 @@ export class Explorer {
       document.getElementById(`explorer-modal-newtxt`).addEventListener("click", () => {
         this.newTxt();
       });
-      document.getElementById(`explorer-modal-upload`).addEventListener("change", e => {
+      document.getElementById(`explorer-modal-upload`).addEventListener("change", (e) => {
         this.upload(e.srcElement.files);
       });
     }
@@ -92,9 +92,9 @@ export class Explorer {
         method: "PROPFIND",
         headers: new Headers({
           Depth: "1",
-          "XSRF-Token": this.user.xsrftoken
+          "XSRF-Token": this.user.xsrftoken,
         }),
-        credentials: "include"
+        credentials: "include",
       });
       if (response.status !== 207) {
         throw new Error(`Files could not be fetched (status ${response.status})`);
@@ -110,10 +110,10 @@ export class Explorer {
 
   displayFiles() {
     // Create template
-    const markup = this.files.map(file => this.fileTemplate(file)).join("");
+    const markup = this.files.map((file) => this.fileTemplate(file)).join("");
     document.getElementById("explorer-modal-content").innerHTML = markup;
     // Register events
-    this.files.map(file => {
+    this.files.map((file) => {
       this.registerEvents(file);
     });
   }
@@ -190,15 +190,15 @@ export class Explorer {
           const response = await fetch(location.origin + "/api/common/Share", {
             method: "POST",
             headers: new Headers({
-              "XSRF-Token": this.user.xsrftoken
+              "XSRF-Token": this.user.xsrftoken,
             }),
             credentials: "include",
             body: JSON.stringify({
               sharedfor: "external_editor",
               lifespan: 1,
               url: this.hostname + file.path,
-              readonly: false
-            })
+              readonly: false,
+            }),
           });
           if (response.status !== 200) {
             throw new Error(`Share token could not be made (status ${response.status})`);
@@ -217,37 +217,37 @@ export class Explorer {
     });
 
     if (this.readwrite) {
-      document.getElementById(`file-${file.id}-rename`).addEventListener("click", event => {
+      document.getElementById(`file-${file.id}-rename`).addEventListener("click", (event) => {
         event.stopPropagation();
         this.rename(file);
       });
-      document.getElementById(`file-${file.id}-cut`).addEventListener("click", event => {
+      document.getElementById(`file-${file.id}-cut`).addEventListener("click", (event) => {
         event.stopPropagation();
         this.moveOrCopy(file, false);
       });
-      document.getElementById(`file-${file.id}-copy`).addEventListener("click", event => {
+      document.getElementById(`file-${file.id}-copy`).addEventListener("click", (event) => {
         event.stopPropagation();
         this.moveOrCopy(file, true);
       });
       if (GetType(file) === "text") {
-        document.getElementById(`file-${file.id}-edit`).addEventListener("click", event => {
+        document.getElementById(`file-${file.id}-edit`).addEventListener("click", (event) => {
           event.stopPropagation();
           const editModal = new Edit(this.fullHostname, file);
           editModal.show(true);
         });
       }
-      document.getElementById(`file-${file.id}-delete`).addEventListener("click", event => {
+      document.getElementById(`file-${file.id}-delete`).addEventListener("click", (event) => {
         event.stopPropagation();
         this.delete(file);
       });
     }
     if (!(this.encrypted && file.isDir)) {
-      document.getElementById(`file-${file.id}-download`).addEventListener("click", event => {
+      document.getElementById(`file-${file.id}-download`).addEventListener("click", (event) => {
         event.stopPropagation();
         this.download(file);
       });
     }
-    document.getElementById(`file-${file.id}-share`).addEventListener("click", event => {
+    document.getElementById(`file-${file.id}-share`).addEventListener("click", (event) => {
       event.stopPropagation();
       const shareModal = new Share(this.hostname, file);
       shareModal.show(true);
@@ -290,9 +290,9 @@ export class Explorer {
           method: "MOVE",
           headers: new Headers({
             Destination: this.fullHostname + path(this.path, renameModal.getElementsByTagName("input")[0].value),
-            "XSRF-Token": this.user.xsrftoken
+            "XSRF-Token": this.user.xsrftoken,
           }),
-          credentials: "include"
+          credentials: "include",
         });
         if (response.status !== 201) {
           throw new Error(`File could not be renamed (status ${response.status})`);
@@ -303,12 +303,12 @@ export class Explorer {
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(renameModal, "fadeOut", function() {
+      AnimateCSS(renameModal, "fadeOut", function () {
         renameModal.parentNode.removeChild(renameModal);
       });
     });
     renameModal.querySelector("#" + "explorer-rename-cancel").addEventListener("click", () => {
-      AnimateCSS(renameModal, "fadeOut", function() {
+      AnimateCSS(renameModal, "fadeOut", function () {
         renameModal.parentNode.removeChild(renameModal);
       });
     });
@@ -339,9 +339,9 @@ export class Explorer {
           method: isCopy ? "COPY" : "MOVE",
           headers: new Headers({
             Destination: this.fullHostname + path(this.path, file.name),
-            "XSRF-Token": this.user.xsrftoken
+            "XSRF-Token": this.user.xsrftoken,
           }),
-          credentials: "include"
+          credentials: "include",
         });
         if (response.status !== 201) {
           throw new Error(`File could not be pasted (status ${response.status})`);
@@ -350,12 +350,12 @@ export class Explorer {
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(pasteControl, "zoomOut", function() {
+      AnimateCSS(pasteControl, "zoomOut", function () {
         pasteControl.parentNode.removeChild(pasteControl);
       });
     });
     pasteControl.getElementsByTagName("a")[1].addEventListener("click", async () => {
-      AnimateCSS(pasteControl, "zoomOut", function() {
+      AnimateCSS(pasteControl, "zoomOut", function () {
         pasteControl.parentNode.removeChild(pasteControl);
       });
     });
@@ -369,9 +369,9 @@ export class Explorer {
       const response = await fetch(this.fullHostname + folder.path, {
         method: "MKCOL",
         headers: new Headers({
-          "XSRF-Token": this.user.xsrftoken
+          "XSRF-Token": this.user.xsrftoken,
         }),
-        credentials: "include"
+        credentials: "include",
       });
       if (response.status !== 201) {
         throw new Error(`Folder could not be created (status ${response.status})`);
@@ -387,15 +387,15 @@ export class Explorer {
     const newTxtName = "New Text.txt";
     const txt = { name: newTxtName, isDir: false, type: "text", size: 0, lastModified: new Date(), path: path(this.path, newTxtName), id: this.files.length + 1 };
     try {
-      if (this.files.some(file => file.name === newTxtName)) {
+      if (this.files.some((file) => file.name === newTxtName)) {
         throw new Error(`Text document already exists`);
       }
       const response = await fetch(this.fullHostname + txt.path, {
         method: "PUT",
         headers: new Headers({
-          "XSRF-Token": this.user.xsrftoken
+          "XSRF-Token": this.user.xsrftoken,
         }),
-        credentials: "include"
+        credentials: "include",
       });
       if (response.status !== 201) {
         throw new Error(`Text document could not be created (status ${response.status})`);
@@ -413,14 +413,14 @@ export class Explorer {
         const response = await fetch(this.fullHostname + file.path, {
           method: "DELETE",
           headers: new Headers({
-            "XSRF-Token": this.user.xsrftoken
+            "XSRF-Token": this.user.xsrftoken,
           }),
-          credentials: "include"
+          credentials: "include",
         });
         if (response.status !== 204) {
           throw new Error(`File could not be deleted (status ${response.status})`);
         }
-        this.files = this.files.filter(el => el.name !== file.name);
+        this.files = this.files.filter((el) => el.name !== file.name);
         this.displayFiles();
       } catch (e) {
         HandleError(e);
@@ -440,13 +440,13 @@ export class Explorer {
       let msg = document.createElement("div");
       msg.innerHTML = /* HTML */ `
         <div class="content"><p>${file.name} (file: ${fileIdx}/${files.length})</p></div>
-        <progress class="progress is-primary" value="0" max="100" style="margin-bottom: 0px;"></progress>
+        <progress class="progress is-primary is-small" value="0" max="100" style="margin-bottom: 0px;"></progress>
       `;
       msg.classList.add("is-info", "notification", "uploader", "animated", "fadeInUp", "faster");
       const delBtn = document.createElement("button");
       let xhr = new XMLHttpRequest();
       // track upload progress
-      xhr.upload.onprogress = function(e) {
+      xhr.upload.onprogress = function (e) {
         msg.getElementsByTagName("progress")[0].value = (e.loaded / e.total) * 100;
       };
       delBtn.addEventListener("click", async () => {
@@ -455,9 +455,9 @@ export class Explorer {
           const response = await fetch(this.fullHostname + file.path, {
             method: "DELETE",
             headers: new Headers({
-              "XSRF-Token": this.user.xsrftoken
+              "XSRF-Token": this.user.xsrftoken,
             }),
-            credentials: "include"
+            credentials: "include",
           });
           if (response.status !== 204) {
             throw new Error(`Cancelled file could not be deleted (status ${response.status})`);
@@ -479,7 +479,7 @@ export class Explorer {
             type: file.type,
             size: file.size,
             lastModified: file.lastModified,
-            id: id
+            id: id,
           });
           this.displayFiles();
         }
@@ -487,7 +487,7 @@ export class Explorer {
         console.error(e.statusText);
         Messages.Show("is-warning", e.statusText);
       }
-      AnimateCSS(msg, "fadeOutDown", function() {
+      AnimateCSS(msg, "fadeOutDown", function () {
         msg.parentNode.removeChild(msg);
       });
     }
@@ -501,21 +501,21 @@ export class Explorer {
         if (xhr.status === 0) {
           reject({
             status: xhr.status,
-            statusText: `Upload of ${file.name} cancelled`
+            statusText: `Upload of ${file.name} cancelled`,
           });
         } else if (xhr.status == 201) {
           resolve(xhr.status);
         } else {
           reject({
             status: xhr.status,
-            statusText: `Error uploading ${file.name} (status ${xhr.status})`
+            statusText: `Error uploading ${file.name} (status ${xhr.status})`,
           });
         }
       };
-      xhr.onerror = function(e) {
+      xhr.onerror = function (e) {
         reject({
           status: this.status,
-          statusText: `Error uploading ${file.name} (status ${xhr.status})`
+          statusText: `Error uploading ${file.name} (status ${xhr.status})`,
         });
       };
       xhr.open("PUT", this.fullHostname + file.path);
@@ -529,15 +529,15 @@ export class Explorer {
       const response = await fetch(location.origin + "/api/common/Share", {
         method: "POST",
         headers: new Headers({
-          "XSRF-Token": this.user.xsrftoken
+          "XSRF-Token": this.user.xsrftoken,
         }),
         credentials: "include",
         body: JSON.stringify({
           sharedfor: "download",
           lifespan: 1,
           url: this.hostname + file.path,
-          readonly: true
-        })
+          readonly: true,
+        }),
       });
       if (response.status !== 200) {
         throw new Error(`Share token could not be made (status ${response.status})`);
@@ -608,9 +608,9 @@ export async function LoadImage(image, url, user) {
     const response = await fetch(url, {
       method: "GET",
       headers: new Headers({
-        "XSRF-Token": user.xsrftoken
+        "XSRF-Token": user.xsrftoken,
       }),
-      credentials: "include"
+      credentials: "include",
     });
     if (response.status !== 200) {
       throw new Error(`Error loading image (status ${response.status})`);

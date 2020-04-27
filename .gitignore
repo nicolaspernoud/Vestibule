@@ -1,3 +1,5 @@
 vestibule
 __debug_bin
 miscellaneous/mock_onlyoffice/data
+node_modules/
+miscellaneous/bulma/css/

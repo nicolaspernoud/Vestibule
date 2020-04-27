@@ -116,7 +116,6 @@ Loosely based on Webfront (https://github.com/nf/webfront), by Andrew Gerrand, G
 Uses :
 
 - Bulma : https://bulma.io/, https://github.com/jgthms/bulma (MIT Licence)
-- Bulma Fluent : https://mubaidr.js.org/bulma-fluent/#/, https://github.com/mubaidr/bulma-fluent (MIT Licence)
 - Animate.css : https://daneden.github.io/animate.css/, https://github.com/daneden/animate.css (MIT Licence)
 - Font Awesome : https://fontawesome.com, https://github.com/FortAwesome/Font-Awesome (Font Awesome Free License)
 - Secure IO : https://secure-io.org, https://github.com/secure-io/sio-go (MIT Licence), lots of thanks to @aead (Andreas Auernhammer) who has been a great help in understanding the library and for his cryptography insights
@@ -129,7 +128,7 @@ Uses :
 
 The product is licenced under **_GNU AFFERO GENERAL PUBLIC LICENSE Version 3_**, it is made primarily by Nicolas Pernoud, a member of **Métropole de Lyon**, on professional time (some), and personal time (most). It is used on Métropole de Lyon "alpha" lab to allow quick prototyping and proof of concepts.
 
-![Alpha logo](miscellaneous/images/logo_alpha_couleurs_RVB.png "Alpha logo")
+<img src="miscellaneous/images/logo_alpha_couleurs_RVB.png" alt="alpha logo" style="height:100px;">
 
 ## Beeing part of the project
 
