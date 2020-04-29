@@ -29,12 +29,12 @@ export class Delete {
     `;
     deleteModal.querySelector("#" + "delete-ok").addEventListener("click", async () => {
       await okFunction();
-      AnimateCSS(deleteModal, "fadeOut", function() {
+      AnimateCSS(deleteModal, "fadeOut", function () {
         deleteModal.parentNode.removeChild(deleteModal);
       });
     });
     deleteModal.querySelector("#" + "delete-cancel").addEventListener("click", () => {
-      AnimateCSS(deleteModal, "fadeOut", function() {
+      AnimateCSS(deleteModal, "fadeOut", function () {
         deleteModal.parentNode.removeChild(deleteModal);
       });
     });
