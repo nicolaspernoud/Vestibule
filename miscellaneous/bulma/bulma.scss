@@ -52,7 +52,7 @@ $progress-indeterminate-duration: 1s;
 @import "node_modules/bulma/sass/elements/button.sass";
 @import "node_modules/bulma/sass/elements/container.sass";
 @import "node_modules/bulma/sass/elements/content.sass";
-@import "node_modules/bulma/sass/elements/form.sass";
+// DEPRECATED !!! @import "node_modules/bulma/sass/elements/form.sass";
 @import "node_modules/bulma/sass/elements/icon.sass";
 @import "node_modules/bulma/sass/elements/image.sass";
 @import "node_modules/bulma/sass/elements/notification.sass";
@@ -143,6 +143,11 @@ img {
 
 .navbar-menu-icon {
   margin-right: 5px;
+}
+
+.navbar-item.is-active {
+  border-style: none solid none solid;
+  border-width: 1px;
 }
 
 .notification {

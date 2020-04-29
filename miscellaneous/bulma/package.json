@@ -4,8 +4,7 @@
   "description": "Bulma for vestibule",
   "main": "sass/mystyles.scss",
   "scripts": {
-    "build": "npm run build-clean && npm run build-sass && npm run build-autoprefix && npm run build-cleancss",
-    "build-autoprefix": "postcss --use autoprefixer --map false --output css/bulma.css css/bulma.css",
+    "build": "npm run build-clean && npm run build-sass && npm run build-cleancss",
     "build-cleancss": "cleancss -o ../../web/assets/bulma.min.css css/bulma.css",
     "build-clean": "rimraf css",
     "build-sass": "node-sass --output-style expanded --source-map true bulma.scss css/bulma.css",
@@ -15,11 +14,9 @@
   "author": "Nicolas Pernoud",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "autoprefixer": "^9.7.6",
     "bulma": "^0.8.2",
     "clean-css-cli": "^4.3.0",
     "node-sass": "^4.13.1",
-    "postcss-cli": "^7.1.0",
     "rimraf": "^3.0.2"
   }
 }
