@@ -471,7 +471,7 @@ async function pickIcon() {
     '<div class="buttons">' +
     Icons.map(
       (icon) => /* HTML */ `
-        <button class="button${icon_field.value == icon ? " is-primary" : ""}" id="apps-icon-modal-list-${icon}">
+        <button class="button${icon_field.value == icon ? " is-primary" : ""} is-medium" id="apps-icon-modal-list-${icon}">
           <span class="icon">
             <i class="fas fa-${icon}"></i>
           </span>
