@@ -511,7 +511,7 @@ function openWebview(app) {
     AnimateCSS(webview.getElementsByClassName("modal-background")[0], "fadeOut", function () {
       webview.parentNode.removeChild(webview);
     });
-    AnimateCSS(webview.getElementsByClassName("modal-content")[0], "zoomOut");
+    AnimateCSS(webview.getElementsByClassName("modal-card")[0], "zoomOut");
   });
   document.body.appendChild(webview);
 }
