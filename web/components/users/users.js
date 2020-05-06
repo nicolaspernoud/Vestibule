@@ -144,13 +144,14 @@ function userTemplate(user) {
 }
 
 function displayUsers() {
-  const markup = users.map(user => userTemplate(user)).join("");
+  users.sort((a, b) => parseInt(a.id) - parseInt(b.id));
+  const markup = users.map((user) => userTemplate(user)).join("");
   document.getElementById("users").innerHTML = markup;
-  users.map(user => {
-    document.getElementById(`users-user-edit-${user.id}`).addEventListener("click", function() {
+  users.map((user) => {
+    document.getElementById(`users-user-edit-${user.id}`).addEventListener("click", function () {
       editUser(user);
     });
-    document.getElementById(`users-user-delete-${user.id}`).addEventListener("click", function() {
+    document.getElementById(`users-user-delete-${user.id}`).addEventListener("click", function () {
       new Delete(() => {
         deleteUser(user);
       });
@@ -163,8 +164,8 @@ async function firstShowUsers() {
     const response = await fetch("/api/admin/users/", {
       method: "GET",
       headers: new Headers({
-        "XSRF-Token": current_user.xsrftoken
-      })
+        "XSRF-Token": current_user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Users could not be fetched (status ${response.status})`);
@@ -181,8 +182,8 @@ async function deleteUser(user) {
     const response = await fetch("/api/admin/users/" + user.id, {
       method: "delete",
       headers: new Headers({
-        "XSRF-Token": current_user.xsrftoken
-      })
+        "XSRF-Token": current_user.xsrftoken,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`User could not be deleted (status ${response.status})`);
@@ -201,19 +202,19 @@ function registerModalFields() {
   name_field = document.getElementById("users-modal-name");
   surname_field = document.getElementById("users-modal-surname");
   roles_field = document.getElementById("users-modal-roles");
-  document.getElementById(`users-modal-close`).addEventListener("click", function() {
+  document.getElementById(`users-modal-close`).addEventListener("click", function () {
     toggleModal();
   });
-  document.getElementById(`users-modal-cancel`).addEventListener("click", function() {
+  document.getElementById(`users-modal-cancel`).addEventListener("click", function () {
     toggleModal();
   });
-  document.getElementById(`users-modal-save`).addEventListener("click", function() {
+  document.getElementById(`users-modal-save`).addEventListener("click", function () {
     postUser();
   });
-  document.getElementById(`users-new`).addEventListener("click", function() {
+  document.getElementById(`users-new`).addEventListener("click", function () {
     newUser();
   });
-  password_field.addEventListener("click", function() {
+  password_field.addEventListener("click", function () {
     password_field.value = RandomString(48);
   });
 }
@@ -232,7 +233,7 @@ async function editUser(user) {
 
 async function newUser() {
   let maxid = 0;
-  users.map(function(user) {
+  users.map(function (user) {
     if (parseInt(user.id) > maxid) maxid = user.id;
   });
   maxid++;
@@ -251,7 +252,7 @@ async function postUser() {
     const response = await fetch("/api/admin/users/", {
       method: "POST",
       headers: new Headers({
-        "XSRF-Token": current_user.xsrftoken
+        "XSRF-Token": current_user.xsrftoken,
       }),
       body: JSON.stringify({
         id: id_field.value,
@@ -260,8 +261,8 @@ async function postUser() {
         passwordHash: passwordhash_field.value,
         name: name_field.value,
         surname: surname_field.value,
-        memberOf: roles_field.value.split(",")
-      })
+        memberOf: roles_field.value.split(","),
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Users could not be updated (status ${response.status})`);
@@ -279,7 +280,7 @@ function toggleModal() {
   const card = document.getElementById("users-modal-card");
   if (modal.classList.contains("is-active")) {
     AnimateCSS(modal, "fadeOut");
-    AnimateCSS(card, "zoomOut", function() {
+    AnimateCSS(card, "zoomOut", function () {
       modal.classList.remove("is-active");
     });
   } else {
