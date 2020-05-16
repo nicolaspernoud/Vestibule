@@ -5,19 +5,18 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 )
 
 var (
 	hostname = os.Getenv("HOSTNAME")
-	port     string
+	port     int
 )
 
 // Init initialize the configuration
 func Init(portFromMain int) {
-	port = strconv.Itoa(portFromMain)
+	port = portFromMain
 }
 
 // CreateMockOAuth2 creates a mock OAuth2 serve mux for development purposes
@@ -79,7 +78,6 @@ func CreateMockOAuth2() *http.ServeMux {
 func CreateMockAPI() *http.ServeMux {
 	mux := http.NewServeMux()
 	// Returns authorization code back to the user
-	frameSource := "https://static." + hostname + ":" + port
 	mux.Handle("/", middlewares.Cors(func() http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Type", "application/json")
@@ -90,6 +88,6 @@ func CreateMockAPI() *http.ServeMux {
 				"bar": "foo"
 			}`))
 		})
-	}(), frameSource))
+	}(), hostname, port))
 	return mux
 }

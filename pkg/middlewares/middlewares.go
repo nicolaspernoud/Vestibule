@@ -8,12 +8,23 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/nicolaspernoud/vestibule/pkg/glob"
 )
 
 // Cors enables CORS Request on server (for development purposes)
-func Cors(next http.Handler, allowedOrigin string) http.Handler {
+func Cors(next http.Handler, allowedDomain string, port int) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+		origin := req.Header.Get("Origin")
+		allowedSubDomains := func(hostname string, port int) string {
+			if port == 80 || port == 443 {
+				return "https://*." + hostname
+			}
+			return "https://*." + hostname + ":" + strconv.Itoa(port)
+		}(allowedDomain, port)
+		if GetFullHostname(allowedDomain, port) == origin || glob.Glob(allowedSubDomains, origin) {
+			w.Header().Set("Access-Control-Allow-Origin", origin)
+		}
 		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PROPFIND, MKCOL, MOVE, COPY")
 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, XSRF-TOKEN, Authorization, Depth, Destination")
 		w.Header().Set("Access-Control-Allow-Credentials", "true")
