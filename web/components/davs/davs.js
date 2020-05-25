@@ -113,7 +113,7 @@ export async function mount(where) {
       </div>
     </div>
 
-    <div class="modal animated zoomIn faster" id="davs-icons-modal">
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="davs-icons-modal">
       <div class="modal-card">
         <section id="davs-icons-modal-list" class="modal-card-body"></section>
       </div>
@@ -153,7 +153,7 @@ function davTemplate(dav) {
               </span>
             </button>
           </div>
-          <div class="dropdown-menu animated fadeIn faster" role="menu">
+          <div class="dropdown-menu animate__animated animate__fadeIn animate__faster" role="menu">
             <div class="dropdown-content">
               <div class="dropdown-item"></div>
               ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-edit-' + dav.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
@@ -368,14 +368,14 @@ function toggleModal() {
   const modal = document.getElementById("davs-modal");
   const card = document.getElementById("davs-modal-card");
   if (modal.classList.contains("is-active")) {
-    AnimateCSS(modal, "fadeOut");
-    AnimateCSS(card, "zoomOut", function () {
+    AnimateCSS(modal, "animate__fadeOut");
+    AnimateCSS(card, "animate__zoomOut", function () {
       modal.classList.remove("is-active");
     });
   } else {
     modal.classList.add("is-active");
-    AnimateCSS(modal, "fadeIn");
-    AnimateCSS(card, "zoomIn");
+    AnimateCSS(modal, "animate__fadeIn");
+    AnimateCSS(card, "animate__zoomIn");
   }
 }
 
@@ -421,6 +421,6 @@ function openExplorerModal(hostname, readwrite, encrypted) {
   const explorer = new Explorer(hostname);
   explorer.mount("davs-explorer-modal-card", readwrite, encrypted);
   modal.classList.add("is-active");
-  AnimateCSS(modal, "fadeIn");
-  AnimateCSS(card, "zoomIn");
+  AnimateCSS(modal, "animate__fadeIn");
+  AnimateCSS(card, "animate__zoomIn");
 }

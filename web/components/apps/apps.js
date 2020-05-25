@@ -153,7 +153,7 @@ export async function mount(where) {
       </div>
     </div>
 
-    <div class="modal animated zoomIn faster" id="apps-icons-modal">
+    <div class="modal animate__animated animate__zoomIn animate__faster" id="apps-icons-modal">
       <div class="modal-card">
         <section id="apps-icons-modal-list" class="modal-card-body"></section>
       </div>
@@ -186,7 +186,7 @@ function appTemplate(app) {
               </span>
             </button>
           </div>
-          <div class="dropdown-menu animated fadeIn faster" role="menu">
+          <div class="dropdown-menu animate__animated animate__fadeIn animate__faster" role="menu">
             <div class="dropdown-content">
               <a class="dropdown-item" href="https://${app.host}:${location.port}"><i class="fas fa-external-link-alt"></i><strong> Visit</strong></a>
               ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-edit-' + app.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
@@ -433,14 +433,14 @@ function toggleModal() {
   const modal = document.getElementById("apps-modal");
   const card = document.getElementById("apps-modal-card");
   if (modal.classList.contains("is-active")) {
-    AnimateCSS(modal, "fadeOut");
-    AnimateCSS(card, "zoomOut", function () {
+    AnimateCSS(modal, "animate__fadeOut");
+    AnimateCSS(card, "animate__zoomOut", function () {
       modal.classList.remove("is-active");
     });
   } else {
     modal.classList.add("is-active");
-    AnimateCSS(modal, "fadeIn");
-    AnimateCSS(card, "zoomIn");
+    AnimateCSS(modal, "animate__fadeIn");
+    AnimateCSS(card, "animate__zoomIn");
   }
 }
 
@@ -495,8 +495,8 @@ function openWebview(app) {
   let webview = document.createElement("div");
   webview.classList.add("modal", "is-active");
   webview.innerHTML = /* HTML */ `
-    <div class="modal-background animated fadeIn faster"></div>
-    <div class="modal-card animated zoomIn faster" style="width: 90vw;">
+    <div class="modal-background animate__animated animate__fadeIn animate__faster"></div>
+    <div class="modal-card animate__animated animate__zoomIn animate__faster" style="width: 90vw;">
       <header class="modal-card-head">
         <p class="modal-card-title">${app.name}</p>
         <button class="delete" aria-label="close" id="apps-webview-close"></button>
@@ -508,10 +508,10 @@ function openWebview(app) {
     </div>
   `;
   webview.querySelector("#" + "apps-webview-close").addEventListener("click", () => {
-    AnimateCSS(webview.getElementsByClassName("modal-background")[0], "fadeOut", function () {
+    AnimateCSS(webview.getElementsByClassName("modal-background")[0], "animate__fadeOut", function () {
       webview.parentNode.removeChild(webview);
     });
-    AnimateCSS(webview.getElementsByClassName("modal-card")[0], "zoomOut");
+    AnimateCSS(webview.getElementsByClassName("modal-card")[0], "animate__zoomOut");
   });
   document.body.appendChild(webview);
 }

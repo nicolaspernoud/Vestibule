@@ -20,7 +20,7 @@ export class Share {
   async show() {
     this.user = await Auth.GetUser();
     let shareModal = document.createElement("div");
-    shareModal.classList.add("modal", "animated", "fadeIn", "faster", "is-active");
+    shareModal.classList.add("modal", "animate__animated", "animate__fadeIn", "animate__faster", "is-active");
     shareModal.innerHTML = /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-content">
@@ -59,15 +59,15 @@ export class Share {
         const response = await fetch(location.origin + "/api/common/Share", {
           method: "POST",
           headers: new Headers({
-            "XSRF-Token": this.user.xsrftoken
+            "XSRF-Token": this.user.xsrftoken,
           }),
           credentials: "include",
           body: JSON.stringify({
             sharedfor: this.gid("share-for").value,
             lifespan: lifespan,
             url: this.url,
-            readonly: true
-          })
+            readonly: true,
+          }),
         });
         if (response.status !== 200) {
           throw new Error(`Share token could not be made (status ${response.status})`);
@@ -75,7 +75,7 @@ export class Share {
         const shareToken = await response.text();
         // Create result modal
         let resultModal = document.createElement("div");
-        resultModal.classList.add("modal", "animated", "fadeIn", "faster", "is-active");
+        resultModal.classList.add("modal", "animate__animated", "animate__fadeIn", "animate__faster", "is-active");
         resultModal.innerHTML = /* HTML */ `
           <div class="modal-background"></div>
           <div class="modal-content">
@@ -101,19 +101,19 @@ export class Share {
         `;
         document.body.appendChild(resultModal);
         this.gid("explorer-result-close").addEventListener("click", () => {
-          AnimateCSS(resultModal, "fadeOut", function() {
+          AnimateCSS(resultModal, "animate__fadeOut", function () {
             resultModal.parentNode.removeChild(resultModal);
           });
         });
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(shareModal, "fadeOut", function() {
+      AnimateCSS(shareModal, "animate__fadeOut", function () {
         shareModal.parentNode.removeChild(shareModal);
       });
     });
     this.gid("share-cancel").addEventListener("click", () => {
-      AnimateCSS(shareModal, "fadeOut", function() {
+      AnimateCSS(shareModal, "animate__fadeOut", function () {
         shareModal.parentNode.removeChild(shareModal);
       });
     });

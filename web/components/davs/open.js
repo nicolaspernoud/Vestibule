@@ -10,7 +10,7 @@ export class Open {
     this.fullHostname = fullHostname;
     this.files = files;
     this.file = file;
-    this.index = files.findIndex(element => element.name === file.name);
+    this.index = files.findIndex((element) => element.name === file.name);
     this.type = GetType(this.file);
     this.url = `${fullHostname}${file.path}`;
     // Random id seed
@@ -40,7 +40,7 @@ export class Open {
     this.user = await Auth.GetUser();
     this.openModal = document.createElement("div");
     this.openModal.classList.add("modal", "is-active");
-    if (animated) this.openModal.classList.add("animated", "fadeIn", "faster");
+    if (animated) this.openModal.classList.add("animate__animated", "animate__fadeIn", "animate__faster");
     let content;
     let token;
     if (this.type == "text") {
@@ -48,9 +48,9 @@ export class Open {
         const response = await fetch(this.url, {
           method: "GET",
           headers: new Headers({
-            "XSRF-Token": this.user.xsrftoken
+            "XSRF-Token": this.user.xsrftoken,
           }),
-          credentials: "include"
+          credentials: "include",
         });
         if (response.status !== 200) {
           throw new Error(`Text content could not be fetched (status ${response.status})`);
@@ -64,15 +64,15 @@ export class Open {
         const response = await fetch(location.origin + "/api/common/Share", {
           method: "POST",
           headers: new Headers({
-            "XSRF-Token": this.user.xsrftoken
+            "XSRF-Token": this.user.xsrftoken,
           }),
           credentials: "include",
           body: JSON.stringify({
             sharedfor: "file_preview",
             lifespan: 1,
             url: this.hostname + this.file.path,
-            readonly: true
-          })
+            readonly: true,
+          }),
         });
         if (response.status !== 200) {
           throw new Error(`Share token could not be made (status ${response.status})`);
@@ -86,7 +86,7 @@ export class Open {
     this.openModal.innerHTML = this.computeTemplate(content, token);
     document.body.appendChild(this.openModal);
     this.gid("open-close").addEventListener("click", () => {
-      AnimateCSS(this.openModal, "fadeOut", () => {
+      AnimateCSS(this.openModal, "animate__fadeOut", () => {
         this.openModal.parentNode.removeChild(this.openModal);
       });
     });
@@ -111,27 +111,11 @@ export class Open {
           <p class="modal-card-title has-text-centered">${this.file.name}</p>
         </header>
         <section class="modal-card-body is-paddingless flex-container">
-          ${this.type == "other"
-            ? /* HTML */ `
-                <embed src="${this.url}?token=${token}&inline" type="application/pdf" width="100%" style="height: 75vh;" />
-              `
-            : ""}
+          ${this.type == "other" ? /* HTML */ ` <embed src="${this.url}?token=${token}&inline" type="application/pdf" width="100%" style="height: 75vh;" /> ` : ""}
           ${this.type == "image" ? `<img id="${this.prefix}open-image" src="${this.url}?token=${token}" alt="Previewed image" />` : ""}
-          ${this.type == "audio"
-            ? /* HTML */ `
-                <audio controls autoplay><source src="${this.url}?token=${token}" /></audio>
-              `
-            : ""}
-          ${this.type == "video"
-            ? /* HTML */ `
-                <video controls autoplay><source src="${this.url}?token=${token}" /></video>
-              `
-            : ""}
-          ${this.type == "text"
-            ? /* HTML */ `
-                <textarea class="textarea" readonly>${content}</textarea>
-              `
-            : ""}
+          ${this.type == "audio" ? /* HTML */ ` <audio controls autoplay><source src="${this.url}?token=${token}" /></audio> ` : ""}
+          ${this.type == "video" ? /* HTML */ ` <video controls autoplay><source src="${this.url}?token=${token}" /></video> ` : ""}
+          ${this.type == "text" ? /* HTML */ ` <textarea class="textarea" readonly>${content}</textarea> ` : ""}
         </section>
         <footer class="modal-card-foot">
           <button id="${this.prefix}open-previous" class="button">

@@ -10,7 +10,7 @@ export function Show(bulmaClass, message) {
     let msg = document.createElement("div");
     msg.style.marginBottom = offset.toString() + "px";
     msg.innerText = message;
-    msg.classList.add("notification", "animated", "fadeInUp", "faster");
+    msg.classList.add("notification", "animate__animated", "animate__fadeInUp", "animate__faster");
     msg.classList.add(bulmaClass);
     const delBtn = document.createElement("button");
     delBtn.classList.add("delete");
@@ -19,10 +19,10 @@ export function Show(bulmaClass, message) {
     const height = msg.offsetHeight + 1;
     offset = offset + height;
     messages.push(message);
-    const timer = setTimeout(function() {
+    const timer = setTimeout(function () {
       removeMsg(msg, message, height);
     }, 5000);
-    delBtn.addEventListener("click", function() {
+    delBtn.addEventListener("click", function () {
       removeMsg(msg, message, height);
       clearTimeout(timer);
     });
@@ -30,7 +30,7 @@ export function Show(bulmaClass, message) {
 }
 
 function removeMsg(msg, message, height) {
-  AnimateCSS(msg, "fadeOutDown", function() {
+  AnimateCSS(msg, "animate__fadeOutDown", function () {
     msg.parentNode.removeChild(msg);
   });
   offset = offset - height;

@@ -26,7 +26,7 @@ export function mount(mountpoint) {
   menu = document.getElementById("navbar-menu");
   const openClose = (e) => {
     if (burger.classList.contains("is-active")) {
-      AnimateCSS(menu, "slideOutRight", function () {
+      AnimateCSS(menu, "animate__slideOutRight", function () {
         menu.classList.remove("is-active");
         burger.classList.remove("is-active");
       });
@@ -34,7 +34,7 @@ export function mount(mountpoint) {
       if (e.srcElement == burger) {
         menu.classList.add("is-active");
         burger.classList.add("is-active");
-        AnimateCSS(menu, "slideInRight");
+        AnimateCSS(menu, "animate__slideInRight");
       }
     }
   };

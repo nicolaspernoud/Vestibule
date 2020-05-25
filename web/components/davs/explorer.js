@@ -60,8 +60,8 @@ export class Explorer {
     this.user = await Auth.GetUser();
     document.getElementById(`explorer-modal-close`).addEventListener("click", function () {
       const modal = card.parentNode;
-      AnimateCSS(modal, "fadeOut");
-      AnimateCSS(card, "zoomOut", function () {
+      AnimateCSS(modal, "animate__fadeOut");
+      AnimateCSS(card, "animate__zoomOut", function () {
         modal.classList.remove("is-active");
       });
     });
@@ -120,7 +120,7 @@ export class Explorer {
 
   fileTemplate(file) {
     return /* HTML */ `
-      <article id="file-${file.id}-content" class="media animated fadeIn faster">
+      <article id="file-${file.id}-content" class="media animate__animated animate__fadeIn animate__faster">
         <figure class="media-left">
           ${file.type.includes("image")
             ? `<p class="image is-48x48"><img id="file-${file.id}-image" src="assets/spinner.svg"/></p>`
@@ -256,7 +256,7 @@ export class Explorer {
 
   rename(file) {
     let renameModal = document.createElement("div");
-    renameModal.classList.add("modal", "animated", "fadeIn", "faster", "is-active");
+    renameModal.classList.add("modal", "animate__animated", "animate__fadeIn", "animate__faster", "is-active");
     renameModal.innerHTML = /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-content">
@@ -303,12 +303,12 @@ export class Explorer {
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(renameModal, "fadeOut", function () {
+      AnimateCSS(renameModal, "animate__fadeOut", function () {
         renameModal.parentNode.removeChild(renameModal);
       });
     });
     renameModal.querySelector("#" + "explorer-rename-cancel").addEventListener("click", () => {
-      AnimateCSS(renameModal, "fadeOut", function () {
+      AnimateCSS(renameModal, "animate__fadeOut", function () {
         renameModal.parentNode.removeChild(renameModal);
       });
     });
@@ -318,7 +318,7 @@ export class Explorer {
 
   moveOrCopy(file, isCopy) {
     let pasteControl = document.createElement("div");
-    pasteControl.classList.add("field", "has-addons", "animated", "zoomIn", "faster", "is-active");
+    pasteControl.classList.add("field", "has-addons", "animate__animated", "animate__zoomIn", "animate__faster", "is-active");
     pasteControl.innerHTML = /* HTML */ `
       <a class="button is-link">
         <span class="icon is-small">
@@ -350,12 +350,12 @@ export class Explorer {
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(pasteControl, "zoomOut", function () {
+      AnimateCSS(pasteControl, "animate__zoomOut", function () {
         pasteControl.parentNode.removeChild(pasteControl);
       });
     });
     pasteControl.getElementsByTagName("a")[1].addEventListener("click", async () => {
-      AnimateCSS(pasteControl, "zoomOut", function () {
+      AnimateCSS(pasteControl, "animate__zoomOut", function () {
         pasteControl.parentNode.removeChild(pasteControl);
       });
     });
@@ -442,7 +442,7 @@ export class Explorer {
         <div class="content"><p>${file.name} (file: ${fileIdx}/${files.length})</p></div>
         <progress class="progress is-primary is-small" value="0" max="100" style="margin-bottom: 0px;"></progress>
       `;
-      msg.classList.add("is-info", "notification", "uploader", "animated", "fadeInUp", "faster");
+      msg.classList.add("is-info", "notification", "uploader", "animate__animated", "animate__fadeInUp", "animate__faster");
       const delBtn = document.createElement("button");
       let xhr = new XMLHttpRequest();
       // track upload progress
@@ -487,7 +487,7 @@ export class Explorer {
         console.error(e.statusText);
         Messages.Show("is-warning", e.statusText);
       }
-      AnimateCSS(msg, "fadeOutDown", function () {
+      AnimateCSS(msg, "animate__fadeOutDown", function () {
         msg.parentNode.removeChild(msg);
       });
     }

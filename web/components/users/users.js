@@ -279,13 +279,13 @@ function toggleModal() {
   const modal = document.getElementById("users-modal");
   const card = document.getElementById("users-modal-card");
   if (modal.classList.contains("is-active")) {
-    AnimateCSS(modal, "fadeOut");
-    AnimateCSS(card, "zoomOut", function () {
+    AnimateCSS(modal, "animate__fadeOut");
+    AnimateCSS(card, "animate__zoomOut", function () {
       modal.classList.remove("is-active");
     });
   } else {
     modal.classList.add("is-active");
-    AnimateCSS(modal, "fadeIn");
-    AnimateCSS(card, "zoomIn");
+    AnimateCSS(modal, "animate__fadeIn");
+    AnimateCSS(card, "animate__zoomIn");
   }
 }

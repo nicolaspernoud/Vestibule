@@ -4,7 +4,7 @@ import { AnimateCSS } from "/services/common/common.js";
 export class Delete {
   constructor(okFunction) {
     let deleteModal = document.createElement("div");
-    deleteModal.classList.add("modal", "animated", "fadeIn", "faster", "is-active");
+    deleteModal.classList.add("modal", "animate__animated", "animate__fadeIn", "animate__faster", "is-active");
     deleteModal.innerHTML = /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-content">
@@ -29,12 +29,12 @@ export class Delete {
     `;
     deleteModal.querySelector("#" + "delete-ok").addEventListener("click", async () => {
       await okFunction();
-      AnimateCSS(deleteModal, "fadeOut", function () {
+      AnimateCSS(deleteModal, "animate__fadeOut", function () {
         deleteModal.parentNode.removeChild(deleteModal);
       });
     });
     deleteModal.querySelector("#" + "delete-cancel").addEventListener("click", () => {
-      AnimateCSS(deleteModal, "fadeOut", function () {
+      AnimateCSS(deleteModal, "animate__fadeOut", function () {
         deleteModal.parentNode.removeChild(deleteModal);
       });
     });
