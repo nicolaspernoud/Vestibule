@@ -41,7 +41,7 @@ After, for every access to a proxied application or a webdav service (say myapp.
 
 Applications and davs can be opened to everyone as well (no authentication).
 
-Vestibule creates a subdomain for every services (apps and davs) and provide Let's encrypt certificate automatically.
+Vestibule creates a subdomain for every services (apps and davs) and provide Let's encrypt certificates automatically.
 
 ## Installation
 
@@ -84,7 +84,7 @@ printf "1\n${LOGIN}\n${TOKEN}\n" | gio mount $DAV_URL
 
 ### Override branding
 
-Every branding asset is in `web/assets/brand` directory. It can be altered according to your needs.
+Every branding asset is in `web/assets/brand` directory. They can be altered according to your needs.
 
 ## Development
 

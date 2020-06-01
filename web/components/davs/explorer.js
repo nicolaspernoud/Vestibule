@@ -284,8 +284,16 @@ export class Explorer {
     `;
     const field = renameModal.getElementsByTagName("input")[0];
     field.setSelectionRange(0, file.name.lastIndexOf("."));
-    renameModal.querySelector("#" + "explorer-rename-ok").addEventListener("click", async () => {
+    const renameOK = renameModal.querySelector("#explorer-rename-ok");
+    const renameCancel = renameModal.querySelector("#explorer-rename-cancel");
+    const toggleButtons = () => {
+      renameOK.classList.toggle("is-loading");
+      renameOK.disabled = !renameOK.disabled;
+      renameCancel.disabled = !renameCancel.disabled;
+    };
+    renameOK.addEventListener("click", async () => {
       try {
+        toggleButtons();
         const response = await fetch(this.fullHostname + file.path, {
           method: "MOVE",
           headers: new Headers({
@@ -307,7 +315,7 @@ export class Explorer {
         renameModal.parentNode.removeChild(renameModal);
       });
     });
-    renameModal.querySelector("#" + "explorer-rename-cancel").addEventListener("click", () => {
+    renameCancel.addEventListener("click", () => {
       AnimateCSS(renameModal, "animate__fadeOut", function () {
         renameModal.parentNode.removeChild(renameModal);
       });

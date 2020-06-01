@@ -78,7 +78,14 @@ export class Edit {
   }
 
   async save() {
+    const toggleButtons = () => {
+      this.gid("edit-save").classList.toggle("is-loading");
+      this.gid("edit-save").disabled = !this.gid("edit-save").disabled;
+      this.gid("edit-close").disabled = !this.gid("edit-close").disabled;
+      this.gid("edit-share").disabled = !this.gid("edit-share").disabled;
+    };
     try {
+      toggleButtons();
       const response = await fetch(this.url, {
         method: "put",
         headers: new Headers({
@@ -93,5 +100,6 @@ export class Edit {
     } catch (e) {
       HandleError(e);
     }
+    toggleButtons();
   }
 }

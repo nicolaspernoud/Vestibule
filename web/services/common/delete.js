@@ -27,13 +27,22 @@ export class Delete {
         </div>
       </div>
     `;
-    deleteModal.querySelector("#" + "delete-ok").addEventListener("click", async () => {
+    const deleteOK = deleteModal.querySelector("#delete-ok");
+    const deleteCancel = deleteModal.querySelector("#delete-cancel");
+    const toggleButtons = () => {
+      deleteOK.classList.toggle("is-loading");
+      deleteOK.disabled = !deleteOK.disabled;
+      deleteCancel.disabled = !deleteCancel.disabled;
+    };
+    deleteOK.addEventListener("click", async () => {
+      toggleButtons();
       await okFunction();
+      toggleButtons();
       AnimateCSS(deleteModal, "animate__fadeOut", function () {
         deleteModal.parentNode.removeChild(deleteModal);
       });
     });
-    deleteModal.querySelector("#" + "delete-cancel").addEventListener("click", () => {
+    deleteCancel.addEventListener("click", () => {
       AnimateCSS(deleteModal, "animate__fadeOut", function () {
         deleteModal.parentNode.removeChild(deleteModal);
       });
