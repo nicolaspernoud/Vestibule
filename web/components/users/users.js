@@ -53,43 +53,50 @@ export async function mount(where) {
         </header>
         <section class="modal-card-body">
           <div class="field">
-            <label>Id</label>
+            <label class="label">Id</label>
             <div class="control">
               <input class="input" type="number" id="users-modal-id" />
             </div>
           </div>
           <div class="field">
-            <label>Login</label>
+            <label class="label">Login</label>
             <div class="control">
               <input class="input" type="text" id="users-modal-login" />
             </div>
           </div>
-          <div class="field" id="users-modal-password-container">
-            <label>Password</label>
-            <div class="control">
+          <label class="label">Password</label>
+          <div class="field has-addons">
+            <div class="control is-expanded">
               <input class="input" type="text" id="users-modal-password" />
             </div>
+            <div class="control">
+              <button id="users-modal-password-generate" class="button">
+                <span class="icon is-small">
+                  <i class="fas fa-dice"></i>
+                </span>
+              </button>
+            </div>
           </div>
-          <div class="field" id="users-modal-password-container">
-            <label>Password Hash</label>
+          <div class="field">
+            <label class="label">Password Hash</label>
             <div class="control">
               <input class="input" type="text" id="users-modal-passwordhash" />
             </div>
           </div>
           <div class="field" id="users-modal-name-container">
-            <label>Name</label>
+            <label class="label">Name</label>
             <div class="control">
               <input class="input" type="text" id="users-modal-name" />
             </div>
           </div>
           <div class="field" id="users-modal-surname-container">
-            <label>Surname</label>
+            <label class="label">Surname</label>
             <div class="control">
               <input class="input" type="text" id="users-modal-surname" />
             </div>
           </div>
           <div class="field" id="users-modal-roles-container">
-            <label>Roles (separated with commas)</label>
+            <label class="label">Roles (separated with commas)</label>
             <div class="control">
               <input class="input" type="text" id="users-modal-roles" />
             </div>
@@ -214,7 +221,7 @@ function registerModalFields() {
   document.getElementById(`users-new`).addEventListener("click", function () {
     newUser();
   });
-  password_field.addEventListener("click", function () {
+  document.getElementById(`users-modal-password-generate`).addEventListener("click", function () {
     password_field.value = RandomString(48);
   });
 }

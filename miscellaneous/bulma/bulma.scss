@@ -165,6 +165,9 @@ img {
 
 .uploader {
   left: 5vw;
+  .content {
+    overflow-wrap: break-word;
+  }
 }
 
 .spinner {

@@ -1,7 +1,7 @@
 // Imports
 import * as Auth from "/services/auth/auth.js";
 import { Icons } from "/services/common/icons.js";
-import { AnimateCSS } from "/services/common/common.js";
+import { AnimateCSS, RandomString } from "/services/common/common.js";
 import { Explorer } from "./explorer.js";
 import { Delete } from "/services/common/delete.js";
 import { GetColor } from "../sysinfo/sysinfo.js";
@@ -98,10 +98,24 @@ export async function mount(where) {
               <input class="input" type="text" id="davs-modal-roles" />
             </div>
           </div>
-          <div class="field">
-            <label class="label">Passphrase to encrypt files (leave empty to disable encryption)</label>
-            <div class="control">
+          <label class="label">Passphrase to encrypt files (leave empty to disable encryption)</label>
+          <div class="field has-addons">
+            <div class="control is-expanded">
               <input class="input" type="text" id="davs-modal-passphrase" />
+            </div>
+            <div class="control">
+              <button id="davs-modal-passphrase-remove" class="button">
+                <span class="icon is-small">
+                  <i class="fas fa-times"></i>
+                </span>
+              </button>
+            </div>
+            <div class="control">
+              <button id="davs-modal-passphrase-generate" class="button">
+                <span class="icon is-small">
+                  <i class="fas fa-dice"></i>
+                </span>
+              </button>
             </div>
           </div>
           <br />
@@ -270,6 +284,12 @@ function registerModalFields() {
   });
   secured_field.addEventListener("click", function () {
     toggleRoles();
+  });
+  document.getElementById(`davs-modal-passphrase-generate`).addEventListener("click", function () {
+    passphrase_field.value = RandomString(48);
+  });
+  document.getElementById(`davs-modal-passphrase-remove`).addEventListener("click", function () {
+    passphrase_field.value = "";
   });
 }
 
