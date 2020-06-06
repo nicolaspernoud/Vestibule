@@ -62,14 +62,14 @@ export function mount(where) {
 function registerModalFields() {
   login_field = document.getElementById("login-login");
   password_field = document.getElementById("login-password");
-  password_field.addEventListener("keyup", function(event) {
+  password_field.addEventListener("keyup", function (event) {
     // Number 13 is the "Enter" key on the keyboard
     if (event.keyCode === 13) {
       doLogin();
     }
   });
   login_inmemory = document.getElementById("login-inmemory");
-  login_inmemory.addEventListener("click", function() {
+  login_inmemory.addEventListener("click", function () {
     doLogin();
   });
   login_icon = document.getElementById("login-icon");
@@ -82,13 +82,19 @@ async function doLogin() {
       method: "POST",
       body: JSON.stringify({
         login: login_field.value,
-        password: password_field.value
-      })
+        password: password_field.value,
+      }),
     });
     if (response.status !== 200) {
       throw new Error(`Login error (status ${response.status})`);
     }
     await Auth.GetUser();
+    // Redirect to original subdomain if login was displayed after an authentication error on the original subdomain
+    const urlParams = new URLSearchParams(window.location.search);
+    const redirectAfterLogin = urlParams.get("redirectAfterLogin");
+    if (redirectAfterLogin != "" && redirectAfterLogin != null) {
+      window.location.replace("https://" + redirectAfterLogin);
+    }
     location.hash = "#davs";
     Navbar.CreateMenu();
   } catch (e) {
