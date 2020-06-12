@@ -54,7 +54,7 @@ Launch `start.sh`.
 ### With docker
 
 Alter `.env` and `docker-compose.yml` according to your needs.
-Launch with `docker-compose up`.
+Launch with `COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose up`.
 
 ## Usage
 
