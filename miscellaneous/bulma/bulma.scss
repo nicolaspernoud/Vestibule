@@ -101,6 +101,9 @@ button {
   transition: 0.2s;
 }
 
+:focus {
+  outline: none;
+}
 ::-moz-focus-inner {
   border: 0;
 }
@@ -148,6 +151,10 @@ img {
 .navbar-item.is-active {
   border-style: none solid none solid;
   border-width: 1px;
+}
+
+a.navbar-item:focus {
+  background-color: $very-light-grey;
 }
 
 .notification {
