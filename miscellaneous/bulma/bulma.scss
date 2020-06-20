@@ -182,7 +182,8 @@ a.navbar-item:focus {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 25%;
+  width: 20%;
+  max-width: 300px;
 }
 
 .icon-card {
