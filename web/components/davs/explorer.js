@@ -120,7 +120,7 @@ export class Explorer {
 
   fileTemplate(file) {
     return /* HTML */ `
-      <article id="file-${file.id}-content" class="media animate__animated animate__fadeIn animate__faster">
+      <article id="file-${file.id}-content" class="media animate__animated animate__fadeIn">
         <figure class="media-left">
           ${file.type.includes("image")
             ? `<p class="image is-48x48"><img id="file-${file.id}-image" src="assets/spinner.svg"/></p>`
@@ -256,7 +256,7 @@ export class Explorer {
 
   rename(file) {
     let renameModal = document.createElement("div");
-    renameModal.classList.add("modal", "animate__animated", "animate__fadeIn", "animate__faster", "is-active");
+    renameModal.classList.add("modal", "animate__animated", "animate__fadeIn", "is-active");
     renameModal.innerHTML = /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-content">
@@ -326,7 +326,7 @@ export class Explorer {
 
   moveOrCopy(file, isCopy) {
     let pasteControl = document.createElement("div");
-    pasteControl.classList.add("field", "has-addons", "animate__animated", "animate__zoomIn", "animate__faster", "is-active");
+    pasteControl.classList.add("field", "has-addons", "animate__animated", "animate__zoomIn", "is-active");
     pasteControl.innerHTML = /* HTML */ `
       <a class="button is-link">
         <span class="icon is-small">
@@ -450,7 +450,7 @@ export class Explorer {
         <div class="content"><p>${file.name} (file: ${fileIdx}/${files.length})</p></div>
         <progress class="progress is-primary is-small" value="0" max="100" style="margin-bottom: 0px;"></progress>
       `;
-      msg.classList.add("is-info", "notification", "uploader", "animate__animated", "animate__fadeInUp", "animate__faster");
+      msg.classList.add("is-info", "notification", "uploader", "animate__animated", "animate__fadeInUp");
       const delBtn = document.createElement("button");
       let xhr = new XMLHttpRequest();
       // track upload progress

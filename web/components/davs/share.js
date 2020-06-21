@@ -20,7 +20,7 @@ export class Share {
   async show() {
     this.user = await Auth.GetUser();
     let shareModal = document.createElement("div");
-    shareModal.classList.add("modal", "animate__animated", "animate__fadeIn", "animate__faster", "is-active");
+    shareModal.classList.add("modal", "animate__animated", "animate__fadeIn", "is-active");
     shareModal.innerHTML = /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-content">
@@ -75,7 +75,7 @@ export class Share {
         const shareToken = await response.text();
         // Create result modal
         let resultModal = document.createElement("div");
-        resultModal.classList.add("modal", "animate__animated", "animate__fadeIn", "animate__faster", "is-active");
+        resultModal.classList.add("modal", "animate__animated", "animate__fadeIn", "is-active");
         resultModal.innerHTML = /* HTML */ `
           <div class="modal-background"></div>
           <div class="modal-content">

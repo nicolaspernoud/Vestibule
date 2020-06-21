@@ -153,7 +153,7 @@ export async function mount(where) {
       </div>
     </div>
 
-    <div class="modal animate__animated animate__zoomIn animate__faster" id="apps-icons-modal">
+    <div class="modal animate__animated animate__zoomIn" id="apps-icons-modal">
       <div class="modal-card">
         <section id="apps-icons-modal-list" class="modal-card-body"></section>
       </div>
@@ -186,7 +186,7 @@ function appTemplate(app) {
               </span>
             </button>
           </div>
-          <div class="dropdown-menu animate__animated animate__fadeIn animate__faster" role="menu">
+          <div class="dropdown-menu animate__animated animate__fadeIn" role="menu">
             <div class="dropdown-content">
               <a class="dropdown-item" href="https://${app.host}:${location.port}"><i class="fas fa-external-link-alt"></i><strong> Visit</strong></a>
               ${user.isAdmin ? '<a class="dropdown-item" id="apps-app-edit-' + app.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}
@@ -495,8 +495,8 @@ function openWebview(app) {
   let webview = document.createElement("div");
   webview.classList.add("modal", "is-active");
   webview.innerHTML = /* HTML */ `
-    <div class="modal-background animate__animated animate__fadeIn animate__faster"></div>
-    <div class="modal-card animate__animated animate__zoomIn animate__faster" style="width: 90vw;">
+    <div class="modal-background animate__animated animate__fadeIn"></div>
+    <div class="modal-card animate__animated animate__zoomIn" style="width: 90vw;">
       <header class="modal-card-head">
         <p class="modal-card-title">${app.name}</p>
         <button class="delete" aria-label="close" id="apps-webview-close"></button>

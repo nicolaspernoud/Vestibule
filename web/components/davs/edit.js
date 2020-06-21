@@ -21,7 +21,7 @@ export class Edit {
     this.user = await Auth.GetUser();
     this.editModal = document.createElement("div");
     this.editModal.classList.add("modal", "is-active");
-    this.editModal.classList.add("animate__animated", "animate__fadeIn", "animate__faster");
+    this.editModal.classList.add("animate__animated", "animate__fadeIn");
     let content;
     try {
       const response = await fetch(this.url, {

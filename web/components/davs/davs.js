@@ -127,7 +127,7 @@ export async function mount(where) {
       </div>
     </div>
 
-    <div class="modal animate__animated animate__zoomIn animate__faster" id="davs-icons-modal">
+    <div class="modal animate__animated animate__zoomIn" id="davs-icons-modal">
       <div class="modal-card">
         <section id="davs-icons-modal-list" class="modal-card-body"></section>
       </div>
@@ -167,7 +167,7 @@ function davTemplate(dav) {
               </span>
             </button>
           </div>
-          <div class="dropdown-menu animate__animated animate__fadeIn animate__faster" role="menu">
+          <div class="dropdown-menu animate__animated animate__fadeIn" role="menu">
             <div class="dropdown-content">
               <div class="dropdown-item"></div>
               ${user.isAdmin ? '<a class="dropdown-item" id="davs-dav-edit-' + dav.id + '"><i class="fas fa-edit"></i><strong> Edit</strong></a>' : ""}

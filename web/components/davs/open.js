@@ -40,7 +40,7 @@ export class Open {
     this.user = await Auth.GetUser();
     this.openModal = document.createElement("div");
     this.openModal.classList.add("modal", "is-active");
-    if (animated) this.openModal.classList.add("animate__animated", "animate__fadeIn", "animate__faster");
+    if (animated) this.openModal.classList.add("animate__animated", "animate__fadeIn");
     let content;
     let token;
     if (this.type == "text") {

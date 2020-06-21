@@ -10,7 +10,7 @@ export function Show(bulmaClass, message) {
     let msg = document.createElement("div");
     msg.style.marginBottom = offset.toString() + "px";
     msg.innerText = message;
-    msg.classList.add("notification", "animate__animated", "animate__fadeInUp", "animate__faster");
+    msg.classList.add("notification", "animate__animated", "animate__fadeInUp");
     msg.classList.add(bulmaClass);
     const delBtn = document.createElement("button");
     delBtn.classList.add("delete");

@@ -1,7 +1,7 @@
 export function AnimateCSS(el, animationName, callback) {
-  el.classList.add("animate__animated", "animate__faster", animationName);
+  el.classList.add("animate__animated", animationName);
   function handleAnimationEnd() {
-    el.classList.remove("animate__animated", "animate__faster", animationName);
+    el.classList.remove("animate__animated", animationName);
     el.removeEventListener("animationend", handleAnimationEnd);
     if (typeof callback === "function") callback();
   }
