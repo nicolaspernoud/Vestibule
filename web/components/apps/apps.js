@@ -426,21 +426,20 @@ async function reloadAppsOnServer() {
   }
 }
 
-function toggleModal() {
+async function toggleModal() {
   toggleForwardServe();
   toggleRoles();
   updateIcon();
   const modal = document.getElementById("apps-modal");
   const card = document.getElementById("apps-modal-card");
   if (modal.classList.contains("is-active")) {
-    AnimateCSS(modal, "animate__fadeOut");
-    AnimateCSS(card, "animate__zoomOut", function () {
-      modal.classList.remove("is-active");
-    });
+    AnimateCSS(modal, "fadeOut");
+    await AnimateCSS(card, "zoomOut");
+    modal.classList.remove("is-active");
   } else {
     modal.classList.add("is-active");
-    AnimateCSS(modal, "animate__fadeIn");
-    AnimateCSS(card, "animate__zoomIn");
+    AnimateCSS(modal, "fadeIn");
+    AnimateCSS(card, "zoomIn");
   }
 }
 
@@ -507,11 +506,10 @@ function openWebview(app) {
       <footer class="modal-card-foot"></footer>
     </div>
   `;
-  webview.querySelector("#" + "apps-webview-close").addEventListener("click", () => {
-    AnimateCSS(webview.getElementsByClassName("modal-background")[0], "animate__fadeOut", function () {
-      webview.parentNode.removeChild(webview);
-    });
-    AnimateCSS(webview.getElementsByClassName("modal-card")[0], "animate__zoomOut");
+  webview.querySelector("#" + "apps-webview-close").addEventListener("click", async () => {
+    AnimateCSS(webview.getElementsByClassName("modal-background")[0], "fadeOut");
+    await AnimateCSS(webview.getElementsByClassName("modal-card")[0], "zoomOut");
+    webview.parentNode.removeChild(webview);
   });
   document.body.appendChild(webview);
 }

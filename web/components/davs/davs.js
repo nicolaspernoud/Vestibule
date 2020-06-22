@@ -382,20 +382,19 @@ async function reloadDavsOnServer() {
   }
 }
 
-function toggleModal() {
+async function toggleModal() {
   toggleRoles();
   updateIcon();
   const modal = document.getElementById("davs-modal");
   const card = document.getElementById("davs-modal-card");
   if (modal.classList.contains("is-active")) {
-    AnimateCSS(modal, "animate__fadeOut");
-    AnimateCSS(card, "animate__zoomOut", function () {
-      modal.classList.remove("is-active");
-    });
+    AnimateCSS(modal, "fadeOut");
+    await AnimateCSS(card, "zoomOut");
+    modal.classList.remove("is-active");
   } else {
     modal.classList.add("is-active");
-    AnimateCSS(modal, "animate__fadeIn");
-    AnimateCSS(card, "animate__zoomIn");
+    AnimateCSS(modal, "fadeIn");
+    AnimateCSS(card, "zoomIn");
   }
 }
 
@@ -441,6 +440,6 @@ function openExplorerModal(hostname, readwrite, encrypted) {
   const explorer = new Explorer(hostname);
   explorer.mount("davs-explorer-modal-card", readwrite, encrypted);
   modal.classList.add("is-active");
-  AnimateCSS(modal, "animate__fadeIn");
-  AnimateCSS(card, "animate__zoomIn");
+  AnimateCSS(modal, "fadeIn");
+  AnimateCSS(card, "zoomIn");
 }

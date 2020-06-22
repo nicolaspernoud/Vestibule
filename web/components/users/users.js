@@ -282,17 +282,16 @@ async function postUser() {
   toggleModal();
 }
 
-function toggleModal() {
+async function toggleModal() {
   const modal = document.getElementById("users-modal");
   const card = document.getElementById("users-modal-card");
   if (modal.classList.contains("is-active")) {
-    AnimateCSS(modal, "animate__fadeOut");
-    AnimateCSS(card, "animate__zoomOut", function () {
-      modal.classList.remove("is-active");
-    });
+    AnimateCSS(modal, "fadeOut");
+    await AnimateCSS(card, "zoomOut");
+    modal.classList.remove("is-active");
   } else {
     modal.classList.add("is-active");
-    AnimateCSS(modal, "animate__fadeIn");
-    AnimateCSS(card, "animate__zoomIn");
+    AnimateCSS(modal, "fadeIn");
+    AnimateCSS(card, "zoomIn");
   }
 }

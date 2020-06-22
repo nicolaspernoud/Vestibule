@@ -85,10 +85,9 @@ export class Open {
     }
     this.openModal.innerHTML = this.computeTemplate(content, token);
     document.body.appendChild(this.openModal);
-    this.gid("open-close").addEventListener("click", () => {
-      AnimateCSS(this.openModal, "animate__fadeOut", () => {
-        this.openModal.parentNode.removeChild(this.openModal);
-      });
+    this.gid("open-close").addEventListener("click", async () => {
+      await AnimateCSS(this.openModal, "fadeOut");
+      this.openModal.parentNode.removeChild(this.openModal);
     });
     this.gid("open-previous").addEventListener("click", () => {
       this.update(false);

@@ -24,17 +24,16 @@ export function mount(mountpoint) {
   // Hamburger menu
   const burger = document.getElementById("navbar-burger");
   menu = document.getElementById("navbar-menu");
-  const openClose = (e) => {
+  const openClose = async (e) => {
     if (burger.classList.contains("is-active")) {
-      AnimateCSS(menu, "animate__slideOutRight", function () {
-        menu.classList.remove("is-active");
-        burger.classList.remove("is-active");
-      });
+      await AnimateCSS(menu, "slideOutRight");
+      menu.classList.remove("is-active");
+      burger.classList.remove("is-active");
     } else {
       if (e.srcElement == burger) {
         menu.classList.add("is-active");
         burger.classList.add("is-active");
-        AnimateCSS(menu, "animate__slideInRight");
+        AnimateCSS(menu, "slideInRight");
       }
     }
   };

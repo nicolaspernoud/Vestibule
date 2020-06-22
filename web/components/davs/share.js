@@ -100,22 +100,19 @@ export class Share {
           </div>
         `;
         document.body.appendChild(resultModal);
-        this.gid("explorer-result-close").addEventListener("click", () => {
-          AnimateCSS(resultModal, "animate__fadeOut", function () {
-            resultModal.parentNode.removeChild(resultModal);
-          });
+        this.gid("explorer-result-close").addEventListener("click", async () => {
+          await AnimateCSS(resultModal, "fadeOut");
+          resultModal.parentNode.removeChild(resultModal);
         });
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(shareModal, "animate__fadeOut", function () {
-        shareModal.parentNode.removeChild(shareModal);
-      });
+      await AnimateCSS(shareModal, "fadeOut");
+      shareModal.parentNode.removeChild(shareModal);
     });
-    this.gid("share-cancel").addEventListener("click", () => {
-      AnimateCSS(shareModal, "animate__fadeOut", function () {
-        shareModal.parentNode.removeChild(shareModal);
-      });
+    this.gid("share-cancel").addEventListener("click", async () => {
+      await AnimateCSS(shareModal, "fadeOut");
+      shareModal.parentNode.removeChild(shareModal);
     });
   }
 }

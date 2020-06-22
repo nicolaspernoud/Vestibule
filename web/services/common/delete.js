@@ -38,14 +38,12 @@ export class Delete {
       toggleButtons();
       await okFunction();
       toggleButtons();
-      AnimateCSS(deleteModal, "animate__fadeOut", function () {
-        deleteModal.parentNode.removeChild(deleteModal);
-      });
+      await AnimateCSS(deleteModal, "fadeOut");
+      deleteModal.parentNode.removeChild(deleteModal);
     });
-    deleteCancel.addEventListener("click", () => {
-      AnimateCSS(deleteModal, "animate__fadeOut", function () {
-        deleteModal.parentNode.removeChild(deleteModal);
-      });
+    deleteCancel.addEventListener("click", async () => {
+      await AnimateCSS(deleteModal, "fadeOut");
+      deleteModal.parentNode.removeChild(deleteModal);
     });
     document.body.appendChild(deleteModal);
   }

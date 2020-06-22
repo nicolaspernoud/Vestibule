@@ -52,18 +52,15 @@ async function navigate() {
 }
 
 async function load(element, domAlteration) {
-  AnimateCSS(element, "animate__fadeOut", async function () {
-    element.classList.add("is-hidden");
-    spinner.classList.remove("is-hidden");
-    AnimateCSS(spinner, "animate__fadeIn", async () => {
-      if (typeof domAlteration === "function") {
-        await domAlteration();
-        AnimateCSS(spinner, "animate__fadeOut", () => {
-          spinner.classList.add("is-hidden");
-          element.classList.remove("is-hidden");
-          AnimateCSS(element, "animate__fadeIn");
-        });
-      }
-    });
-  });
+  await AnimateCSS(element, "fadeOut");
+  element.classList.add("is-hidden");
+  spinner.classList.remove("is-hidden");
+  await AnimateCSS(spinner, "fadeIn");
+  if (typeof domAlteration === "function") {
+    await domAlteration();
+    await AnimateCSS(spinner, "fadeOut");
+    spinner.classList.add("is-hidden");
+    element.classList.remove("is-hidden");
+    AnimateCSS(element, "fadeIn");
+  }
 }

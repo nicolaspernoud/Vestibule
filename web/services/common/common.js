@@ -1,12 +1,18 @@
-export function AnimateCSS(el, animationName, callback) {
-  el.classList.add("animate__animated", animationName);
-  function handleAnimationEnd() {
-    el.classList.remove("animate__animated", animationName);
-    el.removeEventListener("animationend", handleAnimationEnd);
-    if (typeof callback === "function") callback();
-  }
-  el.addEventListener("animationend", handleAnimationEnd);
-}
+export const AnimateCSS = (element, animation, prefix = "animate__") =>
+  // We create a Promise and return it
+  new Promise((resolve, reject) => {
+    const animationName = `${prefix}${animation}`;
+
+    element.classList.add(`${prefix}animated`, animationName);
+
+    // When the animation ends, we clean the classes and resolve the Promise
+    function handleAnimationEnd() {
+      element.classList.remove(`${prefix}animated`, animationName);
+      element.removeEventListener("animationend", handleAnimationEnd);
+      resolve("Animation ended");
+    }
+    element.addEventListener("animationend", handleAnimationEnd);
+  });
 
 export let GID = (obj, id) => {
   return document.getElementById(obj.prefix + id);

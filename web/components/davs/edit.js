@@ -40,10 +40,9 @@ export class Edit {
     }
     this.editModal.innerHTML = this.computeTemplate(content);
     document.body.appendChild(this.editModal);
-    this.gid("edit-close").addEventListener("click", () => {
-      AnimateCSS(this.editModal, "animate__fadeOut", () => {
-        this.editModal.parentNode.removeChild(this.editModal);
-      });
+    this.gid("edit-close").addEventListener("click", async () => {
+      await AnimateCSS(this.editModal, "fadeOut");
+      this.editModal.parentNode.removeChild(this.editModal);
     });
     this.gid("edit-save").addEventListener("click", () => {
       this.save();

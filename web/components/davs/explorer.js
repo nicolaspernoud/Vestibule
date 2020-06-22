@@ -58,12 +58,11 @@ export class Explorer {
       </footer>
     `;
     this.user = await Auth.GetUser();
-    document.getElementById(`explorer-modal-close`).addEventListener("click", function () {
+    document.getElementById(`explorer-modal-close`).addEventListener("click", async function () {
       const modal = card.parentNode;
-      AnimateCSS(modal, "animate__fadeOut");
-      AnimateCSS(card, "animate__zoomOut", function () {
-        modal.classList.remove("is-active");
-      });
+      AnimateCSS(modal, "fadeOut");
+      await AnimateCSS(card, "zoomOut");
+      modal.classList.remove("is-active");
     });
     document.getElementById(`explorer-modal-back`).addEventListener("click", () => {
       this.navigate(goUp(this.path));
@@ -311,14 +310,12 @@ export class Explorer {
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(renameModal, "animate__fadeOut", function () {
-        renameModal.parentNode.removeChild(renameModal);
-      });
+      await AnimateCSS(renameModal, "fadeOut");
+      renameModal.parentNode.removeChild(renameModal);
     });
-    renameCancel.addEventListener("click", () => {
-      AnimateCSS(renameModal, "animate__fadeOut", function () {
-        renameModal.parentNode.removeChild(renameModal);
-      });
+    renameCancel.addEventListener("click", async () => {
+      await AnimateCSS(renameModal, "fadeOut");
+      renameModal.parentNode.removeChild(renameModal);
     });
     document.body.appendChild(renameModal);
     field.focus();
@@ -358,14 +355,12 @@ export class Explorer {
       } catch (e) {
         HandleError(e);
       }
-      AnimateCSS(pasteControl, "animate__zoomOut", function () {
-        pasteControl.parentNode.removeChild(pasteControl);
-      });
+      await AnimateCSS(pasteControl, "zoomOut");
+      pasteControl.parentNode.removeChild(pasteControl);
     });
     pasteControl.getElementsByTagName("a")[1].addEventListener("click", async () => {
-      AnimateCSS(pasteControl, "animate__zoomOut", function () {
-        pasteControl.parentNode.removeChild(pasteControl);
-      });
+      await AnimateCSS(pasteControl, "zoomOut");
+      pasteControl.parentNode.removeChild(pasteControl);
     });
     document.getElementById("explorer-modal-footer-buttons").appendChild(pasteControl);
   }
@@ -495,9 +490,8 @@ export class Explorer {
         console.error(e.statusText);
         Messages.Show("is-warning", e.statusText);
       }
-      AnimateCSS(msg, "animate__fadeOutDown", function () {
-        msg.parentNode.removeChild(msg);
-      });
+      await AnimateCSS(msg, "fadeOutDown");
+      msg.parentNode.removeChild(msg);
     }
   }
 

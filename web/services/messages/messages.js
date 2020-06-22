@@ -29,13 +29,11 @@ export function Show(bulmaClass, message) {
   }
 }
 
-function removeMsg(msg, message, height) {
-  AnimateCSS(msg, "animate__fadeOutDown", function () {
-    msg.parentNode.removeChild(msg);
-  });
-  offset = offset - height;
+async function removeMsg(msg, message, height) {
   const index = messages.indexOf(message);
   if (index > -1) {
     messages.splice(index, 1);
   }
+  await AnimateCSS(msg, "fadeOutDown");
+  msg.parentNode.removeChild(msg);
 }
