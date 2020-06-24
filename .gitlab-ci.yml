@@ -32,6 +32,7 @@ sonarqube:
       -Dsonar.host.url=${SONAR_URL}
       -Dsonar.projectKey=${SONAR_PROJECT_KEY}
       -Dsonar.login=${SONAR_TOKEN}
+      -Dsonar.organization="default-organization"
 
 build-master:
   stage: build
