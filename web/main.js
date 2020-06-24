@@ -54,13 +54,13 @@ async function navigate() {
 async function load(element, domAlteration) {
   await AnimateCSS(element, "fadeOut");
   element.classList.add("is-hidden");
+  // Start the alteration
+  const alteration = domAlteration();
   spinner.classList.remove("is-hidden");
   await AnimateCSS(spinner, "fadeIn");
-  if (typeof domAlteration === "function") {
-    await domAlteration();
-    await AnimateCSS(spinner, "fadeOut");
-    spinner.classList.add("is-hidden");
-    element.classList.remove("is-hidden");
-    AnimateCSS(element, "fadeIn");
-  }
+  await alteration; // Await for alteration end
+  await AnimateCSS(spinner, "fadeOut");
+  spinner.classList.add("is-hidden");
+  element.classList.remove("is-hidden");
+  AnimateCSS(element, "fadeIn");
 }
