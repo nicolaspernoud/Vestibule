@@ -17,7 +17,7 @@ func (u user) String() string {
 	return fmt.Sprintf("Login: %v, Password: %v", u.Login, u.Password)
 }
 
-func Test_manager_CreateToken_unStoreData(t *testing.T) {
+func TestManagerCreateTokenUnStoreData(t *testing.T) {
 	key, _ := common.GenerateRandomBytes(32)
 	key2, _ := common.GenerateRandomBytes(32)
 	type fields struct {

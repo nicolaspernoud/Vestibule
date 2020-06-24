@@ -82,9 +82,9 @@ export class Explorer {
     await this.navigate("/");
   }
 
-  async navigate(path) {
-    if (!path.endsWith("/")) path += "/";
-    this.path = path;
+  async navigate(destPath) {
+    if (!destPath.endsWith("/")) destPath += "/";
+    this.path = destPath;
     this.progress.classList.remove("is-hidden");
     try {
       const response = await fetch(this.fullHostname + this.path, {
@@ -577,11 +577,11 @@ function parseWebDavResponse(txt) {
   return files.sort(fileSortFunction);
 }
 
-function goUp(path) {
-  if (path === "/") return path;
-  if (path.endsWith("/")) path = path.substring(0, path.length - 1);
-  const lastSlashPosition = path.lastIndexOf("/");
-  return lastSlashPosition === 0 ? "/" : path.substring(0, lastSlashPosition + 1);
+function goUp(destPath) {
+  if (destPath === "/") return destPath;
+  if (destPath.endsWith("/")) destPath = destPath.substring(0, destPath.length - 1);
+  const lastSlashPosition = destPath.lastIndexOf("/");
+  return lastSlashPosition === 0 ? "/" : destPath.substring(0, lastSlashPosition + 1);
 }
 
 function sizeToHuman(size) {
@@ -625,6 +625,6 @@ export async function LoadImage(image, url, user) {
   }
 }
 
-function path(path, name) {
-  return path + encodeURIComponent(name);
+function path(destPath, name) {
+  return destPath + encodeURIComponent(name);
 }
