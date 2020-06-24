@@ -2,16 +2,16 @@
 
 Vestibule is an HTTP server, reverse proxy and webdav server, with OIDC/OAuth2 and local users file authentication, and a _Single Page Application_ GUI to configure everything.
 
-[![Maintainability Rating](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=sqale_rating)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Security Rating](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=security_rating)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Reliability Rating](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=reliability_rating)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Quality Gate Status](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=alert_status)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Bugs](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=bugs)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Vulnerabilities](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=vulnerabilities)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Code Smells](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=code_smells)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Technical Debt](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=sqale_index)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Lines of Code](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=ncloc)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
-[![Duplicated Lines (%)](https://sonarqube.forge.grandlyon.com/api/project_badges/measure?project=vestibule&metric=duplicated_lines_density)](https://sonarqube.forge.grandlyon.com/dashboard?id=vestibule)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=security_rating)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=reliability_rating)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=alert_status)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=bugs)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=code_smells)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=sqale_index)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=ncloc)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=duplicated_lines_density)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
 
 ## Features
 
