@@ -6,7 +6,8 @@ on:
     types: [opened, synchronize, reopened]
 name: Main Workflow
 jobs:
-  scan-and-build:
+  sonarcloud-scan:
+    name: Scan with SonarCloud
     runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
@@ -19,7 +20,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Build container image and push to Docker Hub
+  docker-build:
+    name: Build image and push to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Build image and push to Docker Hub
         uses: docker/build-push-action@v1
         env:
           DOCKER_BUILDKIT: 1
