@@ -10,7 +10,7 @@
       </rdf:RDF>
    </metadata>
    <circle cx="50" cy="50" r="45" fill="none" stroke="#b0bec5" stroke-width="10" />
-   <path d="m95 50c0 24.854-20.147 45-45 45m-45-45c2e-7 -24.854 20.147-45 45-45 24.854 0 45 20.147 45 45" fill="none" stroke="#0d47a1" stroke-linecap="round" stroke-width="5">
+   <path d="m5 50c0-24.853 20.147-45 45-45" fill="none" stroke="#0d47a1" stroke-linecap="round" stroke-width="10">
       <animateTransform attributeName="transform" dur="1s" from="0 50 50" repeatDur="indefinite" to="360 50 50" type="rotate" />
    </path>
 </svg>
