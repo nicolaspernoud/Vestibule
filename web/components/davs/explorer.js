@@ -438,7 +438,7 @@ export class Explorer {
     for (const file of files) {
       id++;
       fileIdx++;
-      file.path = path(this.path, file.name);
+      file.path = path(onStartPath, file.name);
       // Create a message to allow progress tracking and cancellation
       let msg = document.createElement("div");
       msg.innerHTML = /* HTML */ `
