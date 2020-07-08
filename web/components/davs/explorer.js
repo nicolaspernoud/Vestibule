@@ -1,7 +1,7 @@
 // Imports
 import * as Messages from "/services/messages/messages.js";
 import * as Auth from "/services/auth/auth.js";
-import { AnimateCSS, GetType } from "/services/common/common.js";
+import { AnimateCSS, GetType, Truncate } from "/services/common/common.js";
 import { Open } from "/components/davs/open.js";
 import { Edit } from "/components/davs/edit.js";
 import { Share } from "/components/davs/share.js";
@@ -329,7 +329,7 @@ export class Explorer {
         <span class="icon is-small">
           <i class="fas fa-${isCopy ? "copy" : "cut"}"></i>
         </span>
-        <span>Paste ${file.name} here</span>
+        <span>Paste <small>"${Truncate(file.name)}"</small> here</span>
       </a>
       <a class="button is-link">
         <span class="icon is-small">

@@ -47,3 +47,5 @@ export function GetType(file) {
     return "other";
   }
 }
+
+export const Truncate = (input) => (input.length > 12 ? `${input.substring(0, 12)}...` : input);

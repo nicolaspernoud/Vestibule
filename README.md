@@ -1,5 +1,7 @@
 # Vestibule
 
+Alternate URL (on the Grand Lyon software forge) : https://forge.grandlyon.com/NPERNOUD/vestibule .
+
 Vestibule is an HTTP server, reverse proxy and webdav server, with OIDC/OAuth2 and local users file authentication, and a _Single Page Application_ GUI to configure everything.
 
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=nicolaspernoud_Vestibule&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=nicolaspernoud_Vestibule)
