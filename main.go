@@ -93,6 +93,6 @@ func main() {
 		}
 
 		go http.ListenAndServe(":"+strconv.Itoa(*httpPort), certManager.HTTPHandler(nil))
-		server.ListenAndServeTLS("", "")
+		log.Logger.Fatal(server.ListenAndServeTLS("", ""))
 	}
 }
