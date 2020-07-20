@@ -49,16 +49,18 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 	roleChecker := func(w http.ResponseWriter, r *http.Request) {
 		user := TokenData{}
 		checkXSRF, err := tokens.Manager.ExtractAndValidateToken(r, authTokenKey, &user, checkXSRF)
-		// Handle CORS preflight requests
-		if err != nil && r.Method == "OPTIONS" {
-			// Handle GIO preflight requests
-			if strings.Contains(r.UserAgent(), "vfs") || strings.Contains(r.UserAgent(), "Microsoft-WebDAV") {
+		if err != nil {
+			// Handle WebDav authentication
+			if strings.Contains(r.UserAgent(), "vfs") || strings.Contains(r.UserAgent(), "Microsoft-WebDAV") || strings.Contains(r.UserAgent(), "Konqueror") {
 				w.Header().Set("WWW-Authenticate", `Basic realm="server"`)
 				http.Error(w, "webdav client authentication", 401)
+				return
 			}
-			return
-		}
-		if err != nil {
+			// Handle CORS preflight requests
+			if r.Method == "OPTIONS" {
+				return
+			}
+			// Default to redirect to authentication
 			redirectTo := os.Getenv("HOSTNAME")
 			_, port, perr := net.SplitHostPort(r.Host)
 			if perr == nil {
@@ -69,6 +71,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			responseContent := fmt.Sprintf("error extracting token: %v<meta http-equiv=\"Refresh\" content=\"0; url=https://%v?redirectAfterLogin=%v#login\"/>", err.Error(), redirectTo, r.Host)
 			fmt.Fprintf(w, responseContent)
 			return
+
 		}
 		// Check XSRF Token
 		if checkXSRF && r.Header.Get("XSRF-TOKEN") != user.XSRFToken {
