@@ -31,50 +31,14 @@ $progress-border-radius: 0px;
 $progress-indeterminate-duration: 1s;
 
 // Bulma imports
-@import "node_modules/bulma/sass/utilities/_all.sass";
-@import "node_modules/bulma/sass/base/_all.sass";
-
-//@import "node_modules/bulma/sass/components/breadcrumb.sass";
-@import "node_modules/bulma/sass/components/card.sass";
-@import "node_modules/bulma/sass/components/dropdown.sass";
-//@import "node_modules/bulma/sass/components/level.sass";
-//@import "node_modules/bulma/sass/components/list.sass";
-@import "node_modules/bulma/sass/components/media.sass";
-//@import "node_modules/bulma/sass/components/menu.sass";
-//@import "node_modules/bulma/sass/components/message.sass";
-@import "node_modules/bulma/sass/components/modal.sass";
-@import "node_modules/bulma/sass/components/navbar.sass";
-//@import "node_modules/bulma/sass/components/pagination.sass";
-//@import "node_modules/bulma/sass/components/panel.sass";
-//@import "node_modules/bulma/sass/components/tabs.sass";
-
-//@import "node_modules/bulma/sass/elements/box.sass";
-@import "node_modules/bulma/sass/elements/button.sass";
-@import "node_modules/bulma/sass/elements/container.sass";
-@import "node_modules/bulma/sass/elements/content.sass";
-// DEPRECATED !!! @import "node_modules/bulma/sass/elements/form.sass";
-@import "node_modules/bulma/sass/elements/icon.sass";
-@import "node_modules/bulma/sass/elements/image.sass";
-@import "node_modules/bulma/sass/elements/notification.sass";
-@import "node_modules/bulma/sass/elements/other.sass";
-@import "node_modules/bulma/sass/elements/progress.sass";
-@import "node_modules/bulma/sass/elements/table.sass";
-//@import "node_modules/bulma/sass/elements/tag.sass";
-@import "node_modules/bulma/sass/elements/title.sass";
-
-@import "node_modules/bulma/sass/form/shared.sass";
-//@import "node_modules/bulma/sass/form/checkbox-radio.sass";
-@import "node_modules/bulma/sass/form/file.sass";
-@import "node_modules/bulma/sass/form/input-textarea.sass";
-@import "node_modules/bulma/sass/form/select.sass";
-@import "node_modules/bulma/sass/form/tools.sass";
-
-@import "node_modules/bulma/sass/grid/columns.sass";
-//@import "node_modules/bulma/sass/grid/tiles.sass";
-
-@import "node_modules/bulma/sass/layout/footer.sass";
-//@import "node_modules/bulma/sass/layout/hero.sass";
-@import "node_modules/bulma/sass/layout/section.sass";
+@import "node_modules/bulma/sass/utilities/_all";
+@import "node_modules/bulma/sass/base/_all";
+@import "node_modules/bulma/sass/elements/_all";
+@import "node_modules/bulma/sass/form/_all";
+@import "node_modules/bulma/sass/components/_all";
+@import "node_modules/bulma/sass/grid/_all";
+@import "node_modules/bulma/sass/helpers/_all";
+@import "node_modules/bulma/sass/layout/_all";
 
 ////////////////////////////////////
 //                                //

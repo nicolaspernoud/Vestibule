@@ -14,7 +14,7 @@
   "author": "Nicolas Pernoud",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
-    "bulma": "^0.8.2",
+    "bulma": "^0.9.0",
     "clean-css-cli": "^4.3.0",
     "node-sass": "^4.14.1",
     "rimraf": "^3.0.2"
