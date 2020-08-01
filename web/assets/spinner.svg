@@ -9,8 +9,8 @@
          </cc:Work>
       </rdf:RDF>
    </metadata>
-   <circle cx="50" cy="50" r="45" fill="none" stroke="#b0bec5" stroke-width="10" />
-   <path d="m5 50c0-24.853 20.147-45 45-45" fill="none" stroke="#0d47a1" stroke-linecap="round" stroke-width="10">
+   <circle cx="50" cy="50" r="45" fill="none" stroke="#b0bec5" stroke-width="5" />
+   <path d="m5 50c0-24.853 20.147-45 45-45" fill="none" stroke="#0d47a1" stroke-linecap="round" stroke-width="5">
       <animateTransform attributeName="transform" dur="1s" from="0 50 50" repeatDur="indefinite" to="360 50 50" type="rotate" />
    </path>
 </svg>

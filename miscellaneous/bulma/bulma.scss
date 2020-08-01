@@ -117,7 +117,8 @@ img {
   border-width: 1px;
 }
 
-a.navbar-item:focus {
+// To ensure color event if element is focused
+a.navbar-item.is-active {
   background-color: $very-light-grey;
 }
 
