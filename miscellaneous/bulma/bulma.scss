@@ -17,6 +17,7 @@ $very-light-grey: #eceff1;
 $primary: $deep-blue;
 $dark: $grey;
 $light: $light-grey;
+$radius-small: 2px;
 
 // Bulma's component variables
 $body-background-color: $very-light-grey;
@@ -29,6 +30,9 @@ $navbar-item-active-color: $nice-red;
 $navbar-item-active-background-color: $very-light-grey;
 $progress-border-radius: 0px;
 $progress-indeterminate-duration: 1s;
+$modal-card-head-padding: 15px;
+$modal-card-head-background-color: $light;
+$modal-card-head-radius: $radius-small;
 
 // Bulma imports
 @import "node_modules/bulma/sass/utilities/_all";
@@ -115,6 +119,7 @@ img {
 .navbar-item.is-active {
   border-style: none solid none solid;
   border-width: 1px;
+  border-radius: $radius-small $radius-small 0 0;
 }
 
 // To ensure color event if element is focused
