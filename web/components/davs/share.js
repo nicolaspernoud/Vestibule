@@ -24,7 +24,7 @@ export class Share {
     shareModal.innerHTML = /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-content">
-        <div class="box" style="margin: 2rem;">
+        <div class="box">
           <div class="field">
             <label class="label">Share with</label>
             <div class="control">
@@ -79,7 +79,7 @@ export class Share {
         resultModal.innerHTML = /* HTML */ `
           <div class="modal-background"></div>
           <div class="modal-content">
-            <div class="box" style="margin: 2rem;">
+            <div class="box">
               <div class="content is-small">
                 <h1>This link will be available during ${lifespan} days</h1>
                 <a href="${this.fullURL + "?token=" + encodeURIComponent(shareToken)}" class="button">

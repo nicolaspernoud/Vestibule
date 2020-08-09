@@ -495,7 +495,7 @@ function openWebview(app) {
   webview.classList.add("modal", "is-active");
   webview.innerHTML = /* HTML */ `
     <div class="modal-background animate__animated animate__fadeIn"></div>
-    <div class="modal-card animate__animated animate__zoomIn" style="width: 90vw;">
+    <div class="modal-card animate__animated animate__zoomIn">
       <header class="modal-card-head">
         <p class="modal-card-title">${app.name}</p>
         <button class="delete" aria-label="close" id="apps-webview-close"></button>

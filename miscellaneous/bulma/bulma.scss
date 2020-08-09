@@ -125,9 +125,9 @@ a.navbar-item.is-active {
 .notification {
   z-index: 100;
   position: fixed;
-  left: 45vw;
+  left: 45%;
   bottom: 1rem;
-  width: 50vw;
+  width: 50%;
   transition: all 0.5s ease;
 }
 
@@ -136,7 +136,7 @@ a.navbar-item.is-active {
 }
 
 .uploader {
-  left: 5vw;
+  left: 5%;
   .content {
     overflow-wrap: break-word;
   }
@@ -166,4 +166,10 @@ a.navbar-item.is-active {
 .modal-content {
   background-color: $very-light-grey;
   border-radius: $radius-large;
+  max-width: 90%;
+}
+
+.modal-card {
+  width: 95%;
+  max-height: 95%;
 }

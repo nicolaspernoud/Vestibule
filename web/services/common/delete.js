@@ -8,7 +8,7 @@ export class Delete {
     deleteModal.innerHTML = /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-content">
-        <div class="box" style="margin: 2rem;">
+        <div class="box">
           <div class="field">
             <label class="label">Confirm</label>
           </div>
