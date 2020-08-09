@@ -178,3 +178,12 @@ a.navbar-item.is-active {
   width: 95%;
   max-height: 95%;
 }
+
+.modal-card-head .delete {
+  transition: 0.2s;
+}
+
+.modal-card-head .delete:hover {
+  background-color: $nice-red;
+  transform: scale(1.1);
+}

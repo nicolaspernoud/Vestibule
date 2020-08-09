@@ -468,6 +468,7 @@ func decryptFile(filePath string, key []byte) http.Handler {
 
 func getTrueSize(stream *sio.Stream, header streamHeader, encSize int64) (int64, error) {
 	overhead := stream.Overhead(0)
+	encSize = encSize - int64(header.binarySize())
 	size := encSize / int64(sio.BufSize+overhead) * int64(sio.BufSize)
 	if mod := encSize % int64(sio.BufSize+overhead); mod > 0 {
 		if mod < overhead {
@@ -475,7 +476,6 @@ func getTrueSize(stream *sio.Stream, header streamHeader, encSize int64) (int64,
 		}
 		size += mod - overhead
 	}
-	size -= int64(header.binarySize())
 	return size, nil
 }
 
