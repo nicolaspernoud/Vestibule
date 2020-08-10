@@ -114,7 +114,7 @@ export class Open {
       <div class="modal-card">
         <header class="modal-card-head">
           <button class="delete navbar-menu-icon" aria-label="close" id="${this.prefix}open-close"></button>
-          <p class="modal-card-title has-text-centered">${this.file.name}</p>
+          <p id="${this.prefix}filename" class="modal-card-title has-text-centered">${this.file.name}</p>
         </header>
         <section id="${this.prefix}content" class="modal-card-body is-paddingless flex-container"></section>
         <footer class="modal-card-foot">
@@ -140,5 +140,6 @@ export class Open {
       ${this.type == "video" ? /* HTML */ ` <video controls autoplay><source src="${this.url}?token=${token}" /></video> ` : ""}
       ${this.type == "text" ? /* HTML */ ` <textarea class="textarea" readonly>${content}</textarea> ` : ""}
     `;
+    this.gid("filename").innerHTML = /* HTML */ `${this.file.name}`;
   }
 }
