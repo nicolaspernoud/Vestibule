@@ -21,7 +21,33 @@ export class Open {
     return GID(this, id);
   }
 
-  update(isNext) {
+  async show(animated) {
+    // Create empty modal
+    this.openModal = document.createElement("div");
+    this.openModal.classList.add("modal", "is-active");
+    if (animated) this.openModal.classList.add("animate__animated", "animate__fadeIn");
+    this.openModal.innerHTML = this.emptyTemplate();
+    document.body.appendChild(this.openModal);
+    // Add events
+    this.gid("open-close").addEventListener("click", async () => {
+      await AnimateCSS(this.openModal, "fadeOut");
+      this.openModal.parentNode.removeChild(this.openModal);
+    });
+    this.gid("open-previous").addEventListener("click", () => {
+      this.seek(false);
+    });
+    this.gid("open-next").addEventListener("click", () => {
+      this.seek(true);
+    });
+    this.gid("open-share").addEventListener("click", () => {
+      const shareModal = new Share(this.hostname, this.file);
+      shareModal.show();
+    });
+    // Display
+    this.showContent();
+  }
+
+  seek(isNext) {
     const idx = isNext ? this.index + 1 : this.index - 1;
     if (idx >= 0 && idx < this.files.length) {
       const type = GetType(this.files[idx]);
@@ -30,17 +56,13 @@ export class Open {
         this.file = this.files[idx];
         this.type = type;
         this.url = `${this.fullHostname}${this.file.path}`;
-        this.openModal.parentNode.removeChild(this.openModal);
-        this.show(false);
+        this.showContent();
       }
     }
   }
 
-  async show(animated) {
+  async showContent() {
     this.user = await Auth.GetUser();
-    this.openModal = document.createElement("div");
-    this.openModal.classList.add("modal", "is-active");
-    if (animated) this.openModal.classList.add("animate__animated", "animate__fadeIn");
     let content;
     let token;
     if (this.type == "text") {
@@ -83,25 +105,10 @@ export class Open {
         HandleError(e);
       }
     }
-    this.openModal.innerHTML = this.computeTemplate(content, token);
-    document.body.appendChild(this.openModal);
-    this.gid("open-close").addEventListener("click", async () => {
-      await AnimateCSS(this.openModal, "fadeOut");
-      this.openModal.parentNode.removeChild(this.openModal);
-    });
-    this.gid("open-previous").addEventListener("click", () => {
-      this.update(false);
-    });
-    this.gid("open-next").addEventListener("click", () => {
-      this.update(true);
-    });
-    this.gid("open-share").addEventListener("click", () => {
-      const shareModal = new Share(this.hostname, this.file);
-      shareModal.show();
-    });
+    this.updateTemplate(content, token);
   }
 
-  computeTemplate(content, token) {
+  emptyTemplate() {
     return /* HTML */ `
       <div class="modal-background"></div>
       <div class="modal-card">
@@ -109,13 +116,7 @@ export class Open {
           <button class="delete navbar-menu-icon" aria-label="close" id="${this.prefix}open-close"></button>
           <p class="modal-card-title has-text-centered">${this.file.name}</p>
         </header>
-        <section class="modal-card-body is-paddingless flex-container">
-          ${this.type == "other" ? /* HTML */ ` <embed src="${this.url}?token=${token}&inline" type="application/pdf" width="100%" style="height: 75vh;" /> ` : ""}
-          ${this.type == "image" ? `<img id="${this.prefix}open-image" src="${this.url}?token=${token}" alt="Previewed image" />` : ""}
-          ${this.type == "audio" ? /* HTML */ ` <audio controls autoplay><source src="${this.url}?token=${token}" /></audio> ` : ""}
-          ${this.type == "video" ? /* HTML */ ` <video controls autoplay><source src="${this.url}?token=${token}" /></video> ` : ""}
-          ${this.type == "text" ? /* HTML */ ` <textarea class="textarea" readonly>${content}</textarea> ` : ""}
-        </section>
+        <section id="${this.prefix}content" class="modal-card-body is-paddingless flex-container"></section>
         <footer class="modal-card-foot">
           <button id="${this.prefix}open-previous" class="button">
             <span class="icon is-small"><i class="fas fa-arrow-circle-left"></i></span>
@@ -128,6 +129,16 @@ export class Open {
           </button>
         </footer>
       </div>
+    `;
+  }
+
+  updateTemplate(content, token) {
+    this.gid("content").innerHTML = /* HTML */ `
+      ${this.type == "other" ? /* HTML */ ` <embed src="${this.url}?token=${token}&inline" type="application/pdf" width="100%" style="height: 75vh;" /> ` : ""}
+      ${this.type == "image" ? `<img id="${this.prefix}open-image" src="${this.url}?token=${token}" alt="Previewed image" />` : ""}
+      ${this.type == "audio" ? /* HTML */ ` <audio controls autoplay><source src="${this.url}?token=${token}" /></audio> ` : ""}
+      ${this.type == "video" ? /* HTML */ ` <video controls autoplay><source src="${this.url}?token=${token}" /></video> ` : ""}
+      ${this.type == "text" ? /* HTML */ ` <textarea class="textarea" readonly>${content}</textarea> ` : ""}
     `;
   }
 }
