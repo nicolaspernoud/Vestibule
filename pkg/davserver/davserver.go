@@ -459,10 +459,9 @@ func decryptFile(filePath string, key []byte) http.Handler {
 			w.Header().Set("content-length", strconv.FormatInt(size, 10))
 		}
 
-		_, err = io.Copy(w, ioutil.NopCloser(stream.DecryptReader(f, nonce, nil)))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
+		dr := stream.DecryptReaderAt(io.NewSectionReader(f, int64(len(binaryHeader)), fi.Size()), nonce, nil)
+		section := io.NewSectionReader(dr, 0, size)
+		http.ServeContent(w, r, f.Name(), time.Time{}, section)
 	})
 }
 
