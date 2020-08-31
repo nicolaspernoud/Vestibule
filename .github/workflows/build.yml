@@ -13,13 +13,13 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v1
         with:
-          go-version: 1.14.x
+          go-version: 1.x.x
       - name: Code Checkout
         uses: actions/checkout@v2
         with:
           # Disabling shallow clone is recommended for improving relevancy of reporting
           fetch-depth: 0
-      - name: Calculate Golang coverage 
+      - name: Calculate Golang coverage
         run: go test ./... -coverprofile=coverage.out
       - name: SonarCloud Scan
         uses: sonarsource/sonarcloud-github-action@master
