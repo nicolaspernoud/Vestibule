@@ -68,7 +68,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			}
 			w.Header().Set("Content-Type", "text/html")
 			w.WriteHeader(http.StatusUnauthorized)
-			responseContent := fmt.Sprintf("error extracting token: %v<meta http-equiv=\"Refresh\" content=\"0; url=https://%v?redirectAfterLogin=%v#login\"/>", err.Error(), redirectTo, r.Host)
+			responseContent := fmt.Sprintf("error extracting token: %v<meta http-equiv=\"Refresh\" content=\"0; url=https://%v?redirectAfterLogin=%v#login\"/>", err.Error(), redirectTo, r.Host+r.URL.Path)
 			fmt.Fprintf(w, responseContent)
 			return
 
