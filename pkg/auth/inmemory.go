@@ -48,7 +48,7 @@ func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "error generating XSRF Token", 500)
 		return
 	}
-	tokenData := TokenData{User: User{ID: user.ID, Login: user.Login, Roles: user.Roles}, XSRFToken: xsrfToken}
+	tokenData := TokenData{User: User{ID: user.ID, Login: user.Login, Email: user.Email, Roles: user.Roles}, XSRFToken: xsrfToken}
 	tokens.Manager.StoreData(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
 	// Log the connexion
 	log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))

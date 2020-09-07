@@ -27,6 +27,7 @@ type User struct {
 	ID           string   `json:"id,omitempty"`
 	Login        string   `json:"login"`
 	DisplayName  string   `json:"displayName,omitempty"`
+	Email        string   `json:"email,omitempty"`
 	Roles        []string `json:"memberOf"`
 	IsAdmin      bool     `json:"isAdmin,omitempty"`
 	Name         string   `json:"name,omitempty"`

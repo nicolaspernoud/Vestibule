@@ -12,6 +12,7 @@ let password_field;
 let passwordhash_field;
 let name_field;
 let surname_field;
+let email_field;
 let roles_field;
 
 // local variables
@@ -31,6 +32,7 @@ export async function mount(where) {
             <th>Hash</th>
             <th>Name</th>
             <th>Surname</th>
+            <th>Email</th>
             <th>Roles</th>
             <th>Actions</th>
           </tr>
@@ -95,6 +97,12 @@ export async function mount(where) {
               <input class="input" type="text" id="users-modal-surname" />
             </div>
           </div>
+          <div class="field" id="users-modal-email-container">
+            <label class="label">Email</label>
+            <div class="control">
+              <input class="input" type="email" id="users-modal-email" />
+            </div>
+          </div>
           <div class="field" id="users-modal-roles-container">
             <label class="label">Roles (separated with commas)</label>
             <div class="control">
@@ -115,7 +123,7 @@ export async function mount(where) {
 }
 
 function cleanUser(user) {
-  let props = ["password", "name", "surname", "memberOf"];
+  let props = ["password", "name", "surname", "email", "memberOf"];
   for (const prop of props) {
     user[prop] = user[prop] === undefined ? "" : user[prop];
   }
@@ -131,6 +139,7 @@ function userTemplate(user) {
       <td>${user.passwordHash === undefined ? "" : "..."}</td>
       <td>${user.name}</td>
       <td>${user.surname}</td>
+      <td>${user.email}</td>
       <td>${user.memberOf}</td>
       <td>
         <a id="users-user-edit-${user.id}" class="button is-link is-small">
@@ -208,6 +217,7 @@ function registerModalFields() {
   passwordhash_field = document.getElementById("users-modal-passwordhash");
   name_field = document.getElementById("users-modal-name");
   surname_field = document.getElementById("users-modal-surname");
+  email_field = document.getElementById("users-modal-email");
   roles_field = document.getElementById("users-modal-roles");
   document.getElementById(`users-modal-close`).addEventListener("click", function () {
     toggleModal();
@@ -234,6 +244,7 @@ async function editUser(user) {
   passwordhash_field.value = user.passwordHash;
   name_field.value = user.name;
   surname_field.value = user.surname;
+  email_field.value = user.email;
   roles_field.value = user.memberOf;
   toggleModal();
 }
@@ -250,6 +261,7 @@ async function newUser() {
   passwordhash_field.value = "";
   name_field.value = "";
   surname_field.value = "";
+  email_field.value = "";
   roles_field.value = "";
   toggleModal();
 }
@@ -268,6 +280,7 @@ async function postUser() {
         passwordHash: passwordhash_field.value,
         name: name_field.value,
         surname: surname_field.value,
+        email: email_field.value,
         memberOf: roles_field.value.split(","),
       }),
     });
