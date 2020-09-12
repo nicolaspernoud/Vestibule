@@ -7,7 +7,7 @@
 @charset "utf-8";
 
 // Brand colors
-$deep-blue: #0d47a1;
+$deep-blue: #304ffe;
 $nice-red: #c2185b;
 $grey: #78909c;
 $light-grey: #b0bec5;
@@ -33,6 +33,7 @@ $progress-indeterminate-duration: 1s;
 $modal-card-head-padding: 15px;
 $modal-card-head-background-color: $light;
 $modal-card-head-radius: $radius-small;
+$modal-card-title-color: $very-light-grey;
 
 // Bulma imports
 @import "node_modules/bulma/sass/utilities/_all";
@@ -119,7 +120,9 @@ img {
 .navbar-item.is-active {
   border-style: none solid none solid;
   border-width: 1px;
-  border-radius: $radius-small $radius-small 0 0;
+  @media screen and (min-width: 1024px) {
+    border-radius: $radius-small $radius-small 0 0;
+  }
 }
 
 // To ensure color event if element is focused
@@ -186,4 +189,8 @@ a.navbar-item.is-active {
 .modal-card-head .delete:hover {
   background-color: $nice-red;
   transform: scale(1.1);
+}
+
+.modal-card-title {
+  font-weight: bold;
 }
