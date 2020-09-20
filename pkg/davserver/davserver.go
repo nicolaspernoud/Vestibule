@@ -17,6 +17,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/nicolaspernoud/vestibule/pkg/s3webdavfs"
+
 	"bytes"
 	"crypto/hmac"
 	"fmt"
@@ -25,6 +27,7 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/auth"
 	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/log"
+	"github.com/nicolaspernoud/vestibule/pkg/s3"
 	"golang.org/x/net/webdav"
 
 	"github.com/secure-io/sio-go"
@@ -124,7 +127,7 @@ func parseDavs(file string, authz authzFunc) ([]*dav, error) {
 
 // makeHandler constructs the appropriate Handler for the given dav.
 func makeHandler(dav *dav, authz authzFunc) http.Handler {
-	handler := NewWebDavAug("", dav.Root, dav.Writable, dav.EncryptionPassphrase)
+	handler := NewWebDavAug("", dav)
 	if !dav.Secured {
 		return handler
 	}
@@ -138,15 +141,22 @@ type WebdavAug struct {
 	methodMux   map[string]http.Handler
 	zipHandler  http.Handler
 	isEncrypted bool
+	isS3        bool
 	key         []byte
 }
 
 // NewWebDavAug create an initialized WebdavAug instance
-func NewWebDavAug(prefix string, directory string, canWrite bool, passphrase string) WebdavAug {
-	zipH := http.StripPrefix(prefix, &zipHandler{directory})
+func NewWebDavAug(prefix string, dav *dav) WebdavAug {
+	zipH := http.StripPrefix(prefix, &zipHandler{dav.Root})
+	var fs webdav.FileSystem
+	if dav.IsS3 {
+		fs = s3.NewWdFs(dav.Endpoint, dav.Region, dav.Bucket, dav.AccessKeyID, dav.SecretAccessKey)
+	} else {
+		fs = webdav.Dir(dav.Root)
+	}
 	davH := &webdav.Handler{
 		Prefix:     prefix,
-		FileSystem: webdav.Dir(directory),
+		FileSystem: fs,
 		LockSystem: webdav.NewMemLS(),
 		Logger:     webdavLogger,
 	}
@@ -155,14 +165,14 @@ func NewWebDavAug(prefix string, directory string, canWrite bool, passphrase str
 	var isEncrypted bool
 
 	// Handle encryption
-	if passphrase != "" {
+	if dav.EncryptionPassphrase != "" {
 		h := sha256.New()
-		h.Write([]byte(passphrase))
+		h.Write([]byte(dav.EncryptionPassphrase))
 		key = h.Sum(nil)
 		isEncrypted = true
 	}
 
-	if canWrite {
+	if dav.Writable {
 		mMux = map[string]http.Handler{
 			"GET":       davH,
 			"OPTIONS":   davH,
@@ -186,10 +196,11 @@ func NewWebDavAug(prefix string, directory string, canWrite bool, passphrase str
 
 	return WebdavAug{
 		prefix:      prefix,
-		directory:   directory,
+		directory:   dav.Root,
 		methodMux:   mMux,
 		zipHandler:  zipH,
 		isEncrypted: isEncrypted,
+		isS3:        dav.IsS3,
 		key:         key,
 	}
 
@@ -212,7 +223,7 @@ func (wdaug WebdavAug) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				h = rewritePropfindSizes(h, wdaug.key)
 			}
 		} else {
-			if r.Method == "GET" {
+			if r.Method == "GET" && !wdaug.isS3 { // Disable zip download if backend is s3
 				info, err := os.Stat(fPath)
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusBadRequest)
@@ -220,11 +231,10 @@ func (wdaug WebdavAug) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 				}
 				if info.IsDir() {
 					h = wdaug.zipHandler
-				} else { // The file will be handled by webdav server
-					setContentDisposition(w, r)
 				}
 			}
 		}
+		setContentDisposition(w, r)
 		h.ServeHTTP(w, r)
 	} else {
 		http.Error(w, "method not allowed : dav is read only", http.StatusMethodNotAllowed)

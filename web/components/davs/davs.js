@@ -20,6 +20,14 @@ let secured_field;
 let roles_field;
 let roles_container;
 let passphrase_field;
+let root_container;
+let iss3_field;
+let s3_container;
+let endpoint_field;
+let region_field;
+let bucket_field;
+let accesskeyid_field;
+let secretaccesskey_field;
 
 // local variables
 let davs;
@@ -81,12 +89,57 @@ export async function mount(where) {
               <label class="label"><input id="davs-modal-writable" type="checkbox" />Allow write access</label>
             </div>
           </div>
+
+          <div class="field">
+            <div class="control">
+              <label class="label"><input id="davs-modal-iss3" type="checkbox" />Use S3 compatible backend</label>
+            </div>
+          </div>
+
           <div class="field" id="davs-modal-root-container">
             <label class="label">Root directory to serve</label>
             <div class="control">
               <input class="input" type="text" id="davs-modal-root" />
             </div>
           </div>
+
+          <div class="field" id="davs-modal-s3-container">
+            <div class="field" id="davs-modal-endpoint-container">
+              <label class="label">S3 backend endpoint</label>
+              <div class="control">
+                <input class="input" type="text" id="davs-modal-endpoint" />
+              </div>
+            </div>
+
+            <div class="field" id="davs-modal-region-container">
+              <label class="label">S3 backend region</label>
+              <div class="control">
+                <input class="input" type="text" id="davs-modal-region" />
+              </div>
+            </div>
+
+            <div class="field" id="davs-modal-bucket-container">
+              <label class="label">S3 backend bucket</label>
+              <div class="control">
+                <input class="input" type="text" id="davs-modal-bucket" />
+              </div>
+            </div>
+
+            <div class="field" id="davs-modal-accesskeyid-container">
+              <label class="label">S3 backend access key id</label>
+              <div class="control">
+                <input class="input" type="text" id="davs-modal-accesskeyid" />
+              </div>
+            </div>
+
+            <div class="field" id="davs-modal-secretaccesskey-container">
+              <label class="label">S3 backend secret access key</label>
+              <div class="control">
+                <input class="input" type="text" id="davs-modal-secretaccesskey" />
+              </div>
+            </div>
+          </div>
+
           <div class="field">
             <div class="control">
               <label class="label"><input id="davs-modal-secured" type="checkbox" />Secure access</label>
@@ -179,7 +232,7 @@ function davTemplate(dav) {
                 </p>
                 <hr class="dropdown-divider" />
                 <p><strong>${dav.host}</strong></p>
-                <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
+                <p>serves ${dav.iss3 ? `${dav.bucket} bucket` : `${dav.root} directory`}, with ${dav.writable ? "read/write" : "read only"} access</p>
                 <p>${dav.secured ? "Restricted access to users with roles <strong>" + dav.roles + "</strong>" : "Unrestricted access"}</p>
                 <p class="has-text-centered"><strong>-${dav.id}-</strong></p>
               </div>
@@ -263,10 +316,18 @@ function registerModalFields() {
   host_field = document.getElementById("davs-modal-host");
   writable_field = document.getElementById("davs-modal-writable");
   root_field = document.getElementById("davs-modal-root");
+  root_container = document.getElementById("davs-modal-root-container");
   secured_field = document.getElementById("davs-modal-secured");
   roles_field = document.getElementById("davs-modal-roles");
   roles_container = document.getElementById("davs-modal-roles-container");
   passphrase_field = document.getElementById("davs-modal-passphrase");
+  iss3_field = document.getElementById("davs-modal-iss3");
+  s3_container = document.getElementById("davs-modal-s3-container");
+  endpoint_field = document.getElementById("davs-modal-endpoint");
+  region_field = document.getElementById("davs-modal-region");
+  bucket_field = document.getElementById("davs-modal-bucket");
+  accesskeyid_field = document.getElementById("davs-modal-accesskeyid");
+  secretaccesskey_field = document.getElementById("davs-modal-secretaccesskey");
   document.getElementById(`davs-modal-close`).addEventListener("click", function () {
     toggleModal();
   });
@@ -284,6 +345,9 @@ function registerModalFields() {
   });
   secured_field.addEventListener("click", function () {
     toggleRoles();
+  });
+  iss3_field.addEventListener("click", function () {
+    toggleS3();
   });
   document.getElementById(`davs-modal-passphrase-generate`).addEventListener("click", function () {
     passphrase_field.value = RandomString(48);
@@ -305,11 +369,17 @@ async function editDav(dav) {
   secured_field.checked = dav.secured;
   roles_field.value = dav.roles;
   passphrase_field.value = dav.passphrase;
+  iss3_field.checked = dav.iss3;
+  endpoint_field.value = dav.endpoint;
+  region_field.value = dav.region;
+  bucket_field.value = dav.bucket;
+  accesskeyid_field.value = dav.accesskeyid;
+  secretaccesskey_field.value = dav.secretaccesskey;
   toggleModal();
 }
 
 function cleanDav(dav) {
-  let props = ["writable", "name", "roles", "passphrase"];
+  let props = ["writable", "name", "roles", "passphrase", "endpoint", "region", "bucket", "accesskeyid", "secretaccesskey"];
   for (const prop of props) {
     dav[prop] = dav[prop] === undefined ? "" : dav[prop];
   }
@@ -331,6 +401,12 @@ async function newDav() {
   secured_field.checked = false;
   roles_field.value = "";
   passphrase_field.value = "";
+  iss3_field.checked = false;
+  endpoint_field.value = "";
+  region_field.value = "";
+  bucket_field.value = "";
+  accesskeyid_field.value = "";
+  secretaccesskey_field.value = "";
   toggleModal();
 }
 
@@ -352,6 +428,12 @@ async function postDav() {
         secured: secured_field.checked,
         roles: secured_field.checked ? roles_field.value.split(",") : "",
         passphrase: passphrase_field.value,
+        iss3: iss3_field.checked,
+        endpoint: endpoint_field.value,
+        region: region_field.value,
+        bucket: bucket_field.value,
+        accesskeyid: accesskeyid_field.value,
+        secretaccesskey: secretaccesskey_field.value,
       }),
     });
     if (response.status !== 200) {
@@ -384,6 +466,7 @@ async function reloadDavsOnServer() {
 
 async function toggleModal() {
   toggleRoles();
+  toggleS3();
   updateIcon();
   const modal = document.getElementById("davs-modal");
   const card = document.getElementById("davs-modal-card");
@@ -403,6 +486,16 @@ function toggleRoles() {
     roles_container.style.display = "block";
   } else {
     roles_container.style.display = "none";
+  }
+}
+
+function toggleS3() {
+  if (iss3_field.checked) {
+    s3_container.style.display = "block";
+    root_container.style.display = "none";
+  } else {
+    s3_container.style.display = "none";
+    root_container.style.display = "block";
   }
 }
 

@@ -17,7 +17,6 @@ import (
 type Dav struct {
 	ID                   int      `json:"id"`
 	Host                 string   `json:"host"`                 // to match against request Host header
-	Root                 string   `json:"root"`                 // the file system directory to serve the webdav from
 	Writable             bool     `json:"writable,omitempty"`   // whether if the webdav is writable (default to read only)
 	Name                 string   `json:"name,omitempty"`       // name of the file service
 	Icon                 string   `json:"icon,omitempty"`       // icon to display
@@ -27,6 +26,13 @@ type Dav struct {
 	EncryptionPassphrase string   `json:"passphrase,omitempty"` // passphrase to encrypt data
 	UsedGB               uint64   `json:"usedgb,omitempty"`
 	TotalGB              uint64   `json:"totalgb,omitempty"`
+	IsS3                 bool     `json:"iss3"`           // webdav backend (true if S3)
+	Root                 string   `json:"root,omitempty"` // the file system directory to serve the webdav from (in case of normal backend)
+	Endpoint             string   `json:"endpoint,omitempty"`
+	Region               string   `json:"region,omitempty"`
+	Bucket               string   `json:"bucket,omitempty"`
+	AccessKeyID          string   `json:"accesskeyid,omitempty"`
+	SecretAccessKey      string   `json:"secretaccesskey,omitempty"`
 }
 
 type dav struct {

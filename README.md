@@ -125,6 +125,7 @@ Uses :
 - HTTP Cache by Victor Springer : https://github.com/victorspringer/http-cache (MIT Licence), parts are included in pkg/cache directory (to avoid getting unwanted redis dependencies)
 - Go-Glob by Ryan Uber : https://github.com/ryanuber/go-glob (MIT Licence)
 - go-disk-usage by ricochet2200 : https://github.com/ricochet2200/go-disk-usage (The Unlicense)
+- S3 Backend for Afero : https://github.com/fclairamb/afero-s3 (Unlicensed), parts are included in pkg/s3 directory (with the afero dependencies removed)
 
 ## Licence
 
