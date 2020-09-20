@@ -178,7 +178,7 @@ function appTemplate(app) {
       </div>
       <p class="has-text-centered"><strong>${app.name ? app.name : app.id}</strong></p>
       <div class="card-footer">
-        <div class="dropdown is-hoverable">
+        <div class="dropdown is-hoverable" style="margin-top: 1px;">
           <div class="dropdown-trigger">
             <button class="button is-white">
               <span class="icon is-small">
