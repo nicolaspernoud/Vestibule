@@ -159,7 +159,7 @@ function davTemplate(dav) {
       </div>
       <p class="has-text-centered"><strong>${dav.name ? dav.name : dav.id}</strong></p>
       <div class="card-footer">
-        <div class="dropdown is-hoverable">
+        <div class="dropdown is-hoverable" style="margin-top: 1px;">
           <div class="dropdown-trigger">
             <button class="button is-white">
               <span class="icon is-small">

@@ -25,7 +25,7 @@ export class Explorer {
         <p class="modal-card-title">Explorer</p>
         <button class="delete" aria-label="close" id="explorer-modal-close"></button>
       </header>
-      <section id="explorer-modal-content" class="modal-card-body"></section>
+      <section id="explorer-modal-content" class="modal-card-body pt-0"></section>
       <progress id="explorer-modal-progress" class="progress is-primary is-small" style="margin-bottom:0px;"></progress>
       <footer id="explorer-modal-footer" class="modal-card-foot">
         <div class="buttons" id="explorer-modal-footer-buttons">
@@ -293,10 +293,11 @@ export class Explorer {
     renameOK.addEventListener("click", async () => {
       try {
         toggleButtons();
+        const newName = file.isDir ? renameModal.getElementsByTagName("input")[0].value + "/" : renameModal.getElementsByTagName("input")[0].value;
         const response = await fetch(this.fullHostname + file.path, {
           method: "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + path(this.path, renameModal.getElementsByTagName("input")[0].value),
+            Destination: this.fullHostname + path(this.path, newName),
             "XSRF-Token": this.user.xsrftoken,
           }),
           credentials: "include",
@@ -340,10 +341,11 @@ export class Explorer {
     `;
     pasteControl.getElementsByTagName("a")[0].addEventListener("click", async () => {
       try {
+        const dest = file.isDir ? path(this.path, file.name) + "/" : path(this.path, file.name);
         const response = await fetch(this.fullHostname + file.path, {
           method: isCopy ? "COPY" : "MOVE",
           headers: new Headers({
-            Destination: this.fullHostname + path(this.path, file.name),
+            Destination: this.fullHostname + dest,
             "XSRF-Token": this.user.xsrftoken,
           }),
           credentials: "include",
@@ -367,7 +369,7 @@ export class Explorer {
 
   async newFolder() {
     const newFolderName = "New Folder";
-    const folder = { name: newFolderName, isDir: true, type: "dir", size: 0, lastModified: new Date(), path: path(this.path, newFolderName), id: this.files.length + 1 };
+    const folder = { name: newFolderName, isDir: true, type: "dir", size: 0, lastModified: new Date(), path: path(this.path, newFolderName) + "/", id: this.files.length + 1 };
     try {
       const response = await fetch(this.fullHostname + folder.path, {
         method: "MKCOL",
