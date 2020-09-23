@@ -17,7 +17,7 @@ $very-light-grey: #eceff1;
 $primary: $deep-blue;
 $dark: $grey;
 $light: $light-grey;
-$radius-small: 2px;
+$radius-small: 4px;
 
 // Bulma's component variables
 $body-background-color: $very-light-grey;
@@ -167,6 +167,10 @@ a.navbar-item.is-active {
   margin: 1rem;
   width: 12rem;
   transition: 0.3s;
+}
+
+.card {
+  border-radius: $radius-small;
 }
 
 .icon-card:hover {
