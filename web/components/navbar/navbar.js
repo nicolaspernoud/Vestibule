@@ -44,31 +44,27 @@ export function mount(mountpoint) {
 
 export async function CreateMenu() {
   user = await Auth.GetUser();
-  menu.innerHTML = `
-        <div class="navbar-start">
-          ${
-            user === undefined
-              ? ``
-              : /* HTML */ `
-                  <a id="navbar-apps" class="navbar-item" href="#apps"><i class="navbar-menu-icon fas fa-home"></i>Apps</a>
-                  <a id="navbar-davs" class="navbar-item" href="#davs"><i class="navbar-menu-icon fas fa-folder-open"></i>Files</a>
-                  ${user.isAdmin
-                    ? /* HTML */ `
-                        <a id="navbar-users" class="navbar-item" href="#users"><i class="navbar-menu-icon fas fa-users"></i>Users</a>
-                        <a id="navbar-sysinfo" class="navbar-item" href="#sysinfo"><i class="navbar-menu-icon fas fa-stethoscope"></i>System information</a>
-                      `
-                    : ""}
+  menu.innerHTML = /* HTML */ `
+    <div class="navbar-start">
+      ${user === undefined
+        ? ``
+        : /* HTML */ `
+            <a id="navbar-apps" class="navbar-item" href="#apps"><i class="navbar-menu-icon fas fa-home"></i>Apps</a>
+            <a id="navbar-davs" class="navbar-item" href="#davs"><i class="navbar-menu-icon fas fa-folder-open"></i>Files</a>
+            ${user.isAdmin
+              ? /* HTML */ `
+                  <a id="navbar-users" class="navbar-item" href="#users"><i class="navbar-menu-icon fas fa-users"></i>Users</a>
+                  <a id="navbar-sysinfo" class="navbar-item" href="#sysinfo"><i class="navbar-menu-icon fas fa-stethoscope"></i>System information</a>
                 `
-          }
-        </div>
-        <div class="navbar-end">
-          ${
-            user === undefined
-              ? /* HTML */ ` <a class="navbar-item" href="#login"><i class="navbar-menu-icon fas fa-sign-in-alt"></i>Log in</a> `
-              : /* HTML */ ` <a class="navbar-item" href="/Logout"><i class="navbar-menu-icon fas fa-sign-out-alt"></i>Log out</a> `
-          }
-        </div>
-     `;
+              : ""}
+          `}
+    </div>
+    <div class="navbar-end">
+      ${user === undefined
+        ? /* HTML */ ` <a class="navbar-item" href="#login"><i class="navbar-menu-icon fas fa-sign-in-alt"></i>Log in</a> `
+        : /* HTML */ ` <a class="navbar-item" href="/Logout"><i class="navbar-menu-icon fas fa-sign-out-alt"></i>Log out</a> `}
+    </div>
+  `;
   SetActiveItem();
 }
 

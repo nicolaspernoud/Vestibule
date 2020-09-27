@@ -7,8 +7,7 @@
 @charset "utf-8";
 
 // Brand colors
-$deep-blue: #304ffe;
-$nice-red: #c2185b;
+$deep-blue: #3f51b5;
 $grey: #78909c;
 $light-grey: #b0bec5;
 $very-light-grey: #eceff1;
@@ -24,9 +23,9 @@ $body-background-color: $very-light-grey;
 $card-content-padding: 2rem;
 $navbar-item-img-max-height: 2.5rem;
 $navbar-background-color: $light-grey;
-$navbar-item-hover-color: $nice-red;
+$navbar-item-hover-color: $deep-blue;
 $navbar-item-hover-background-color: $dark;
-$navbar-item-active-color: $nice-red;
+$navbar-item-active-color: $deep-blue;
 $navbar-item-active-background-color: $very-light-grey;
 $progress-border-radius: 0px;
 $progress-indeterminate-duration: 1s;
@@ -113,20 +112,18 @@ img {
   height: 3.5rem;
 }
 
+@media screen and (min-width: 1024px) {
+  .navbar-item {
+    border-radius: $radius-small $radius-small 0 0;
+  }
+}
+
 .navbar-item img {
   margin-right: 10px;
 }
 
 .navbar-menu-icon {
   margin-right: 5px;
-}
-
-.navbar-item.is-active {
-  border-style: none solid none solid;
-  border-width: 1px;
-  @media screen and (min-width: 1024px) {
-    border-radius: $radius-small $radius-small 0 0;
-  }
 }
 
 // To ensure color event if element is focused
@@ -195,7 +192,7 @@ a.navbar-item.is-active {
 }
 
 .modal-card-head .delete:hover {
-  background-color: $nice-red;
+  background-color: $deep-blue;
   transform: scale(1.1);
 }
 
