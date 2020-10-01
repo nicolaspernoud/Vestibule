@@ -208,7 +208,7 @@ function displayDavs(inDavs) {
       document.getElementById(`davs-dav-delete-${dav.id}`).addEventListener("click", function () {
         new Delete(() => {
           deleteDav(dav);
-        });
+        }, dav.name);
       });
     }
     if (user.isAdmin || !dav.secured || dav.roles.some((r) => user.memberOf.includes(r))) {

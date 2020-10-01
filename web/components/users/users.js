@@ -170,7 +170,7 @@ function displayUsers() {
     document.getElementById(`users-user-delete-${user.id}`).addEventListener("click", function () {
       new Delete(() => {
         deleteUser(user);
-      });
+      }, user.login);
     });
   });
 }

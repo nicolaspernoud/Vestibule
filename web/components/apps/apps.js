@@ -225,7 +225,7 @@ function displayApps(inApps) {
       document.getElementById(`apps-app-delete-${app.id}`).addEventListener("click", function () {
         new Delete(() => {
           deleteApp(app);
-        });
+        }, app.name);
       });
     }
     if (user.isAdmin || !app.secured || app.roles.some((r) => user.memberOf.includes(r))) {

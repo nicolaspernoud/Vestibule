@@ -2,7 +2,7 @@
 import { AnimateCSS } from "/services/common/common.js";
 
 export class Delete {
-  constructor(okFunction) {
+  constructor(okFunction, what) {
     let deleteModal = document.createElement("div");
     deleteModal.classList.add("modal", "animate__animated", "animate__fadeIn", "is-active");
     deleteModal.innerHTML = /* HTML */ `
@@ -10,7 +10,7 @@ export class Delete {
       <div class="modal-content">
         <div class="box">
           <div class="field">
-            <label class="label">Confirm</label>
+            <label class="label">Confirm deletion of <i>${what}</i> ?</label>
           </div>
           <div class="field is-grouped">
             <div class="control">

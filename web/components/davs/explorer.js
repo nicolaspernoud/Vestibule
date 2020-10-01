@@ -430,7 +430,7 @@ export class Explorer {
       } catch (e) {
         HandleError(e);
       }
-    });
+    }, file.name);
   }
 
   async upload(files) {
