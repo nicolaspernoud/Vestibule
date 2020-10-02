@@ -497,6 +497,7 @@ function openWebview(app) {
     <div class="modal-background animate__animated animate__fadeIn"></div>
     <div class="modal-card animate__animated animate__zoomIn">
       <header class="modal-card-head">
+        <span class="icon mr-2"> <i class="fas fa-lg fa-${app.icon}" style="color: ${app.color};"></i> </span>
         <p class="modal-card-title">${app.name}</p>
         <button class="delete" aria-label="close" id="apps-webview-close"></button>
       </header>

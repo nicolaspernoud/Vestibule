@@ -22,17 +22,16 @@ $radius-small: 4px;
 $body-background-color: $very-light-grey;
 $card-content-padding: 2rem;
 $navbar-item-img-max-height: 2.5rem;
-$navbar-background-color: $light-grey;
-$navbar-item-hover-color: $deep-blue;
+$navbar-background-color: $light;
+$navbar-item-hover-color: $primary;
 $navbar-item-hover-background-color: $dark;
-$navbar-item-active-color: $deep-blue;
+$navbar-item-active-color: $primary;
 $navbar-item-active-background-color: $very-light-grey;
 $progress-border-radius: 0px;
 $progress-indeterminate-duration: 1s;
 $modal-card-head-padding: 15px;
-$modal-card-head-background-color: $light;
+$modal-card-head-background-color: $very-light-grey;
 $modal-card-head-radius: $radius-small;
-$modal-card-title-color: $very-light-grey;
 
 // Bulma imports
 @import "node_modules/bulma/sass/utilities/_all";
@@ -193,7 +192,6 @@ a.navbar-item.is-active {
 
 .modal-card-head .delete:hover {
   background-color: $deep-blue;
-  transform: scale(1.1);
 }
 
 .modal-card-title {

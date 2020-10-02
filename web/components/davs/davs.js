@@ -213,7 +213,7 @@ function displayDavs(inDavs) {
     }
     if (user.isAdmin || !dav.secured || dav.roles.some((r) => user.memberOf.includes(r))) {
       document.getElementById(`davs-dav-open-${dav.id}`).addEventListener("click", function () {
-        openExplorerModal(dav.host, dav.writable, dav.passphrase != null && dav.passphrase !== "");
+        openExplorerModal(dav);
       });
     }
   });
@@ -434,11 +434,11 @@ async function pickIcon() {
   document.getElementById("davs-icons-modal").classList.toggle("is-active");
 }
 
-function openExplorerModal(hostname, readwrite, encrypted) {
+function openExplorerModal(dav) {
   const modal = document.getElementById("davs-explorer-modal");
   const card = document.getElementById("davs-explorer-modal-card");
-  const explorer = new Explorer(hostname);
-  explorer.mount("davs-explorer-modal-card", readwrite, encrypted);
+  const explorer = new Explorer(dav);
+  explorer.mount("davs-explorer-modal-card");
   modal.classList.add("is-active");
   AnimateCSS(modal, "fadeIn");
   AnimateCSS(card, "zoomIn");

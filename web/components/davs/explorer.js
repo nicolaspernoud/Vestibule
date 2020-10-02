@@ -9,20 +9,21 @@ import { Delete } from "/services/common/delete.js";
 import { HandleError } from "/services/common/errors.js";
 
 export class Explorer {
-  constructor(hostname) {
-    this.hostname = hostname;
-    this.fullHostname = `${location.protocol}//${hostname}${location.port !== "" ? ":" + location.port : ""}`;
+  constructor(dav) {
+    this.dav = dav;
+    this.hostname = dav.host;
+    this.fullHostname = `${location.protocol}//${this.hostname}${location.port !== "" ? ":" + location.port : ""}`;
     this.files = [];
     this.path = "/";
+    this.encrypted = this.dav.passphrase != null && this.dav.passphrase !== "";
   }
 
-  async mount(mountpoint, readwrite, encrypted) {
-    this.readwrite = readwrite;
-    this.encrypted = encrypted;
+  async mount(mountpoint) {
     const card = document.getElementById(mountpoint);
     card.innerHTML = /* HTML */ `
       <header class="modal-card-head">
-        <p class="modal-card-title">Explorer</p>
+        <span class="icon mr-2"> <i class="fas fa-lg fa-${this.dav.icon}" style="color: ${this.dav.color};"></i> </span>
+        <p class="modal-card-title">${this.dav.name}</p>
         <button class="delete" aria-label="close" id="explorer-modal-close"></button>
       </header>
       <section id="explorer-modal-content" class="modal-card-body pt-0"></section>
@@ -34,7 +35,7 @@ export class Explorer {
               <i class="fas fa-arrow-circle-left"></i>
             </span>
           </button>
-          ${this.readwrite
+          ${this.dav.writable
             ? /* HTML */ `
                 <button id="explorer-modal-newfolder" class="button">
                   <span class="icon is-small">
@@ -67,7 +68,7 @@ export class Explorer {
     document.getElementById(`explorer-modal-back`).addEventListener("click", () => {
       this.navigate(goUp(this.path));
     });
-    if (this.readwrite) {
+    if (this.dav.writable) {
       document.getElementById(`explorer-modal-newfolder`).addEventListener("click", () => {
         this.newFolder();
       });
@@ -75,7 +76,7 @@ export class Explorer {
         this.newTxt();
       });
       document.getElementById(`explorer-modal-upload`).addEventListener("change", (e) => {
-        this.upload(e.srcElement.files);
+        this.upload(e.target.files);
       });
     }
     this.progress = document.getElementById(`explorer-modal-progress`);
@@ -138,7 +139,7 @@ export class Explorer {
                       <span class="icon is-small"><i class="fas fa-download"></i></span>
                     </a>
                   `}
-              ${this.readwrite
+              ${this.dav.writable
                 ? /* HTML */ `
                     <a id="file-${file.id}-rename" class="level-item">
                       <span class="icon is-small"><i class="fas fa-pen"></i></span>
@@ -164,7 +165,7 @@ export class Explorer {
             </div>
           </nav>
         </div>
-        ${this.readwrite
+        ${this.dav.writable
           ? /* HTML */ `
               <div class="media-right">
                 <a id="file-${file.id}-delete">
@@ -215,7 +216,7 @@ export class Explorer {
       }
     });
 
-    if (this.readwrite) {
+    if (this.dav.writable) {
       document.getElementById(`file-${file.id}-rename`).addEventListener("click", (event) => {
         event.stopPropagation();
         this.rename(file);
@@ -438,6 +439,11 @@ export class Explorer {
     let id = this.files.length;
     let fileIdx = 0;
     for (const file of files) {
+      // Check for overwrite
+      if (this.files.some((e) => e.name === file.name)) {
+        Messages.Show("is-warning", `A file with the name "${file.name}" already exists, please remove the old file before upload.`);
+        continue;
+      }
       id++;
       fileIdx++;
       file.path = path(onStartPath, file.name);
