@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -18,8 +19,22 @@ import (
 
 var (
 	//UsersFile is the file containing the users
-	UsersFile = "./configs/users.json"
+	UsersFile     = "./configs/users.json"
+	tokenLifetime time.Duration
 )
+
+func setTokenLifetime() time.Duration {
+	days := 1
+	i, err := strconv.Atoi(os.Getenv("INMEMORY_TOKEN_LIFE_DAYS"))
+	if err == nil && i >= 1 && i <= 10000 {
+		days = i
+	}
+	return time.Duration(days*24) * time.Hour
+}
+
+func init() {
+	tokenLifetime = setTokenLifetime()
+}
 
 // HandleInMemoryLogin validate the username and password provided in the function body against a local file and return a token if the user is found
 func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +64,7 @@ func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tokenData := TokenData{User: User{ID: user.ID, Login: user.Login, Email: user.Email, Roles: user.Roles}, XSRFToken: xsrfToken}
-	tokens.Manager.StoreData(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
+	tokens.Manager.StoreData(tokenData, m.Hostname, authTokenKey, tokenLifetime, w)
 	// Log the connexion
 	log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 }

@@ -24,7 +24,8 @@
         "ADMIN_ROLE": "ADMINS",
         "HOSTNAME": "vestibule.127.0.0.1.nip.io",
         "ONLYOFFICE_TITLE": "VestibuleOffice",
-        "ONLYOFFICE_SERVER": "https://localhost:2443"
+        "ONLYOFFICE_SERVER": "https://localhost:2443",
+        "INMEMORY_TOKEN_LIFE_DAYS": "2"
       },
       "args": ["-debug", "-https_port=1443"],
       "showLog": true
