@@ -49,3 +49,7 @@ export function GetType(file) {
 }
 
 export const Truncate = (input) => (input.length > 12 ? `${input.substring(0, 12)}...` : input);
+
+export function EncodeURIWithSpecialsCharacters(str) {
+  return encodeURI(str).replace(/[!'()*]/g, escape);
+}

@@ -1,12 +1,14 @@
+import { EncodeURIWithSpecialsCharacters } from "/services/common/common.js";
+
 openDocument();
 
 async function openDocument() {
   const urlParams = new URLSearchParams(window.location.search);
-  const file = urlParams.get("file");
+  const file = EncodeURIWithSpecialsCharacters(urlParams.get("file"));
   const token = encodeURIComponent(urlParams.get("token"));
   const user = urlParams.get("user");
   const mtime = urlParams.get("mtime");
-  const fileName = file.split("/").pop();
+  const fileName = urlParams.get("file").split("/").pop();
   const fileExtension = file.split(".").pop();
   const key = (await digestMessage(fileName + mtime)).substring(0, 20);
   const config = {

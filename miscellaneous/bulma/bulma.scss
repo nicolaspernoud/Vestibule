@@ -164,6 +164,7 @@ a.navbar-item.is-active {
   margin: 1rem;
   width: 12rem;
   transition: 0.3s;
+  overflow: visible; /* Necessary for bulma 0.9.1 to allow menus appearance. Try to remove with coming bulma releases. */
 }
 
 .card {
