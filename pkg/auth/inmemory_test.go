@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func Test_setTokenLifetime(t *testing.T) {
+func TestSetTokenLifetime(t *testing.T) {
 	type args struct {
 		key   string
 		value string

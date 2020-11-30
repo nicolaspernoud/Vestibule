@@ -358,7 +358,7 @@ async function postDav() {
       throw new Error(`Davs could not be updated (status ${response.status})`);
     }
     davs = await response.json();
-    await displayDavs(davs);
+    displayDavs(davs);
     await reloadDavsOnServer();
   } catch (e) {
     HandleError(e);

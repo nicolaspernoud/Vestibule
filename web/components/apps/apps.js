@@ -402,7 +402,7 @@ async function postApp() {
       throw new Error(`Apps could not be updated (status ${response.status})`);
     }
     apps = await response.json();
-    await displayApps(apps);
+    displayApps(apps);
     await reloadAppsOnServer();
   } catch (e) {
     HandleError(e);
