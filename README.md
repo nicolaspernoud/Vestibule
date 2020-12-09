@@ -57,6 +57,8 @@ Launch `start.sh`.
 
 Alter `.env` and `docker-compose.yml` according to your needs.
 Launch with `COMPOSE_DOCKER_CLI_BUILD=1 DOCKER_BUILDKIT=1 docker-compose up`.
+A production deployment example is also provided in the production-deployment-example.sh file.
+The mock ip geodatabase should be replaced with a real one from maxmind for real usefullness.
 
 ## Usage
 
