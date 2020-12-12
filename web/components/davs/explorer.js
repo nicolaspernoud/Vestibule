@@ -325,7 +325,12 @@ export class Explorer {
   }
 
   moveOrCopy(file, isCopy) {
+    // If there is already a move or copy going, cancel
+    if (document.getElementById("explorer-modal-pastecontrol")) {
+      return;
+    }
     let pasteControl = document.createElement("div");
+    pasteControl.id = "explorer-modal-pastecontrol";
     pasteControl.classList.add("field", "has-addons", "animate__animated", "animate__zoomIn", "is-active");
     pasteControl.innerHTML = /* HTML */ `
       <a class="button is-link">
