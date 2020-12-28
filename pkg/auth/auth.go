@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 )
 
@@ -21,6 +22,17 @@ const (
 	// ContextData is the user
 	ContextData key = 0
 )
+
+var (
+	// AdminRole represents the role reserved for admins
+	AdminRole string
+)
+
+func init() {
+	var err error
+	AdminRole, err = common.StringValueFromEnv("ADMIN_ROLE", "ADMINS")
+	common.CheckErrorFatal(err)
+}
 
 // User represents a logged in user
 type User struct {
@@ -84,7 +96,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			http.Error(w, err.Error(), 403)
 			return
 		}
-		err = checkUserHasRole(user, []string{os.Getenv("ADMIN_ROLE")})
+		err = checkUserHasRole(user, []string{AdminRole})
 		if err == nil {
 			user.IsAdmin = true
 		}

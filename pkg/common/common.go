@@ -9,7 +9,10 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"sync"
+
+	"github.com/nicolaspernoud/vestibule/pkg/log"
 )
 
 // Mutex used to lock file writing
@@ -106,4 +109,38 @@ func Contains(a []string, x string) bool {
 		}
 	}
 	return false
+}
+
+// StringValueFromEnv set a value into an *interface from an environment variable or default
+func StringValueFromEnv(ev string, def string) (string, error) {
+	val := os.Getenv(ev)
+	if val == "" {
+		return def, nil
+	}
+	return val, nil
+}
+
+// IntValueFromEnv set a value into an *interface from an environment variable or default
+func IntValueFromEnv(ev string, def int) (int, error) {
+	val := os.Getenv(ev)
+	if val == "" {
+		return def, nil
+	}
+	return strconv.Atoi(val)
+}
+
+// BoolValueFromEnv set a value into an *interface from an environment variable or default
+func BoolValueFromEnv(ev string, def bool) (bool, error) {
+	val := os.Getenv(ev)
+	if val == "" {
+		return def, nil
+	}
+	return strconv.ParseBool(val)
+}
+
+// CheckErrorFatal logs a fatal error
+func CheckErrorFatal(err error) {
+	if err != nil {
+		log.Logger.Fatalf("Error : %v\n", err)
+	}
 }
