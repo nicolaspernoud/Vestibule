@@ -64,7 +64,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 		checkXSRF, err := tokens.Manager.ExtractAndValidateToken(r, authTokenKey, &user, checkXSRF)
 		if err != nil {
 			// Handle WebDav authentication
-			if strings.Contains(r.UserAgent(), "vfs") || strings.Contains(r.UserAgent(), "Microsoft-WebDAV") || strings.Contains(r.UserAgent(), "Konqueror") {
+			if isWebdav(r.UserAgent()) {
 				w.Header().Set("WWW-Authenticate", `Basic realm="server"`)
 				http.Error(w, "webdav client authentication", 401)
 				return
@@ -205,4 +205,14 @@ func GetTokenData(r *http.Request) (TokenData, error) {
 		return user, errors.New("user could not be got from context")
 	}
 	return user, nil
+}
+
+// isWebdav works out if an user agent is a webdav user agent
+func isWebdav(ua string) bool {
+	for _, a := range []string{"vfs", "Microsoft-WebDAV", "Konqueror", "LibreOffice"} {
+		if strings.Contains(ua, a) {
+			return true
+		}
+	}
+	return false
 }

@@ -108,3 +108,25 @@ func writeUsers() (name string) {
 	}
 	return f.Name()
 }
+
+func Test_isWebdav(t *testing.T) {
+	type args struct {
+		ua string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{"is_exact", args{ua: "Microsoft-WebDAV"}, true},
+		{"contains", args{ua: "Contains-Microsoft-WebDAV-"}, true},
+		{"is_not", args{ua: "Microsoft-Other"}, false},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isWebdav(tt.args.ua); got != tt.want {
+				t.Errorf("isWebdav() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
