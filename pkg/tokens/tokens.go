@@ -134,8 +134,8 @@ func (m manager) ExtractAndValidateToken(r *http.Request, cookieName string, v i
 		if authHeader[0] == "Basic" && len(authHeader) == 2 {
 			decoded, err := base64.StdEncoding.DecodeString(authHeader[1])
 			if err == nil {
-				authHeader = strings.Split(string(decoded), ":")
-				return authHeader[1], false, nil
+				auth := strings.Split(string(decoded), ":")
+				return auth[1], false, nil
 			}
 		}
 		return "", false, errors.New("could not extract token")
@@ -214,6 +214,9 @@ func Decrypt(data []byte, key []byte) ([]byte, error) {
 		return []byte{}, err
 	}
 	nonceSize := gcm.NonceSize()
+	if len(data) <= nonceSize {
+		return []byte{}, err
+	}
 	nonce, cipherData := data[:nonceSize], data[nonceSize:]
 	plainData, err := gcm.Open(nil, nonce, cipherData, nil)
 	if err != nil {

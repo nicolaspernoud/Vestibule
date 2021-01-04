@@ -97,20 +97,7 @@ The users roles **must** be recovered in an "memberOf" claim array obtained when
 
 ### Mounting webdav share on your OS
 
-Vestibule allow using the authentication token in an basic auth header to allow mounting webdavs.
-Here is an example of a script login in the user and using the token from the cookie to mount webdav on Ubuntu Linux :
-
-```bash
-#/bin/bash
-LOGIN_URL=https://vestibule.127.0.0.1.nip.io:1443/Login
-DAV_URL=davs://userdav.vestibule.127.0.0.1.nip.io:1443
-LOGIN=admin
-PASSWORD=password
-SENT_BODY="{\"login\":\"${LOGIN}\",\"password\":\"${PASSWORD}\"}"
-HTTP_RESPONSE=$(curl -k --header "Content-Type: application/json" --request POST --data ${SENT_BODY} --silent --output /dev/null --cookie-jar - $LOGIN_URL)
-TOKEN=$(echo $HTTP_RESPONSE | awk '{ print $NF }')
-printf "1\n${LOGIN}\n${TOKEN}\n" | gio mount $DAV_URL
-```
+Vestibule allow using the login with the password **OR** the authentication token in an basic auth header to allow mounting webdavs.
 
 ### Override branding
 

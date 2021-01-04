@@ -3,7 +3,6 @@ package auth
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"os"
 	"sort"
@@ -21,6 +20,7 @@ var (
 	//UsersFile is the file containing the users
 	UsersFile     = "./configs/users.json"
 	tokenLifetime time.Duration
+	cachedUsers   []User
 )
 
 func setTokenLifetime() time.Duration {
@@ -30,6 +30,13 @@ func setTokenLifetime() time.Duration {
 		days = i
 	}
 	return time.Duration(days*24) * time.Hour
+}
+
+func refreshCache() {
+	err := common.Load(UsersFile, &cachedUsers)
+	if err != nil {
+		log.Logger.Fatalln("could not load users")
+	}
 }
 
 func init() {
@@ -83,8 +90,10 @@ func ProcessUsers(w http.ResponseWriter, req *http.Request) {
 		SendUsers(w, req)
 	case "POST":
 		AddUser(w, req)
+		refreshCache()
 	case "DELETE":
 		DeleteUser(w, req)
+		refreshCache()
 	default:
 		http.Error(w, "method not allowed", 400)
 	}
@@ -188,14 +197,11 @@ func DeleteUser(w http.ResponseWriter, req *http.Request) {
 
 // MatchUser attempt to find the given user against users in configuration file
 func MatchUser(sentUser User) (User, error) {
-	var emptyUser User
-	var users []User
-	err := common.Load(UsersFile, &users)
-	if err != nil {
-		fmt.Println(err.Error())
-		return emptyUser, err
+	if len(cachedUsers) == 0 {
+		refreshCache()
 	}
-	for _, user := range users {
+	var emptyUser User
+	for _, user := range cachedUsers {
 		if user.Login == sentUser.Login {
 			notFound := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(sentUser.Password))
 			if notFound == nil {

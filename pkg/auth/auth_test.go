@@ -8,11 +8,13 @@ import (
 	"reflect"
 	"testing"
 
+	b64 "encoding/base64"
+
 	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/tester"
 )
 
-var noH = tester.Header{Key: "", Value: ""}
+var noH map[string]string
 
 func TestCheckUserHasRole(t *testing.T) {
 	type args struct {
@@ -126,6 +128,42 @@ func Test_isWebdav(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := isWebdav(tt.args.ua); got != tt.want {
 				t.Errorf("isWebdav() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_getUserDirectly(t *testing.T) {
+	UsersFile = `../../configs/users.json`
+	sentUser := User{Login: "user", Password: "password", Roles: []string{"USERS"}}
+	sentAdmin := User{Login: "admin", Password: "password", Roles: []string{"ADMINS"}}
+	wrongUser := User{Login: "user", Password: "wrong_password"}
+	authFromUser := func(user User) string {
+		data := user.Login + ":" + user.Password
+		return "Basic " + b64.StdEncoding.EncodeToString([]byte(data))
+	}
+	type args struct {
+		authorizationHeader string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    TokenData
+		wantErr bool
+	}{
+		{"user", args{authorizationHeader: authFromUser(sentUser)}, TokenData{User: sentUser}, false},
+		{"admin", args{authorizationHeader: authFromUser(sentAdmin)}, TokenData{User: sentAdmin}, false},
+		{"wrong_user", args{authorizationHeader: authFromUser(wrongUser)}, TokenData{User: wrongUser}, true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := getUserDirectly(tt.args.authorizationHeader)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("getUserDirectly() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !tt.wantErr && !(got.Login == tt.want.Login && got.Roles[0] == tt.want.Roles[0]) {
+				t.Errorf("getUserDirectly() = %v, want %v", got, tt.want)
 			}
 		})
 	}
