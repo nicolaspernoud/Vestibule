@@ -13,20 +13,14 @@ import (
 	"time"
 )
 
-//Header is a http header
-type Header struct {
-	Key   string
-	Value string
-}
-
 // DoRequestOnHandler does a request on a router (or handler) and check the response
-func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route string, header Header, payload string, expectedStatus int, expectedBody string) string {
+func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
 	req, err := http.NewRequest(method, route, strings.NewReader(payload))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if header.Key != "" {
-		req.Header.Set(header.Key, header.Value)
+	for i, v := range headers {
+		req.Header.Set(i, v)
 	}
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
@@ -40,7 +34,7 @@ func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route 
 }
 
 // DoRequestOnServer does a request on listening server
-func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookiejar.Jar, method string, testURL string, header Header, payload string, expectedStatus int, expectedBody string) string {
+func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookiejar.Jar, method string, testURL string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
@@ -64,8 +58,8 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 	if err != nil {
 		t.Fatal(err)
 	}
-	if header.Key != "" {
-		req.Header.Set(header.Key, header.Value)
+	for i, v := range headers {
+		req.Header.Set(i, v)
 	}
 	var client *http.Client
 	if jar != nil {
@@ -89,8 +83,8 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 }
 
 // CreateServerTester wraps DoRequestOnServer to factorize t, port and jar
-func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar) func(method string, url string, header Header, payload string, expectedStatus int, expectedBody string) string {
-	return func(method string, url string, header Header, payload string, expectedStatus int, expectedBody string) string {
-		return DoRequestOnServer(t, port, hostname, jar, method, url, header, payload, expectedStatus, expectedBody)
+func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar) func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
+	return func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
+		return DoRequestOnServer(t, port, hostname, jar, method, url, headers, payload, expectedStatus, expectedBody)
 	}
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"crypto/tls"
-	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -11,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 
@@ -22,23 +22,33 @@ import (
 )
 
 var (
-	appsFile     = flag.String("apps", "./configs/apps.json", "apps definition `file`")
-	davsFile     = flag.String("davs", "./configs/davs.json", "davs definition `file`")
-	letsCacheDir = flag.String("letsencrypt_cache", "./letsencrypt_cache", "let's encrypt cache `directory`")
-	logFile      = flag.String("log_file", "", "Optional file to log to, defaults to no file logging")
-	httpsPort    = flag.Int("https_port", 443, "HTTPS port to serve on (defaults to 443)")
-	httpPort     = flag.Int("http_port", 80, "HTTP port to serve on (defaults to 80), only used to get let's encrypt certificates")
-	debugMode    = flag.Bool("debug", false, "Debug mode, disable let's encrypt, enable CORS and more logging")
+	appsFile, davsFile, letsCacheDir, logFile string
+	httpsPort, httpPort                       int
+	debugMode                                 bool
 )
 
+func init() {
+	var err error
+	appsFile, err = common.StringValueFromEnv("APPS_FILE", "./configs/apps.json") // Apps configuration file path
+	common.CheckErrorFatal(err)
+	davsFile, err = common.StringValueFromEnv("DAVS_FILE", "./configs/davs.json") // Davs configuration file path
+	common.CheckErrorFatal(err)
+	letsCacheDir, err = common.StringValueFromEnv("LETS_CACHE_DIR", "./letsencrypt_cache") // Let's Encrypt cache directory
+	common.CheckErrorFatal(err)
+	logFile, err = common.StringValueFromEnv("LOG_FILE", "") // Optional file to log to
+	common.CheckErrorFatal(err)
+	httpsPort, err = common.IntValueFromEnv("HTTPS_PORT", 443) // HTTPS port to serve on
+	common.CheckErrorFatal(err)
+	httpPort, err = common.IntValueFromEnv("HTTP_PORT", 80) // HTTP port to serve on, only used for Let's Encrypt HTTP Challenge
+	common.CheckErrorFatal(err)
+	debugMode, err = common.BoolValueFromEnv("DEBUG_MODE", false) // Debug mode, disable Let's Encrypt, enable CORS and more logging
+	common.CheckErrorFatal(err)
+}
+
 func main() {
-
-	// Parse the flags
-	flag.Parse()
-
 	// Initialize logger
-	if *logFile != "" {
-		log.SetFile(*logFile)
+	if logFile != "" {
+		log.SetFile(logFile)
 		// Properly close the log on exit
 		sigs := make(chan os.Signal, 1)
 		signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -50,19 +60,19 @@ func main() {
 		}()
 	}
 	log.Logger.Println("--- Server is starting ---")
-	fullHostname := middlewares.GetFullHostname(os.Getenv("HOSTNAME"), *httpsPort)
+	fullHostname := middlewares.GetFullHostname(os.Getenv("HOSTNAME"), httpsPort)
 	log.Logger.Println("Main hostname is ", fullHostname)
 
 	// Initializations
-	tokens.Init("./configs/tokenskey.json", *debugMode)
+	tokens.Init("./configs/tokenskey.json", debugMode)
 
 	// Create the server
-	rootMux := rootmux.CreateRootMux(*httpsPort, *appsFile, *davsFile, "web")
+	rootMux := rootmux.CreateRootMux(httpsPort, appsFile, davsFile, "web")
 
 	// Serve locally with https on debug mode or with let's encrypt on production mode
-	if *debugMode {
+	if debugMode {
 		// Init the hostname
-		mocks.Init(*httpsPort)
+		mocks.Init(httpsPort)
 		// Start a mock oauth2 server if debug mode is on
 		mockOAuth2Port := ":8090"
 		go http.ListenAndServe(mockOAuth2Port, mocks.CreateMockOAuth2())
@@ -71,17 +81,17 @@ func main() {
 		mockAPIPort := ":8091"
 		go http.ListenAndServe(mockAPIPort, mocks.CreateMockAPI())
 		fmt.Println("Mock API server Listening on: http://localhost" + mockAPIPort)
-		log.Logger.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(*httpsPort), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", log.Middleware(rootMux.Mux)))
+		log.Logger.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(httpsPort), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", log.Middleware(rootMux.Mux)))
 
 	} else {
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,
-			Cache:      autocert.DirCache(*letsCacheDir),
+			Cache:      autocert.DirCache(letsCacheDir),
 			HostPolicy: rootMux.Policy,
 		}
 
 		server := &http.Server{
-			Addr:    ":" + strconv.Itoa(*httpsPort),
+			Addr:    ":" + strconv.Itoa(httpsPort),
 			Handler: rootMux.Mux,
 			TLSConfig: &tls.Config{
 				GetCertificate: certManager.GetCertificate,
@@ -92,7 +102,7 @@ func main() {
 			IdleTimeout:  120 * time.Second,
 		}
 
-		go http.ListenAndServe(":"+strconv.Itoa(*httpPort), certManager.HTTPHandler(nil))
+		go http.ListenAndServe(":"+strconv.Itoa(httpPort), certManager.HTTPHandler(nil))
 		log.Logger.Fatal(server.ListenAndServeTLS("", ""))
 	}
 }

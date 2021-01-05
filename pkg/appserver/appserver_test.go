@@ -14,8 +14,6 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/tester"
 )
 
-var noH = tester.Header{Key: "", Value: ""}
-
 func TestServer(t *testing.T) {
 	// Create the proxy target servers
 	target := httptest.NewServer(http.HandlerFunc(testHandler))
@@ -62,22 +60,22 @@ func TestServer(t *testing.T) {
 	// Create tests
 	var tests = []struct {
 		url        string
-		authHeader tester.Header
+		authHeader map[string]string
 		code       int
 		body       string
 	}{
-		{"http://test.proxy/", noH, 200, "OK"},
-		{"http://foo.test.proxy/", noH, 404, "Not found."},
-		{"http://footest.proxy/", noH, 404, "Not found."},
-		{"http://test.wildcard/", noH, 200, "OK"},
-		{"http://foo.test.wildcard/", noH, 200, "OK"},
-		{"http://test.static/", noH, 200, "contents of index.html"},
-		{"http://test.net/", noH, 404, "Not found."},
+		{"http://test.proxy/", nil, 200, "OK"},
+		{"http://foo.test.proxy/", nil, 404, "Not found."},
+		{"http://footest.proxy/", nil, 404, "Not found."},
+		{"http://test.wildcard/", nil, 200, "OK"},
+		{"http://foo.test.wildcard/", nil, 200, "OK"},
+		{"http://test.static/", nil, 200, "contents of index.html"},
+		{"http://test.net/", nil, 404, "Not found."},
 	}
 
 	// Run tests
 	for _, test := range tests {
-		tester.DoRequestOnHandler(t, s, "GET", test.url, test.authHeader, "", test.code, test.body)
+		tester.DoRequestOnHandler(t, s, "GET", test.url, nil, "", test.code, test.body)
 	}
 
 	// Create redirect tests

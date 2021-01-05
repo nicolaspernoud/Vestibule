@@ -4,7 +4,6 @@ services:
   vestibule-container:
     image: vestibule
     build: .
-    command: -debug
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
@@ -26,3 +25,4 @@ services:
       - LOGOUT_URL=${LOGOUT_URL}
       - ONLYOFFICE_TITLE=${ONLYOFFICE_TITLE}
       - ONLYOFFICE_SERVER=${ONLYOFFICE_SERVER}
+      - DEBUG_MODE=${DEBUG_MODE}

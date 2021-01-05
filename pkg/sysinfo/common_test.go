@@ -9,5 +9,5 @@ import (
 
 func TestGetInfo(t *testing.T) {
 	handler := http.HandlerFunc(GetInfo)
-	tester.DoRequestOnHandler(t, handler, "GET", "/", tester.Header{Key: "", Value: ""}, "", http.StatusOK, `{"uptime"`)
+	tester.DoRequestOnHandler(t, handler, "GET", "/", nil, "", http.StatusOK, `{"uptime"`)
 }

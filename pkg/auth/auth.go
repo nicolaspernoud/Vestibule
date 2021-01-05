@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 )
 
@@ -21,6 +23,17 @@ const (
 	// ContextData is the user
 	ContextData key = 0
 )
+
+var (
+	// AdminRole represents the role reserved for admins
+	AdminRole string
+)
+
+func init() {
+	var err error
+	AdminRole, err = common.StringValueFromEnv("ADMIN_ROLE", "ADMINS")
+	common.CheckErrorFatal(err)
+}
 
 // User represents a logged in user
 type User struct {
@@ -50,13 +63,17 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 	roleChecker := func(w http.ResponseWriter, r *http.Request) {
 		user := TokenData{}
 		checkXSRF, err := tokens.Manager.ExtractAndValidateToken(r, authTokenKey, &user, checkXSRF)
-		if err != nil {
-			// Handle WebDav authentication
-			if strings.Contains(r.UserAgent(), "vfs") || strings.Contains(r.UserAgent(), "Microsoft-WebDAV") || strings.Contains(r.UserAgent(), "Konqueror") {
+		// Handle WebDav authentication
+		if err != nil && isWebdav(r.UserAgent()) {
+			// Test if the user password is directly given in the request, if so populate the user
+			user, err = getUserDirectly(r.Header.Get("Authorization"))
+			if err != nil {
 				w.Header().Set("WWW-Authenticate", `Basic realm="server"`)
 				http.Error(w, "webdav client authentication", 401)
 				return
 			}
+		}
+		if err != nil {
 			// Handle CORS preflight requests
 			if r.Method == "OPTIONS" {
 				return
@@ -84,7 +101,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			http.Error(w, err.Error(), 403)
 			return
 		}
-		err = checkUserHasRole(user, []string{os.Getenv("ADMIN_ROLE")})
+		err = checkUserHasRole(user, []string{AdminRole})
 		if err == nil {
 			user.IsAdmin = true
 		}
@@ -193,4 +210,32 @@ func GetTokenData(r *http.Request) (TokenData, error) {
 		return user, errors.New("user could not be got from context")
 	}
 	return user, nil
+}
+
+// isWebdav works out if an user agent is a webdav user agent
+func isWebdav(ua string) bool {
+	for _, a := range []string{"vfs", "Microsoft-WebDAV", "Konqueror", "LibreOffice", "Rei.Fs.WebDAV"} {
+		if strings.Contains(ua, a) {
+			return true
+		}
+	}
+	return false
+}
+
+// getUserDirectly directly checks if an user is allowed to connect
+func getUserDirectly(authorizationHeader string) (TokenData, error) {
+	authHeader := strings.Split(authorizationHeader, " ")
+	var user User
+	if authHeader[0] == "Basic" && len(authHeader) == 2 {
+		decoded, err := base64.StdEncoding.DecodeString(authHeader[1])
+		if err == nil {
+			auth := strings.Split(string(decoded), ":")
+			sentUser := User{Login: auth[0], Password: auth[1]}
+			foundUser, err := MatchUser(sentUser)
+			if err == nil {
+				return (TokenData{User: foundUser}), nil
+			}
+		}
+	}
+	return TokenData{User: user}, errors.New("could not retrieve user directly from basic auth header")
 }

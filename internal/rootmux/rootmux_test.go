@@ -17,6 +17,8 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/tester"
 	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 
+	b64 "encoding/base64"
+
 	"github.com/nicolaspernoud/vestibule/internal/mocks"
 )
 
@@ -30,7 +32,7 @@ var (
 	initialUsers           = reg.ReplaceAllString(string(initialUsersBuff), "")
 	newUser                = `{"id":"3","login":"new_user","memberOf":["USERS"],"password":"test"}`
 	newDav                 = `{"id": 5,"host":"writableadmindav.vestibule.io","root":"./testdata/data","secured":true,"writable":true,"roles":["ADMINS"]}`
-	noH                    = tester.Header{Key: "", Value: ""}
+	noH                    map[string]string
 )
 
 func init() {
@@ -61,9 +63,10 @@ func TestAll(t *testing.T) {
 	userTests := createUserTests(t)
 	os.Setenv("USERINFO_URL", oAuth2Server.URL+"/admininfo")
 	adminTests := createAdminTests(t)
+	directWebdavTests := createDirectWebdavTests(t)
 	// RUN THE TESTS CONCURRENTLY
 	var wg sync.WaitGroup
-	functions := []func(wg *sync.WaitGroup){oauth2Tests, unloggedTests, userTests, adminTests}
+	functions := []func(wg *sync.WaitGroup){oauth2Tests, unloggedTests, userTests, adminTests, directWebdavTests}
 	for _, f := range functions {
 		wg.Add(1)
 		go f(&wg)
@@ -156,7 +159,7 @@ func createUserTests(t *testing.T) func(wg *sync.WaitGroup) {
 			response := do("GET", "/api/common/WhoAmI", noH, "", 200, "")
 			token := auth.TokenData{}
 			json.Unmarshal([]byte(response), &token)
-			xsrfHeader := tester.Header{Key: "XSRF-TOKEN", Value: token.XSRFToken}
+			xsrfHeader := map[string]string{"XSRF-TOKEN": token.XSRFToken}
 			// Try to get the apps without XSRF token (must fail)
 			do("GET", "/api/admin/apps", noH, "", 401, "XSRF")
 			// Try to get the apps (must fail)
@@ -198,19 +201,19 @@ func createUserTests(t *testing.T) func(wg *sync.WaitGroup) {
 			// Try to get the user informations (must pass)
 			do("GET", "/api/common/WhoAmI", xsrfHeader, "", 200, `{"id":`)
 			// Try to get a share token (must pass)
-			shareHeader := tester.Header{Key: "Authorization", Value: "Bearer " + do("POST", "/api/common/Share", xsrfHeader, `{"sharedfor":"guest","url":"userdav.vestibule.io/mydata/test.txt","lifespan":1,"readonly":true}`, 200, "")}
+			shareHeader := map[string]string{"Authorization": "Bearer " + do("POST", "/api/common/Share", xsrfHeader, `{"sharedfor":"guest","url":"userdav.vestibule.io/mydata/test.txt","lifespan":1,"readonly":true}`, 200, "")}
 			// Try get the specified resource without cookie (must fail)
 			doNoJar("GET", "userdav.vestibule.io/mydata/test.txt", xsrfHeader, "", 401, "error extracting token")
 			// Try to use the share token for the specified ressource (must pass)
 			doNoJar("GET", "userdav.vestibule.io/mydata/test.txt", shareHeader, "", 200, "This is a test")
 			// Try to use the share token for the specified ressource with query (must pass)
-			doNoJar("GET", "userdav.vestibule.io/mydata/test.txt?token="+url.QueryEscape(strings.TrimPrefix(shareHeader.Value, "Bearer ")), noH, "", 200, "This is a test")
+			doNoJar("GET", "userdav.vestibule.io/mydata/test.txt?token="+url.QueryEscape(strings.TrimPrefix(shareHeader["Authorization"], "Bearer ")), noH, "", 200, "This is a test")
 			// Try to use the readonly share token to alter the specified ressource (must fail)
 			doNoJar("PUT", "userdav.vestibule.io/mydata/test.txt", shareHeader, "Altered content", 403, "token is read only")
 			// Try to use the share token for an other ressource (must fail)*/
 			doNoJar("GET", "userdav.vestibule.io/mydata/another_test.txt", shareHeader, "", 401, "token restricted to url")
 			// Try to get a share token for a forbidden -admin only- resource (should pass, but token should be useless)
-			shareHeader = tester.Header{Key: "Authorization", Value: "Bearer " + do("POST", "/api/common/Share", xsrfHeader, `{"sharedfor":"guest","url":"admindav.vestibule.io/mydata/test.txt","lifespan":1,"readonly":true}`, 200, "")}
+			shareHeader = map[string]string{"Authorization": "Bearer " + do("POST", "/api/common/Share", xsrfHeader, `{"sharedfor":"guest","url":"admindav.vestibule.io/mydata/test.txt","lifespan":1,"readonly":true}`, 200, "")}
 			// Try to use the previous token for a forbidden resource (must fail)
 			doNoJar("GET", "admindav.vestibule.io/mydata/test.txt", shareHeader, "", 403, "no user role among")
 		}
@@ -247,7 +250,7 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 			response := do("GET", "/api/common/WhoAmI", noH, "", 200, "")
 			token := auth.TokenData{}
 			json.Unmarshal([]byte(response), &token)
-			xsrfHeader := tester.Header{Key: "XSRF-TOKEN", Value: token.XSRFToken}
+			xsrfHeader := map[string]string{"XSRF-TOKEN": token.XSRFToken}
 			// Try to get the apps (must pass)
 			do("GET", "/api/admin/apps/", xsrfHeader, "", 200, "[{\"id\":1")
 			// Try to create an app without the XSRF-TOKEN (must fail)
@@ -272,6 +275,8 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 			do("POST", "/api/admin/users/", xsrfHeader, `{"id":"4","login":"new_user","memberOf":["USERS"],"password":"test"}`, 400, `login already exists`)
 			// Try to delete an user (must pass)
 			do("DELETE", "/api/admin/users/3", xsrfHeader, "", 200, `[{"id":"1",`)
+			// Try to log with the deleted user (must fail)
+			do("POST", "/Login", noH, `{"login": "new_user","password": "test"}`, 403, "")
 			// Try to get the user informations (must pass)
 			do("GET", "/api/common/WhoAmI", xsrfHeader, "", 200, `{"id":`)
 			// Try to access an authorized dav (must pass)
@@ -303,7 +308,46 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 	}
 }
 
-func createTester(t *testing.T) (*httptest.Server, func(method string, url string, header tester.Header, payload string, expectedStatus int, expectedBody string) string, func(method string, url string, header tester.Header, payload string, expectedStatus int, expectedBody string) string) {
+/**
+DIRECT WEBDAV TESTS (this tests are to check that a direct access webdav works)
+**/
+func createDirectWebdavTests(t *testing.T) func(wg *sync.WaitGroup) {
+	// Users
+	authFromUser := func(user auth.User) string {
+		data := user.Login + ":" + user.Password
+		return "Basic " + b64.StdEncoding.EncodeToString([]byte(data))
+	}
+	correctAuthHeader := map[string]string{"Authorization": authFromUser(auth.User{Login: "user", Password: "password"}), "User-Agent": "LibreOffice"}
+	wrongAuthHeader := map[string]string{"Authorization": authFromUser(auth.User{Login: "user", Password: "wrong_password"}), "User-Agent": "LibreOffice"}
+	wrongUserAgent := map[string]string{"Authorization": authFromUser(auth.User{Login: "user", Password: "password"}), "User-Agent": "Other"}
+	// Create the tester
+	ts, do, _ := createTester(t)
+	return func(wg *sync.WaitGroup) {
+		defer ts.Close() // Close the tester
+		defer wg.Done()
+		// Try to get the apps (must fail)
+		do("GET", "/api/admin/apps", correctAuthHeader, "", 403, "no user role among")
+		// Try to access the davs list (must pass)
+		do("GET", "/api/common/davs", correctAuthHeader, "", 200, "[{\"id\":1")
+		// Try to access a forbidden dav (must fail)
+		do("GET", "admindav.vestibule.io", correctAuthHeader, "", 403, "no user role among")
+		// Try to access the main page (must pass)
+		do("GET", "/", correctAuthHeader, "", 200, "<!DOCTYPE html>")
+		// Try to access an authorized app (must pass)
+		do("GET", "api.vestibule.io", correctAuthHeader, "", 200, "{")
+		// Try to access an authorized dav (must pass)
+		do("GET", "userdav.vestibule.io/mydata/test.txt?inline", correctAuthHeader, "", 200, "This is a test")
+		// Try to access a forbidden dav  (must fail)
+		do("GET", "admindav.vestibule.io/mydata/test.txt", correctAuthHeader, "", 403, "no user role among")
+		// Try to access an authorized dav with wrong password (must fail)
+		do("GET", "userdav.vestibule.io/mydata/test.txt?inline", wrongAuthHeader, "", 401, "webdav client authentication")
+		// Try to access an authorized dav with wrong user agent (must fail)
+		do("GET", "userdav.vestibule.io/mydata/test.txt?inline", wrongUserAgent, "", 401, "error extracting token")
+
+	}
+}
+
+func createTester(t *testing.T) (*httptest.Server, func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string, func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string) {
 	// Create the server
 	mux := CreateRootMux(1443, "./testdata/apps.json", "./testdata/davs.json", "../../web")
 	ts := httptest.NewServer(mux.Mux)

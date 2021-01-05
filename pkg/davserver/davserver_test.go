@@ -17,7 +17,7 @@ func TestEncryption(t *testing.T) {
 	port := url.Port()
 	// wrap the testing function
 	do := tester.CreateServerTester(t, port, "vestibule.io", nil)
-	noH := tester.Header{Key: "", Value: ""}
+	var noH map[string]string
 	// Try to access a crypted file on a encrypted unsecured dav (must pass)
 	do("PUT", "/test-ciphered.txt", noH, "content is encrypted !", 201, "")
 	// Try to access a crypted file on a encrypted unsecured dav (must pass)

@@ -79,7 +79,7 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 	adminMux.HandleFunc("/davs/", davServer.ProcessDavs)
 	adminMux.HandleFunc("/users/", auth.ProcessUsers)
 	adminMux.HandleFunc("/sysinfo/", sysinfo.GetInfo)
-	mainMux.Handle("/api/admin/", http.StripPrefix("/api/admin", auth.ValidateAuthMiddleware(adminMux, []string{os.Getenv("ADMIN_ROLE")}, true)))
+	mainMux.Handle("/api/admin/", http.StripPrefix("/api/admin", auth.ValidateAuthMiddleware(adminMux, []string{auth.AdminRole}, true)))
 	// Serve static files falling back to serving index.html
 	mainMux.Handle("/", middlewares.NoCache(http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)})))
 	// Put it together into the main handler

@@ -7,6 +7,8 @@ import (
 	"os"
 	"text/template"
 	"time"
+
+	"github.com/nicolaspernoud/vestibule/pkg/common"
 )
 
 // HandleOpen open the main onlyoffice  window
@@ -17,10 +19,7 @@ func HandleOpen(fullHostname string) func(w http.ResponseWriter, req *http.Reque
 			http.Error(w, "could not open onlyoffice template: "+err.Error(), 500)
 			return
 		}
-		title := os.Getenv("ONLYOFFICE_TITLE")
-		if title == "" {
-			title = "OnlyOffice"
-		}
+		title, _ := common.StringValueFromEnv("ONLYOFFICE_TITLE", "VestibuleOffice")
 		p := struct {
 			Title            string
 			OnlyOfficeServer string
