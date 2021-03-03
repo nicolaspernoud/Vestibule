@@ -32,12 +32,14 @@ jobs:
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
-      - name: Build image and push to Docker Hub
-        uses: docker/build-push-action@v1
-        env:
-          DOCKER_BUILDKIT: 1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: nicolaspernoud/vestibule
-          tag_with_ref: true
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: login to docker hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      - name: build the image
+        run: |
+          docker buildx build --push \
+            --tag nicolaspernoud/vestibule:"$([[ ${GITHUB_REF##*/} = master ]] && echo "latest" || echo "${GITHUB_REF##*/}")" \
+            --platform linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64 .

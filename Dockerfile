@@ -33,10 +33,10 @@ RUN chown -Rf "${UID}" ./*
 # Get dependencies and run tests
 RUN go version
 RUN go get -d -v && \
-    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test ./...
+    CGO_ENABLED=0 go test ./...
 
 # Build the binary
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
+RUN CGO_ENABLED=0 go build \
     -ldflags='-w -s -extldflags "-static"' -a \
     -o /app/vestibule .
 

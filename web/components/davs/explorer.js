@@ -113,7 +113,7 @@ export class Explorer {
     const markup = this.files.map((file) => this.fileTemplate(file)).join("");
     document.getElementById("explorer-modal-content").innerHTML = markup;
     // Register events
-    this.files.map((file) => {
+    this.files.forEach((file) => {
       this.registerEvents(file);
     });
   }
@@ -562,7 +562,6 @@ export class Explorer {
       const shareURL = `${this.fullHostname + file.path}?token=${encodeURIComponent(shareToken)}`;
       const link = document.createElement("a");
       link.href = shareURL;
-      //document.body.appendChild(link); // required in FF (?), optional for Chrome
       link.click();
     } catch (e) {
       HandleError(e);

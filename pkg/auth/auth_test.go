@@ -111,7 +111,7 @@ func writeUsers() (name string) {
 	return f.Name()
 }
 
-func Test_isWebdav(t *testing.T) {
+func TestIsWebdav(t *testing.T) {
 	type args struct {
 		ua string
 	}
@@ -133,7 +133,7 @@ func Test_isWebdav(t *testing.T) {
 	}
 }
 
-func Test_getUserDirectly(t *testing.T) {
+func TestGetUserDirectly(t *testing.T) {
 	UsersFile = `../../configs/users.json`
 	sentUser := User{Login: "user", Password: "password", Roles: []string{"USERS"}}
 	sentAdmin := User{Login: "admin", Password: "password", Roles: []string{"ADMINS"}}

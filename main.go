@@ -102,7 +102,11 @@ func main() {
 			IdleTimeout:  120 * time.Second,
 		}
 
-		go http.ListenAndServe(":"+strconv.Itoa(httpPort), certManager.HTTPHandler(nil))
+		go func() {
+			h := certManager.HTTPHandler(nil)
+			log.Logger.Fatal(http.ListenAndServe(":"+strconv.Itoa(httpPort), h))
+		}()
+
 		log.Logger.Fatal(server.ListenAndServeTLS("", ""))
 	}
 }
