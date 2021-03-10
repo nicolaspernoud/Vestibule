@@ -51,7 +51,7 @@ func (s *Server) ProcessDavs(w http.ResponseWriter, req *http.Request) {
 	case "DELETE":
 		s.DeleteDav(w, req)
 	default:
-		http.Error(w, "method not allowed", 400)
+		http.Error(w, "method not allowed", http.StatusBadRequest)
 	}
 }
 
@@ -60,13 +60,13 @@ func (s *Server) SendDavs(w http.ResponseWriter, req *http.Request) {
 	// Get user from request
 	user, err := auth.GetTokenData(req)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	var davs []Dav
 	err = common.Load(s.file, &davs)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	for i, dav := range davs {
@@ -89,17 +89,17 @@ func (s *Server) AddDav(w http.ResponseWriter, req *http.Request) {
 	var davs []Dav
 	err := common.Load(s.file, &davs)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if req.Body == nil {
-		http.Error(w, "please send a request body", 400)
+		http.Error(w, "please send a request body", http.StatusBadRequest)
 		return
 	}
 	var newDav Dav
 	err = json.NewDecoder(req.Body).Decode(&newDav)
 	if _, ok := err.(*json.UnmarshalTypeError); !ok && err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	// Add the dav only if the id doesn't exists yet
@@ -117,7 +117,7 @@ func (s *Server) AddDav(w http.ResponseWriter, req *http.Request) {
 	}
 	err = common.Save(s.file, &davs)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	s.SendDavs(w, req)
@@ -128,13 +128,13 @@ func (s *Server) DeleteDav(w http.ResponseWriter, req *http.Request) {
 	var davs []Dav
 	err := common.Load(s.file, &davs)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	pathElements := strings.Split(req.URL.Path, "/")
 	idx, err := strconv.Atoi(pathElements[len(pathElements)-1])
 	if err != nil {
-		http.Error(w, "please provide an dav index", 400)
+		http.Error(w, "please provide an dav index", http.StatusBadRequest)
 		return
 	}
 	// Add the dav only if the name doesn't exists yet
@@ -146,7 +146,7 @@ func (s *Server) DeleteDav(w http.ResponseWriter, req *http.Request) {
 	}
 	err = common.Save(s.file, &newDavs)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	s.SendDavs(w, req)

@@ -53,7 +53,7 @@ func (s *Server) ProcessApps(w http.ResponseWriter, req *http.Request) {
 	case "DELETE":
 		s.DeleteApp(w, req)
 	default:
-		http.Error(w, "method not allowed", 400)
+		http.Error(w, "method not allowed", http.StatusBadRequest)
 	}
 }
 
@@ -62,7 +62,7 @@ func (s *Server) SendApps(w http.ResponseWriter, req *http.Request) {
 	var apps []App
 	err := common.Load(s.file, &apps)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	json.NewEncoder(w).Encode(apps)
@@ -73,17 +73,17 @@ func (s *Server) AddApp(w http.ResponseWriter, req *http.Request) {
 	var apps []App
 	err := common.Load(s.file, &apps)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if req.Body == nil {
-		http.Error(w, "please send a request body", 400)
+		http.Error(w, "please send a request body", http.StatusBadRequest)
 		return
 	}
 	var newApp App
 	err = json.NewDecoder(req.Body).Decode(&newApp)
 	if _, ok := err.(*json.UnmarshalTypeError); !ok && err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	// Add the app only if the id doesn't exists yet
@@ -101,7 +101,7 @@ func (s *Server) AddApp(w http.ResponseWriter, req *http.Request) {
 	}
 	err = common.Save(s.file, &apps)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	s.SendApps(w, req)
@@ -112,13 +112,13 @@ func (s *Server) DeleteApp(w http.ResponseWriter, req *http.Request) {
 	var apps []App
 	err := common.Load(s.file, &apps)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	pathElements := strings.Split(req.URL.Path, "/")
 	idx, err := strconv.Atoi(pathElements[len(pathElements)-1])
 	if err != nil {
-		http.Error(w, "please provide an app index", 400)
+		http.Error(w, "please provide an app index", http.StatusBadRequest)
 		return
 	}
 	// Add the app only if the name doesn't exists yet
@@ -130,7 +130,7 @@ func (s *Server) DeleteApp(w http.ResponseWriter, req *http.Request) {
 	}
 	err = common.Save(s.file, &newApps)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	s.SendApps(w, req)

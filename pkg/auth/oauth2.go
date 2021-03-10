@@ -100,12 +100,12 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 		// Get user
 		var user User
 		if response.Body == nil {
-			http.Error(w, "no response body", 400)
+			http.Error(w, "no response body", http.StatusBadRequest)
 			return
 		}
 		err = json.NewDecoder(response.Body).Decode(&user)
 		if err != nil {
-			http.Error(w, err.Error(), 400)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		// Trim the user roles in case they come from LDAP
@@ -116,7 +116,7 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 		// Generate
 		xsrfToken, err := common.GenerateRandomString(16)
 		if err != nil {
-			http.Error(w, "error generating XSRF Token", 500)
+			http.Error(w, "error generating XSRF Token", http.StatusInternalServerError)
 			return
 		}
 		tokenData := TokenData{User: user, XSRFToken: xsrfToken}

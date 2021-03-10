@@ -16,7 +16,7 @@ func HandleOpen(fullHostname string) func(w http.ResponseWriter, req *http.Reque
 	return func(w http.ResponseWriter, req *http.Request) {
 		t, err := template.ParseFiles("web/onlyoffice/index.tmpl")
 		if err != nil {
-			http.Error(w, "could not open onlyoffice template: "+err.Error(), 500)
+			http.Error(w, "could not open onlyoffice template: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		title, _ := common.StringValueFromEnv("ONLYOFFICE_TITLE", "VestibuleOffice")
@@ -33,11 +33,11 @@ func HandleOpen(fullHostname string) func(w http.ResponseWriter, req *http.Reque
 // the body provides information on where to get the altered document, and the query provides information on where to put it
 func HandleSaveCallback(w http.ResponseWriter, req *http.Request) {
 	if req.Method != "POST" {
-		http.Error(w, "the request method must be POST", 405)
+		http.Error(w, "the request method must be POST", http.StatusMethodNotAllowed)
 		return
 	}
 	if req.Body == nil {
-		http.Error(w, "the request must contain a body", 400)
+		http.Error(w, "the request must contain a body", http.StatusBadRequest)
 		return
 	}
 	var bdy struct {
@@ -65,7 +65,7 @@ func HandleSaveCallback(w http.ResponseWriter, req *http.Request) {
 	}
 	jsonErr := json.NewDecoder(req.Body).Decode(&bdy)
 	if jsonErr != nil {
-		http.Error(w, jsonErr.Error(), 400)
+		http.Error(w, jsonErr.Error(), http.StatusBadRequest)
 		return
 	}
 	// Case of document closed after editing
@@ -73,7 +73,7 @@ func HandleSaveCallback(w http.ResponseWriter, req *http.Request) {
 		// Get the binary content from url
 		resp, err := http.Get(bdy.URL)
 		if err != nil {
-			http.Error(w, "could not get connect to onlyoffice document server", 400)
+			http.Error(w, "could not get connect to onlyoffice document server", http.StatusBadRequest)
 			return
 		}
 		defer resp.Body.Close()
@@ -83,7 +83,7 @@ func HandleSaveCallback(w http.ResponseWriter, req *http.Request) {
 		client := &http.Client{}
 		_, err = client.Do(req)
 		if err != nil {
-			http.Error(w, err.Error(), 400)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 	}

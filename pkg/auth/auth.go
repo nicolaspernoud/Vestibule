@@ -69,7 +69,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			user, err = getUserDirectly(r.Header.Get("Authorization"))
 			if err != nil {
 				w.Header().Set("WWW-Authenticate", `Basic realm="server"`)
-				http.Error(w, "webdav client authentication", 401)
+				http.Error(w, "webdav client authentication", http.StatusUnauthorized)
 				return
 			}
 		}
@@ -93,12 +93,12 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 		}
 		// Check XSRF Token
 		if checkXSRF && r.Header.Get("XSRF-TOKEN") != user.XSRFToken {
-			http.Error(w, "XSRF protection triggered", 401)
+			http.Error(w, "XSRF protection triggered", http.StatusUnauthorized)
 			return
 		}
 		err = checkUserHasRole(user, allowedRoles)
 		if err != nil {
-			http.Error(w, err.Error(), 403)
+			http.Error(w, err.Error(), http.StatusForbidden)
 			return
 		}
 		err = checkUserHasRole(user, []string{AdminRole})
@@ -109,13 +109,13 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 		if user.URL != "" {
 			requestURL := strings.Split(r.Host, ":")[0] + r.URL.EscapedPath()
 			if user.URL != requestURL {
-				http.Error(w, "token restricted to url: "+user.URL, 401)
+				http.Error(w, "token restricted to url: "+user.URL, http.StatusUnauthorized)
 				return
 			}
 		}
 		// Check for method
 		if user.ReadOnly && r.Method != http.MethodGet {
-			http.Error(w, "token is read only", 403)
+			http.Error(w, "token is read only", http.StatusForbidden)
 			return
 		}
 		ctx := context.WithValue(r.Context(), ContextData, user)
@@ -141,7 +141,7 @@ func WhoAmI() http.Handler {
 	whoAmI := func(w http.ResponseWriter, r *http.Request) {
 		user, err := GetTokenData(r)
 		if err != nil {
-			http.Error(w, err.Error(), 400)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		json.NewEncoder(w).Encode(user)
@@ -168,12 +168,12 @@ func checkUserHasRole(user TokenData, allowedRoles []string) error {
 func GetShareToken(w http.ResponseWriter, r *http.Request) {
 	user, err := GetTokenData(r)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", 405)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	var wantedToken struct {
@@ -184,11 +184,11 @@ func GetShareToken(w http.ResponseWriter, r *http.Request) {
 	}
 	err = json.NewDecoder(r.Body).Decode(&wantedToken)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if wantedToken.URL == "" {
-		http.Error(w, "url cannot be empty", 400)
+		http.Error(w, "url cannot be empty", http.StatusBadRequest)
 		return
 	}
 	user.Login = user.Login + "_share_for_" + wantedToken.Sharedfor
@@ -197,7 +197,7 @@ func GetShareToken(w http.ResponseWriter, r *http.Request) {
 	user.SharingUserLogin = wantedToken.Sharedfor
 	token, err := tokens.Manager.CreateToken(user, time.Now().Add(time.Hour*time.Duration(24*wantedToken.Lifespan)))
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	fmt.Fprintf(w, token)

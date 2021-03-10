@@ -64,13 +64,13 @@ func TestServer(t *testing.T) {
 		code       int
 		body       string
 	}{
-		{"http://test.proxy/", nil, 200, "OK"},
-		{"http://foo.test.proxy/", nil, 404, "Not found."},
-		{"http://footest.proxy/", nil, 404, "Not found."},
-		{"http://test.wildcard/", nil, 200, "OK"},
-		{"http://foo.test.wildcard/", nil, 200, "OK"},
-		{"http://test.static/", nil, 200, "contents of index.html"},
-		{"http://test.net/", nil, 404, "Not found."},
+		{"http://test.proxy/", nil, http.StatusOK, "OK"},
+		{"http://foo.test.proxy/", nil, http.StatusNotFound, "Not found."},
+		{"http://footest.proxy/", nil, http.StatusNotFound, "Not found."},
+		{"http://test.wildcard/", nil, http.StatusOK, "OK"},
+		{"http://foo.test.wildcard/", nil, http.StatusOK, "OK"},
+		{"http://test.static/", nil, http.StatusOK, "contents of index.html"},
+		{"http://test.net/", nil, http.StatusNotFound, "Not found."},
 	}
 
 	// Run tests
@@ -84,9 +84,9 @@ func TestServer(t *testing.T) {
 		code     int
 		location string
 	}{
-		{"http://test.fwdtoredirect", 302, "https://test.fwdtoredirect:443/some/path"},
-		{"http://test.relativeredirect/", 302, "https://relative.redirect.test.relativeredirect"},
-		{"http://test.absoluteredirect/", 302, "https://absolute.redirect"},
+		{"http://test.fwdtoredirect", http.StatusFound, "https://test.fwdtoredirect:443/some/path"},
+		{"http://test.relativeredirect/", http.StatusFound, "https://relative.redirect.test.relativeredirect"},
+		{"http://test.absoluteredirect/", http.StatusFound, "https://absolute.redirect"},
 	}
 
 	// Run redirect tests

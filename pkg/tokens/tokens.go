@@ -72,7 +72,7 @@ func (m manager) StoreData(data interface{}, hostName string, cookieName string,
 	expiration := now().Add(duration)
 	value, err := m.CreateToken(data, expiration)
 	if err != nil {
-		http.Error(w, err.Error(), 500)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	cookie := http.Cookie{Name: cookieName, Domain: hostName, Value: value, Expires: expiration, Secure: !m.debugMode, HttpOnly: true, SameSite: http.SameSiteLaxMode}

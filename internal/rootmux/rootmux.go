@@ -60,14 +60,14 @@ func CreateRootMux(port int, appsFile string, davsFile string, staticDir string)
 			appServer.ProcessApps(w, req)
 			return
 		}
-		http.Error(w, "method not allowed", 405)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	})
 	commonMux.HandleFunc("/davs", func(w http.ResponseWriter, req *http.Request) {
 		if req.Method == http.MethodGet {
 			davServer.ProcessDavs(w, req)
 			return
 		}
-		http.Error(w, "method not allowed", 405)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 	})
 	mainMux.Handle("/api/common/WhoAmI", auth.ValidateAuthMiddleware(auth.WhoAmI(), []string{"*"}, false))
 	commonMux.HandleFunc("/Share", auth.GetShareToken)
@@ -122,11 +122,11 @@ func reload(adh *appDavHandler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		err := adh.as.LoadApps()
 		if err != nil {
-			http.Error(w, err.Error(), 400)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
 		err = adh.ds.LoadDavs()
 		if err != nil {
-			http.Error(w, err.Error(), 400)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 		} else {
 			fmt.Fprintf(w, "apps and davs services reloaded")
 		}
