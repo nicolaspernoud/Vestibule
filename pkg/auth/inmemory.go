@@ -46,19 +46,19 @@ func init() {
 // HandleInMemoryLogin validate the username and password provided in the function body against a local file and return a token if the user is found
 func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "method not allowed", 405)
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
 	var sentUser User
 	err := json.NewDecoder(r.Body).Decode(&sentUser)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	// Try to match the user with an user in the database
 	user, err := MatchUser(sentUser)
 	if err != nil {
-		http.Error(w, err.Error(), 403)
+		http.Error(w, err.Error(), http.StatusForbidden)
 		log.Logger.Printf("| %v | Login failure | %v | %v", sentUser.Login, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 		return
 	}
@@ -67,7 +67,7 @@ func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 	// Generate
 	xsrfToken, err := common.GenerateRandomString(16)
 	if err != nil {
-		http.Error(w, "error generating XSRF Token", 500)
+		http.Error(w, "error generating XSRF Token", http.StatusInternalServerError)
 		return
 	}
 	tokenData := TokenData{User: User{ID: user.ID, Login: user.Login, Email: user.Email, Roles: user.Roles}, XSRFToken: xsrfToken}
@@ -95,7 +95,7 @@ func ProcessUsers(w http.ResponseWriter, req *http.Request) {
 		DeleteUser(w, req)
 		refreshCache()
 	default:
-		http.Error(w, "method not allowed", 400)
+		http.Error(w, "method not allowed", http.StatusBadRequest)
 	}
 }
 
@@ -104,7 +104,7 @@ func SendUsers(w http.ResponseWriter, req *http.Request) {
 	var users []User
 	err := common.Load(UsersFile, &users)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	json.NewEncoder(w).Encode(users)
@@ -115,28 +115,28 @@ func AddUser(w http.ResponseWriter, req *http.Request) {
 	var users []User
 	err := common.Load(UsersFile, &users)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	if req.Body == nil {
-		http.Error(w, "please send a request body", 400)
+		http.Error(w, "please send a request body", http.StatusBadRequest)
 		return
 	}
 	var newUser User
 	err = json.NewDecoder(req.Body).Decode(&newUser)
 	if _, ok := err.(*json.UnmarshalTypeError); !ok && err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	// Encrypt the password with bcrypt
 	if newUser.Password == "" && newUser.PasswordHash == "" {
-		http.Error(w, "passwords cannot be blank", 400)
+		http.Error(w, "passwords cannot be blank", http.StatusBadRequest)
 		return
 	}
 	if newUser.Password != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 		if err != nil {
-			http.Error(w, err.Error(), 400)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		newUser.PasswordHash = string(hash)
@@ -149,7 +149,7 @@ func AddUser(w http.ResponseWriter, req *http.Request) {
 			users[idx] = newUser
 			isNew = false
 		} else if val.Login == newUser.Login { // Check for already existing login
-			http.Error(w, "login already exists", 400)
+			http.Error(w, "login already exists", http.StatusBadRequest)
 			return
 		}
 	}
@@ -159,7 +159,7 @@ func AddUser(w http.ResponseWriter, req *http.Request) {
 	}
 	err = common.Save(UsersFile, &users)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	SendUsers(w, req)
@@ -170,13 +170,13 @@ func DeleteUser(w http.ResponseWriter, req *http.Request) {
 	var users []User
 	err := common.Load(UsersFile, &users)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	pathElements := strings.Split(req.URL.Path, "/")
 	idx, err := strconv.Atoi(pathElements[len(pathElements)-1])
 	if err != nil {
-		http.Error(w, "please provide an user index", 400)
+		http.Error(w, "please provide an user index", http.StatusBadRequest)
 		return
 	}
 	// Recreate the user list without the deleted user
@@ -189,7 +189,7 @@ func DeleteUser(w http.ResponseWriter, req *http.Request) {
 	}
 	err = common.Save(UsersFile, &newUsers)
 	if err != nil {
-		http.Error(w, err.Error(), 400)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 	SendUsers(w, req)

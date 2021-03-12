@@ -1,6 +1,7 @@
 package davserver
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
@@ -28,7 +29,7 @@ func TestEncryption(t *testing.T) {
 		t.Errorf("test-ciphered.txt should be 22 bytes")
 	}
 	// Try to access a non crypted file on a encrypted unsecured dav (must fail)
-	do("GET", "/test.txt", noH, "", 500, "unexpected EOF")
+	do("GET", "/test.txt", noH, "", http.StatusInternalServerError, "unexpected EOF")
 	// Try to access a crypted file with the wrong key
 	davAug = NewWebDavAug("", "./testdata", true, "wrong key")
 	body = do("GET", "/test-ciphered.txt", noH, "", 200, "")

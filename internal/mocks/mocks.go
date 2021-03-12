@@ -26,13 +26,13 @@ func CreateMockOAuth2() *http.ServeMux {
 	mux.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		redir := query.Get("redirect_uri") + "?state=" + query.Get("state") + "&code=mock_code"
-		http.Redirect(w, r, redir, 302)
+		http.Redirect(w, r, redir, http.StatusFound)
 	})
 	// Returns authorization code back to the user, but without the provided state
 	mux.HandleFunc("/auth-wrong-state", func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		redir := query.Get("redirect_uri") + "?state=" + "a-random-state" + "&code=mock_code"
-		http.Redirect(w, r, redir, 302)
+		http.Redirect(w, r, redir, http.StatusFound)
 	})
 
 	// Returns access token back to the user
