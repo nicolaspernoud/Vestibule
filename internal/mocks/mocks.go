@@ -4,13 +4,13 @@ package mocks
 import (
 	"fmt"
 	"net/http"
-	"os"
 
+	"github.com/nicolaspernoud/vestibule/pkg/common"
 	"github.com/nicolaspernoud/vestibule/pkg/middlewares"
 )
 
 var (
-	hostname = os.Getenv("HOSTNAME")
+	hostname = common.StringValueFromEnv("HOSTNAME", "vestibule.127.0.0.1.nip.io")
 	port     int
 )
 

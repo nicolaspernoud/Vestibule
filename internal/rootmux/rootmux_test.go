@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"runtime"
 	"strings"
 	"sync"
 	"testing"
@@ -288,7 +289,11 @@ func createAdminTests(t *testing.T) func(wg *sync.WaitGroup) {
 			// Try to delete a resource on an authorized dav (must pass)
 			do("DELETE", "admindav.vestibule.io/mydata/test2.txt", xsrfHeader, "", http.StatusNoContent, "")
 			// Try to get the system information (must pass)
-			do("GET", "/api/admin/sysinfo/", xsrfHeader, "", http.StatusOK, `{"uptime"`)
+			if runtime.GOOS == "windows" {
+				do("GET", "/api/admin/sysinfo/", xsrfHeader, "", http.StatusOK, `{"usedgb"`)
+			} else {
+				do("GET", "/api/admin/sysinfo/", xsrfHeader, "", http.StatusOK, `{"uptime"`)
+			}
 		}
 		// Try to login (must pass)
 		do("GET", "/OAuth2Login", noH, "", http.StatusOK, "<!DOCTYPE html>")
@@ -349,7 +354,7 @@ func createDirectWebdavTests(t *testing.T) func(wg *sync.WaitGroup) {
 
 func createTester(t *testing.T) (*httptest.Server, func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string, func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string) {
 	// Create the server
-	mux := CreateRootMux(1443, "./testdata/apps.json", "./testdata/davs.json", "../../web")
+	mux := CreateRootMux(os.Getenv("HOSTNAME"), 1443, "./testdata/apps.json", "./testdata/davs.json", "../../web")
 	ts := httptest.NewServer(mux.Mux)
 	url, _ := url.Parse(ts.URL)
 	port := url.Port()

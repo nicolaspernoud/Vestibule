@@ -15,8 +15,10 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/log"
 )
 
-// Mutex used to lock file writing
-var lock sync.Mutex
+var (
+	disableLogFatal = false
+	lock            sync.Mutex // Mutex used to lock file writing
+)
 
 // Save saves a representation of v to the file at path.
 func Save(path string, v interface{}) error {
@@ -112,35 +114,36 @@ func Contains(a []string, x string) bool {
 }
 
 // StringValueFromEnv set a value into an *interface from an environment variable or default
-func StringValueFromEnv(ev string, def string) (string, error) {
+func StringValueFromEnv(ev string, def string) string {
 	val := os.Getenv(ev)
 	if val == "" {
-		return def, nil
+		return def
 	}
-	return val, nil
+	return val
 }
 
 // IntValueFromEnv set a value into an *interface from an environment variable or default
-func IntValueFromEnv(ev string, def int) (int, error) {
+func IntValueFromEnv(ev string, def int) int {
 	val := os.Getenv(ev)
 	if val == "" {
-		return def, nil
+		return def
 	}
-	return strconv.Atoi(val)
+	v, err := strconv.Atoi(val)
+	if err != nil && !disableLogFatal {
+		log.Logger.Fatalf("Error : could not get integer value from environment variable %v=%v\n", ev, val)
+	}
+	return v
 }
 
 // BoolValueFromEnv set a value into an *interface from an environment variable or default
-func BoolValueFromEnv(ev string, def bool) (bool, error) {
+func BoolValueFromEnv(ev string, def bool) bool {
 	val := os.Getenv(ev)
 	if val == "" {
-		return def, nil
+		return def
 	}
-	return strconv.ParseBool(val)
-}
-
-// CheckErrorFatal logs a fatal error
-func CheckErrorFatal(err error) {
-	if err != nil {
-		log.Logger.Fatalf("Error : %v\n", err)
+	v, err := strconv.ParseBool(val)
+	if err != nil && !disableLogFatal {
+		log.Logger.Fatalf("Error : could not get boolean value from environment variable %v=%v\n", ev, val)
 	}
+	return v
 }

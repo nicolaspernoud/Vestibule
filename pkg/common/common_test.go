@@ -5,10 +5,13 @@ import (
 	"testing"
 )
 
+func init() {
+	disableLogFatal = true
+}
+
 func TestStringValueFromEnv(t *testing.T) {
 	os.Setenv("MY_EV", "from_env")
 	var rv string
-	var err error
 	type args struct {
 		ev  string
 		def string
@@ -17,16 +20,13 @@ func TestStringValueFromEnv(t *testing.T) {
 		name     string
 		args     args
 		expected string
-		wantErr  bool
 	}{
-		{"string_value_from_env", args{"MY_EV", "test"}, "from_env", false},
-		{"string_value_from_def", args{"MY_DEF", "test"}, "test", false},
+		{"string_value_from_env", args{"MY_EV", "test"}, "from_env"},
+		{"string_value_from_def", args{"MY_DEF", "test"}, "test"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if rv, err = StringValueFromEnv(tt.args.ev, tt.args.def); (err != nil) != tt.wantErr {
-				t.Errorf("StringValueFromEnv() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			rv = StringValueFromEnv(tt.args.ev, tt.args.def)
 			if rv != tt.expected {
 				t.Errorf("StringValueFromEnv() error ; got %v, expected %v", rv, tt.expected)
 			}
@@ -37,7 +37,6 @@ func TestStringValueFromEnv(t *testing.T) {
 func TestIntValueFromEnv(t *testing.T) {
 	os.Setenv("MY_EV", "from_env")
 	var rv int
-	var err error
 	type args struct {
 		ev  string
 		def int
@@ -46,16 +45,13 @@ func TestIntValueFromEnv(t *testing.T) {
 		name     string
 		args     args
 		expected int
-		wantErr  bool
 	}{
-		{"int_value_from_def", args{"MY_DEF", 1}, 1, false},
-		{"string_on_int_from_env", args{"MY_EV", 1}, 0, true},
+		{"int_value_from_def", args{"MY_DEF", 1}, 1},
+		{"string_on_int_from_env", args{"MY_EV", 1}, 0},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if rv, err = IntValueFromEnv(tt.args.ev, tt.args.def); (err != nil) != tt.wantErr {
-				t.Errorf("IntValueFromEnv() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			rv = IntValueFromEnv(tt.args.ev, tt.args.def)
 			if rv != tt.expected {
 				t.Errorf("IntValueFromEnv() error ; got %v, expected %v", rv, tt.expected)
 			}
@@ -66,7 +62,6 @@ func TestIntValueFromEnv(t *testing.T) {
 func TestBoolValueFromEnv(t *testing.T) {
 	os.Setenv("MY_EV", "from_env")
 	var rv bool
-	var err error
 	type args struct {
 		ev  string
 		def bool
@@ -75,17 +70,14 @@ func TestBoolValueFromEnv(t *testing.T) {
 		name     string
 		args     args
 		expected bool
-		wantErr  bool
 	}{
 
-		{"bool_value_from_def", args{"MY_DEF", true}, true, false},
-		{"string_on_bool_from_def", args{"MY_EV", true}, false, true},
+		{"bool_value_from_def", args{"MY_DEF", true}, true},
+		{"string_on_bool_from_def", args{"MY_EV", true}, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if rv, err = BoolValueFromEnv(tt.args.ev, tt.args.def); (err != nil) != tt.wantErr {
-				t.Errorf("BoolValueFromEnv() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			rv = BoolValueFromEnv(tt.args.ev, tt.args.def)
 			if rv != tt.expected {
 				t.Errorf("BoolValueFromEnv() error ; got %v, expected %v", rv, tt.expected)
 			}

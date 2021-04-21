@@ -19,7 +19,7 @@ func HandleOpen(fullHostname string) func(w http.ResponseWriter, req *http.Reque
 			http.Error(w, "could not open onlyoffice template: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		title, _ := common.StringValueFromEnv("ONLYOFFICE_TITLE", "VestibuleOffice")
+		title := common.StringValueFromEnv("ONLYOFFICE_TITLE", "VestibuleOffice")
 		p := struct {
 			Title            string
 			OnlyOfficeServer string
@@ -80,6 +80,10 @@ func HandleSaveCallback(w http.ResponseWriter, req *http.Request) {
 		// PUT the content on the ressource gotten from the query
 		ressource := req.URL.Query().Get("file") + "?token=" + url.QueryEscape(req.URL.Query().Get("token"))
 		req, err := http.NewRequest("PUT", ressource, resp.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		client := &http.Client{}
 		_, err = client.Do(req)
 		if err != nil {

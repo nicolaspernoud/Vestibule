@@ -26,14 +26,9 @@ const (
 
 var (
 	// AdminRole represents the role reserved for admins
-	AdminRole string
+	AdminRole = common.StringValueFromEnv("ADMIN_ROLE", "ADMINS")
+	hostname  = common.StringValueFromEnv("HOSTNAME", "vestibule.127.0.0.1.nip.io")
 )
-
-func init() {
-	var err error
-	AdminRole, err = common.StringValueFromEnv("ADMIN_ROLE", "ADMINS")
-	common.CheckErrorFatal(err)
-}
 
 // User represents a logged in user
 type User struct {
@@ -79,15 +74,20 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 				return
 			}
 			// Default to redirect to authentication
-			redirectTo := os.Getenv("HOSTNAME")
+			redirectTo := hostname
 			_, port, perr := net.SplitHostPort(r.Host)
 			if perr == nil {
 				redirectTo += ":" + port
 			}
+			// Write the requested url in a cookie
+			if r.Host != redirectTo {
+				cookie := http.Cookie{Name: "redirectAfterLogin", Domain: hostname, Value: r.Host + r.URL.Path, MaxAge: 10, Secure: true, HttpOnly: false, SameSite: http.SameSiteLaxMode}
+				http.SetCookie(w, &cookie)
+			}
 			w.Header().Set("Content-Type", "text/html")
 			w.WriteHeader(http.StatusUnauthorized)
-			responseContent := fmt.Sprintf("error extracting token: %v<meta http-equiv=\"Refresh\" content=\"0; url=https://%v?redirectAfterLogin=%v#login\"/>", err.Error(), redirectTo, r.Host+r.URL.Path)
-			fmt.Fprintf(w, responseContent)
+			responseContent := fmt.Sprintf("error extracting token: %v<meta http-equiv=\"Refresh\" content=\"0; url=https://%v#login\"/>", err.Error(), redirectTo)
+			fmt.Fprint(w, responseContent)
 			return
 
 		}
@@ -200,7 +200,7 @@ func GetShareToken(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Fprintf(w, token)
+	fmt.Fprint(w, token)
 }
 
 // GetTokenData gets an user from a request

@@ -22,27 +22,24 @@ import (
 )
 
 var (
-	appsFile, davsFile, letsCacheDir, logFile string
-	httpsPort, httpPort                       int
-	debugMode                                 bool
+	hostname           string
+	appsFile           = common.StringValueFromEnv("APPS_FILE", "./configs/apps.json")      // Apps configuration file path
+	davsFile           = common.StringValueFromEnv("DAVS_FILE", "./configs/davs.json")      // Davs configuration file path
+	letsCacheDir       = common.StringValueFromEnv("LETS_CACHE_DIR", "./letsencrypt_cache") // Let's Encrypt cache directory
+	logFile            = common.StringValueFromEnv("LOG_FILE", "")                          // Optional file to log to
+	httpsPort          = common.IntValueFromEnv("HTTPS_PORT", 443)                          // HTTPS port to serve on
+	httpPort           = common.IntValueFromEnv("HTTP_PORT", 80)                            // HTTP port to serve on, only used for Let's Encrypt HTTP Challenge
+	debugMode          = common.BoolValueFromEnv("DEBUG_MODE", false)                       // Debug mode, disable Let's Encrypt, enable CORS and more logging
+	disableLetsEncrypt = common.BoolValueFromEnv("DISABLE_LETSENCRYPT", false)              // Disable Let's Encrypt certificates (in normal mode) and use development certificates (./dev_certificates/localhost.crt and .key) instead
+
 )
 
 func init() {
-	var err error
-	appsFile, err = common.StringValueFromEnv("APPS_FILE", "./configs/apps.json") // Apps configuration file path
-	common.CheckErrorFatal(err)
-	davsFile, err = common.StringValueFromEnv("DAVS_FILE", "./configs/davs.json") // Davs configuration file path
-	common.CheckErrorFatal(err)
-	letsCacheDir, err = common.StringValueFromEnv("LETS_CACHE_DIR", "./letsencrypt_cache") // Let's Encrypt cache directory
-	common.CheckErrorFatal(err)
-	logFile, err = common.StringValueFromEnv("LOG_FILE", "") // Optional file to log to
-	common.CheckErrorFatal(err)
-	httpsPort, err = common.IntValueFromEnv("HTTPS_PORT", 443) // HTTPS port to serve on
-	common.CheckErrorFatal(err)
-	httpPort, err = common.IntValueFromEnv("HTTP_PORT", 80) // HTTP port to serve on, only used for Let's Encrypt HTTP Challenge
-	common.CheckErrorFatal(err)
-	debugMode, err = common.BoolValueFromEnv("DEBUG_MODE", false) // Debug mode, disable Let's Encrypt, enable CORS and more logging
-	common.CheckErrorFatal(err)
+	defaultHostname := "vestibule.127.0.0.1.nip.io"
+	hostname = common.StringValueFromEnv("HOSTNAME", defaultHostname)
+	if hostname == defaultHostname {
+		disableLetsEncrypt = true
+	}
 }
 
 func main() {
@@ -60,14 +57,14 @@ func main() {
 		}()
 	}
 	log.Logger.Println("--- Server is starting ---")
-	fullHostname := middlewares.GetFullHostname(os.Getenv("HOSTNAME"), httpsPort)
+	fullHostname := middlewares.GetFullHostname(hostname, httpsPort)
 	log.Logger.Println("Main hostname is ", fullHostname)
 
 	// Initializations
 	tokens.Init("./configs/tokenskey.json", debugMode)
 
 	// Create the server
-	rootMux := rootmux.CreateRootMux(httpsPort, appsFile, davsFile, "web")
+	rootMux := rootmux.CreateRootMux(hostname, httpsPort, appsFile, davsFile, "web")
 
 	// Serve locally with https on debug mode or with let's encrypt on production mode
 	if debugMode {
@@ -83,6 +80,8 @@ func main() {
 		fmt.Println("Mock API server Listening on: http://localhost" + mockAPIPort)
 		log.Logger.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(httpsPort), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", log.Middleware(rootMux.Mux)))
 
+	} else if disableLetsEncrypt {
+		log.Logger.Fatal(http.ListenAndServeTLS(":"+strconv.Itoa(httpsPort), "./dev_certificates/localhost.crt", "./dev_certificates/localhost.key", rootMux.Mux))
 	} else {
 		certManager := autocert.Manager{
 			Prompt:     autocert.AcceptTOS,

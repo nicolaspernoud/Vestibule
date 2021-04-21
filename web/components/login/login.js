@@ -95,12 +95,6 @@ async function doLogin() {
       throw new Error(`Login error (status ${response.status})`);
     }
     await Auth.GetUser();
-    // Redirect to original subdomain if login was displayed after an authentication error on the original subdomain
-    const urlParams = new URLSearchParams(window.location.search);
-    const redirectAfterLogin = urlParams.get("redirectAfterLogin");
-    if (redirectAfterLogin != "" && redirectAfterLogin != null) {
-      window.location.replace("https://" + redirectAfterLogin);
-    }
     location.hash = "#davs";
     Navbar.CreateMenu();
   } catch (e) {

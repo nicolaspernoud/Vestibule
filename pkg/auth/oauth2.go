@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -37,7 +38,7 @@ func NewManager() Manager {
 			TokenURL: os.Getenv("TOKEN_URL"),
 		},
 	},
-		Hostname:    os.Getenv("HOSTNAME"),
+		Hostname:    common.StringValueFromEnv("HOSTNAME", "vestibule.127.0.0.1.nip.io"),
 		UserInfoURL: os.Getenv("USERINFO_URL"),
 	}
 }
@@ -81,7 +82,7 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 		http.SetCookie(w, &c)
 		// Perform code exchange
 		code := r.FormValue("code")
-		token, err := m.Config.Exchange(oauth2.NoContext, code)
+		token, err := m.Config.Exchange(context.Background(), code)
 		if err != nil {
 			fmt.Printf("Code exchange failed with '%s'\n", err)
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -103,6 +104,18 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 			http.Error(w, "no response body", http.StatusBadRequest)
 			return
 		}
+		////////////////////////////////////////////////
+		// UNCOMMENT THIS TO DEBUG USERINFO RESPONSE //
+		/*readBody, err := ioutil.ReadAll(response.Body)
+		  if err != nil {
+		      panic(err)
+		  }
+		  newBody := ioutil.NopCloser(bytes.NewBuffer(readBody))
+		  response.Body = newBody
+		  if string(readBody) != "" {
+		      fmt.Printf("BODY : %q", readBody)
+		  }*/
+		////////////////////////////////////////////////
 		err = json.NewDecoder(response.Body).Decode(&user)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)

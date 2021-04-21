@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/nicolaspernoud/vestibule/pkg/appserver"
@@ -27,8 +26,7 @@ type RootMux struct {
 }
 
 // CreateRootMux creates a RootMux
-func CreateRootMux(port int, appsFile string, davsFile string, staticDir string) RootMux {
-	hostname := os.Getenv("HOSTNAME")
+func CreateRootMux(hostname string, port int, appsFile string, davsFile string, staticDir string) RootMux {
 	fullHostname := middlewares.GetFullHostname(hostname, port)
 	// Create the app handler
 	appServer, err := appserver.NewServer(appsFile, port, hostname, auth.ValidateAuthMiddleware)

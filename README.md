@@ -66,27 +66,28 @@ The mock ip geodatabase should be replaced with a real one from maxmind for real
 
 Configuration is done through environment variables. The meaning of the different environment variables is detailed here :
 
-| Environment variable     | Usage                                                                                                                    | Default                     |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------ | --------------------------- |
-| HOSTNAME                 | Vestibule main hostname : needed to know when to respond with the main GUI instead of an application on a webdav service |                             |
-| APPS_FILE                | Apps configuration file path                                                                                             | "./configs/davs.json"       |
-| DAVS_FILE                | Davs configuration file path                                                                                             | "./configs/davs.json"       |
-| LETS_CACHE_DIR           | Let's Encrypt cache directory                                                                                            | "./letsencrypt_cache"       |
-| LOG_FILE                 | Optional file to log to                                                                                                  | defaults to no file logging |
-| HTTPS_PORT               | HTTPS port to serve on                                                                                                   | 443                         |
-| HTTP_PORT                | HTTP port to serve on, only used for Let's Encrypt HTTP Challenge                                                        | 80                          |
-| DEBUG_MODE               | Debug mode, disable Let's Encrypt, enable CORS and more logging                                                          | false                       |
-| ADMIN_ROLE               | Admin role                                                                                                               | ADMINS                      |
-| REDIRECT_URL             | Redirect url used by the idp to handle the callback                                                                      |                             |
-| CLIENT_ID                | Client id to authenticate with the IdP for OAuth2 authentication                                                         |                             |
-| CLIENT_SECRET            | Client id to authenticate with the IdP for OAuth2 authentication                                                         |                             |
-| AUTH_URL                 | IdP's authentication URL                                                                                                 |                             |
-| TOKEN_URL                | IdP's token URL                                                                                                          |                             |
-| USERINFO_URL             | IdP's userinfo URL                                                                                                       |                             |
-| LOGOUT_URL               | IdP's logout URL                                                                                                         |                             |
-| ONLYOFFICE_TITLE         | Title used on the OnlyOffice document editor window                                                                      | VestibuleOffice             |
-| ONLYOFFICE_SERVER        | Url of the OnlyOffice document server used to edit documents                                                             |                             |
-| INMEMORY_TOKEN_LIFE_DAYS | Lifetime of authentication tokens for local users                                                                        | 1                           |
+| Environment variable     | Usage                                                                                                                                    | Default                             |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| HOSTNAME                 | Vestibule main hostname : needed to know when to respond with the main GUI instead of an application on a webdav service                 | vestibule.127.0.0.1.nip.io          |
+| APPS_FILE                | Apps configuration file path                                                                                                             | "./configs/davs.json"               |
+| DAVS_FILE                | Davs configuration file path                                                                                                             | "./configs/davs.json"               |
+| LETS_CACHE_DIR           | Let's Encrypt cache directory                                                                                                            | "./letsencrypt_cache"               |
+| LOG_FILE                 | Optional file to log to                                                                                                                  | defaults to no file logging         |
+| HTTPS_PORT               | HTTPS port to serve on                                                                                                                   | 443                                 |
+| HTTP_PORT                | HTTP port to serve on, only used for Let's Encrypt HTTP Challenge                                                                        | 80                                  |
+| DEBUG_MODE               | Debug mode, disable Let's Encrypt, enable CORS and more logging                                                                          | false                               |
+| ADMIN_ROLE               | Admin role                                                                                                                               | ADMINS                              |
+| REDIRECT_URL             | Redirect url used by the idp to handle the callback                                                                                      |                                     |
+| CLIENT_ID                | Client id to authenticate with the IdP for OAuth2 authentication                                                                         |                                     |
+| CLIENT_SECRET            | Client id to authenticate with the IdP for OAuth2 authentication                                                                         |                                     |
+| AUTH_URL                 | IdP's authentication URL                                                                                                                 |                                     |
+| TOKEN_URL                | IdP's token URL                                                                                                                          |                                     |
+| USERINFO_URL             | IdP's userinfo URL                                                                                                                       |                                     |
+| LOGOUT_URL               | IdP's logout URL                                                                                                                         |                                     |
+| ONLYOFFICE_TITLE         | Title used on the OnlyOffice document editor window                                                                                      | VestibuleOffice                     |
+| ONLYOFFICE_SERVER        | Url of the OnlyOffice document server used to edit documents                                                                             |                                     |
+| INMEMORY_TOKEN_LIFE_DAYS | Lifetime of authentication tokens for local users                                                                                        | 1                                   |
+| DISABLE_LETSENCRYPT      | Disable Let's Encrypt certificates (in normal mode) and use development certificates (./dev_certificates/localhost.crt and .key) instead | false (true if HOSTNAME is not set) |
 
 ### OIDC/OAuth2 configuration
 
