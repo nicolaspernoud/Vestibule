@@ -198,3 +198,12 @@ a.navbar-item.is-active {
 .modal-card-title {
   font-weight: bold;
 }
+
+.textarea:not([rows]) {
+  min-height: 80vh;
+}
+
+.textarea {
+  line-height: 1;
+  font-family: "Lucida Console", monospace;
+}
