@@ -2,10 +2,10 @@
 import { AnimateCSS, RandomString, GID } from "/services/common/common.js";
 import { HandleError } from "/services/common/errors.js";
 import { Share } from "/components/davs/share.js";
-import * as Auth from "/services/auth/auth.js";
 
 export class Edit {
-  constructor(hostname, file) {
+  constructor(user, hostname, file) {
+    this.user = user;
     this.hostname = hostname;
     this.file = file;
     this.url = `${hostname}${file.path}`;
@@ -18,7 +18,6 @@ export class Edit {
   }
 
   async show() {
-    this.user = await Auth.GetUser();
     this.editModal = document.createElement("div");
     this.editModal.classList.add("modal", "is-active");
     this.editModal.classList.add("animate__animated", "animate__fadeIn");
@@ -48,7 +47,7 @@ export class Edit {
       this.save();
     });
     this.gid("edit-share").addEventListener("click", () => {
-      const shareModal = new Share(this.hostname, this.file);
+      const shareModal = new Share(this.user, this.hostname, this.file);
       shareModal.show();
     });
   }

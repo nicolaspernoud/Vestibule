@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httputil"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -144,25 +145,26 @@ func parseApps(file string, authz authzFunc) ([]*app, error) {
 // makeHandler constructs the appropriate Handler for the given app.
 func makeHandler(app *app, authz authzFunc) http.Handler {
 	var handler http.Handler
-	if fwdTo := app.ForwardTo; app.IsProxy && fwdTo != "" {
+	fwdToWithScheme := app.ForwardTo
+	if !strings.Contains(app.ForwardTo, "://") {
+		fwdToWithScheme = "http://" + app.ForwardTo // Scheme default to http
+	}
+	fwdToURL, err := url.Parse(fwdToWithScheme)
+	if err != nil {
+		log.Logger.Printf("app %v forward to a malformed url (%v), skipping", app.Name, app.ForwardTo)
+		return handler
+	}
+	if app.IsProxy {
 		fwdFrom := strings.TrimPrefix(app.Host, "*.")
 		handler = &httputil.ReverseProxy{
 			Transport: &http.Transport{
 				TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 			},
 			Director: func(req *http.Request) {
-				// Set the correct scheme to the request
-				if !strings.HasPrefix(fwdTo, "http") {
-					req.URL.Scheme = "http"
-					req.URL.Host = fwdTo
-				} else {
-					fwdToSplit := strings.Split(fwdTo, "://")
-					req.URL.Scheme = fwdToSplit[0]
-					req.URL.Host = fwdToSplit[1]
-				}
-				// Rewrite host header if the proxy is not to a local service
-				if !strings.Contains(fwdTo, ":") {
-					req.Host = fwdTo
+				req.URL.Scheme = fwdToURL.Scheme
+				req.URL.Host = fwdToURL.Host
+				if fwdToURL.Port() == "" { // If the target service contains no port, is to an external service and we need to rewrite the host header to fool the target site
+					req.Host = fwdToURL.Host
 				}
 				if app.Login != "" && app.Password != "" {
 					req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(app.Login+":"+app.Password)))
@@ -171,8 +173,7 @@ func makeHandler(app *app, authz authzFunc) http.Handler {
 			ModifyResponse: func(res *http.Response) error {
 				u, err := res.Location()
 				if err == nil {
-					// Alter the redirect location if the redirection is relative to the proxied host
-					if strings.Contains(u.Host, fwdTo) {
+					if strings.Contains(u.Host, fwdToURL.Hostname()) { // Alter the redirect location if the redirection is relative to the proxied host
 						u.Scheme = "https"
 						u.Host = fwdFrom + ":" + strconv.Itoa(port)
 					}

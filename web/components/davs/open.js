@@ -1,11 +1,11 @@
 // Imports
 import { AnimateCSS, RandomString, GetType, GID } from "/services/common/common.js";
 import { Share } from "/components/davs/share.js";
-import * as Auth from "/services/auth/auth.js";
 import { HandleError } from "/services/common/errors.js";
 
 export class Open {
-  constructor(hostname, fullHostname, files, file) {
+  constructor(user, hostname, fullHostname, files, file) {
+    this.user = user;
     this.hostname = hostname;
     this.fullHostname = fullHostname;
     this.files = files;
@@ -40,7 +40,7 @@ export class Open {
       this.seek(true);
     });
     this.gid("open-share").addEventListener("click", () => {
-      const shareModal = new Share(this.hostname, this.file);
+      const shareModal = new Share(this.user, this.hostname, this.file);
       shareModal.show();
     });
     // Display
@@ -62,7 +62,6 @@ export class Open {
   }
 
   async showContent() {
-    this.user = await Auth.GetUser();
     let content;
     let token;
     if (this.type == "text") {

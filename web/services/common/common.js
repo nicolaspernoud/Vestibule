@@ -53,3 +53,7 @@ export const Truncate = (input) => (input.length > 12 ? `${input.substring(0, 12
 export function EncodeURIWithSpecialsCharacters(str) {
   return encodeURI(str).replace(/[!'()*]/g, escape);
 }
+
+export function IsEmpty(obj) {
+  return Object.keys(obj).length === 0;
+}

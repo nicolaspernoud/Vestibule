@@ -1,10 +1,10 @@
 // Imports
 import { AnimateCSS, RandomString, GID } from "/services/common/common.js";
-import * as Auth from "/services/auth/auth.js";
 import { HandleError } from "/services/common/errors.js";
 
 export class Share {
-  constructor(hostname, file) {
+  constructor(user, hostname, file) {
+    this.user = user;
     this.hostname = hostname;
     this.file = file;
     this.url = `${hostname}${file.path}`;
@@ -18,7 +18,6 @@ export class Share {
   }
 
   async show() {
-    this.user = await Auth.GetUser();
     let shareModal = document.createElement("div");
     shareModal.classList.add("modal", "animate__animated", "animate__fadeIn", "is-active");
     shareModal.innerHTML = /* HTML */ `

@@ -129,10 +129,7 @@ func AddUser(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	// Encrypt the password with bcrypt
-	if newUser.Password == "" && newUser.PasswordHash == "" {
-		http.Error(w, "passwords cannot be blank", http.StatusBadRequest)
-		return
-	}
+	samePassword := true
 	if newUser.Password != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(newUser.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -141,17 +138,25 @@ func AddUser(w http.ResponseWriter, req *http.Request) {
 		}
 		newUser.PasswordHash = string(hash)
 		newUser.Password = ""
+		samePassword = false
 	}
 	// Add the user only if the id doesn't exists yet
 	isNew := true
 	for idx, val := range users {
 		if val.ID == newUser.ID {
+			if samePassword { // If user exists, and no new password was provided, keep the existing password
+				newUser.PasswordHash = users[idx].PasswordHash
+			}
 			users[idx] = newUser
 			isNew = false
 		} else if val.Login == newUser.Login { // Check for already existing login
 			http.Error(w, "login already exists", http.StatusBadRequest)
 			return
 		}
+	}
+	if newUser.PasswordHash == "" {
+		http.Error(w, "password cannot be empty", http.StatusBadRequest)
+		return
 	}
 	if isNew {
 		users = append(users, newUser)

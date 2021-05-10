@@ -1,10 +1,9 @@
 // Imports
 import { RandomString } from "/services/common/common.js";
-import * as Auth from "/services/auth/auth.js";
 import { HandleError } from "/services/common/errors.js";
 
-export async function mount(where) {
-  const infoComponent = new Sysinfo();
+export async function mount(where, user) {
+  const infoComponent = new Sysinfo(user);
   await infoComponent.mount(where);
   return setInterval(() => {
     infoComponent.update();
@@ -12,7 +11,8 @@ export async function mount(where) {
 }
 
 class Sysinfo {
-  constructor() {
+  constructor(user) {
+    this.user = user;
     // Random id seed
     this.prefix = RandomString(8);
   }
@@ -29,7 +29,6 @@ class Sysinfo {
 
   async update() {
     const content = document.getElementById(`${this.prefix}-sysinfo`);
-    this.user = await Auth.GetUser();
     try {
       const response = await fetch("/api/admin/sysinfo/", {
         method: "GET",

@@ -1,11 +1,12 @@
 // Imports
 import { HandleError } from "/services/common/errors.js";
+import { IsEmpty } from "/services/common/common.js";
 
 // Local variables
-let user;
+let user = {};
 
 export async function GetUser() {
-  if (user != undefined) {
+  if (!IsEmpty(user)) {
     return user;
   }
   try {
@@ -32,5 +33,5 @@ export async function GetUser() {
 }
 
 export function DeleteUser() {
-  user = undefined;
+  user = {};
 }

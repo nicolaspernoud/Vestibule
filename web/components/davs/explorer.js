@@ -212,7 +212,7 @@ export class Explorer {
           HandleError(e);
         }
       } else if (GetType(file)) {
-        const openModal = new Open(this.hostname, this.fullHostname, this.files, file);
+        const openModal = new Open(this.user, this.hostname, this.fullHostname, this.files, file);
         openModal.show(true);
       }
     });
@@ -233,7 +233,7 @@ export class Explorer {
       if (GetType(file) === "text") {
         document.getElementById(`file-${file.id}-edit`).addEventListener("click", (event) => {
           event.stopPropagation();
-          const editModal = new Edit(this.fullHostname, file);
+          const editModal = new Edit(this.user, this.fullHostname, file);
           editModal.show(true);
         });
       }
@@ -250,7 +250,7 @@ export class Explorer {
     }
     document.getElementById(`file-${file.id}-share`).addEventListener("click", (event) => {
       event.stopPropagation();
-      const shareModal = new Share(this.hostname, file);
+      const shareModal = new Share(this.user, this.hostname, file);
       shareModal.show(true);
     });
   }

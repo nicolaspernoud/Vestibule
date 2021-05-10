@@ -47,8 +47,14 @@ func TestAddUser(t *testing.T) {
 	defer os.Remove(UsersFile)
 
 	handler := http.HandlerFunc(AddUser)
-	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"1","login":"admin","password": "password"}`, http.StatusOK, `[{"id":"1","login":"admin"`)
-	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"1","login":"admin","password": ""}`, http.StatusBadRequest, `passwords cannot be blank`)
+	// Alter the password of the admin user, must create an hash
+	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"1","login":"admin","password": "password"}`, http.StatusOK, `[{"id":"1","login":"admin","memberOf":null,"passwordHash":"$2a`)
+	// Test that altering an user without altering the password keep the password hash
+	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"1","login":"admin_altered"}`, http.StatusOK, `[{"id":"1","login":"admin_altered","memberOf":null,"passwordHash":"$2a`)
+	// Add a new user with a password, must pass
+	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"3","login":"user3","password": "password_user3"}`, http.StatusOK, `[{"id":"1","login":"admin`)
+	// Add a new user with no password, must fail
+	tester.DoRequestOnHandler(t, handler, "POST", "/", noH, `{"id":"4","login":"user4","password": ""}`, http.StatusBadRequest, `password cannot be empty`)
 }
 
 func TestMatchUser(t *testing.T) {
@@ -96,8 +102,8 @@ func TestMatchUser(t *testing.T) {
 
 func writeUsers() (name string) {
 	users := []*User{
-		{ID: "1", Login: "admin", Password: "password"},
-		{ID: "2", Login: "user", Password: "password"},
+		{ID: "1", Login: "admin"},
+		{ID: "2", Login: "user"},
 	}
 	f, err := ioutil.TempFile("", "users")
 	if err != nil {
