@@ -81,7 +81,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			}
 			// Write the requested url in a cookie
 			if r.Host != redirectTo {
-				cookie := http.Cookie{Name: "redirectAfterLogin", Domain: hostname, Value: r.Host + r.URL.Path, MaxAge: 10, Secure: true, HttpOnly: false, SameSite: http.SameSiteLaxMode}
+				cookie := http.Cookie{Name: "redirectAfterLogin", Domain: hostname, Value: r.Host + r.URL.Path, MaxAge: 30, Secure: true, HttpOnly: false, SameSite: http.SameSiteLaxMode}
 				http.SetCookie(w, &cookie)
 			}
 			w.Header().Set("Content-Type", "text/html")

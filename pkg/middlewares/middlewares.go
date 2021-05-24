@@ -12,24 +12,36 @@ import (
 	"github.com/nicolaspernoud/vestibule/pkg/glob"
 )
 
-// Cors enables CORS Request on server (for development purposes)
+// Cors enables CORS Request on server, CORS are accepted from the allowed domain, its parent domain, and all subdomains
 func Cors(next http.Handler, allowedDomain string, port int) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		origin := req.Header.Get("Origin")
-		allowedSubDomains := func(hostname string, port int) string {
-			if port == 80 || port == 443 {
-				return "https://*." + hostname
+		if origin != "" {
+			if GetFullHostname(allowedDomain, port) == origin || parentDomain(allowedDomain, port) == origin || glob.Glob(subDomainsGlob(allowedDomain, port), origin) {
+				w.Header().Set("Access-Control-Allow-Origin", origin)
+				w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PROPFIND, MKCOL, MOVE, COPY")
+				w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, XSRF-TOKEN, Authorization, Depth, Destination")
+				w.Header().Set("Access-Control-Allow-Credentials", "true")
 			}
-			return "https://*." + hostname + ":" + strconv.Itoa(port)
-		}(allowedDomain, port)
-		if GetFullHostname(allowedDomain, port) == origin || glob.Glob(allowedSubDomains, origin) {
-			w.Header().Set("Access-Control-Allow-Origin", origin)
 		}
-		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PROPFIND, MKCOL, MOVE, COPY")
-		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, XSRF-TOKEN, Authorization, Depth, Destination")
-		w.Header().Set("Access-Control-Allow-Credentials", "true")
 		next.ServeHTTP(w, req)
 	})
+}
+
+func parentDomain(hostname string, port int) string {
+	lead := strings.Split(hostname, ".")[0]
+	parentHostname := strings.TrimPrefix(hostname, lead+".")
+	if port == 80 || port == 443 {
+		return "https://" + parentHostname
+	}
+	return "https://" + parentHostname + ":" + strconv.Itoa(port)
+}
+
+func subDomainsGlob(hostname string, port int) string {
+	if port == 80 || port == 443 {
+		return "https://*." + hostname
+	}
+	return "https://*." + hostname + ":" + strconv.Itoa(port)
 }
 
 /*

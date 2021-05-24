@@ -2,13 +2,11 @@ package rootmux
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"net/http"
 	"net/http/cookiejar"
 	"net/http/httptest"
 	"net/url"
 	"os"
-	"regexp"
 	"runtime"
 	"strings"
 	"sync"
@@ -24,25 +22,19 @@ import (
 )
 
 var (
-	initialAppsBuff, _     = ioutil.ReadFile("./tesdata/apps.json")
-	reg, _                 = regexp.Compile("[\n \t]+")
-	initialApps            = reg.ReplaceAllString(string(initialAppsBuff), "")
-	newApp                 = "{\"id\":4,\"host\":\"test\",\"isProxy\":false,\"forwardTo\":\"\",\"serve\":\"test\"}"
-	updatedAppsWithSchemes = strings.Replace(initialApps, "api.vestibule.", "http://api.vestibule.", 1)
-	initialUsersBuff, _    = ioutil.ReadFile("../../configs/users.json")
-	initialUsers           = reg.ReplaceAllString(string(initialUsersBuff), "")
-	newUser                = `{"id":"3","login":"new_user","memberOf":["USERS"],"password":"test"}`
-	newDav                 = `{"id": 5,"host":"writableadmindav.vestibule.io","root":"./testdata/data","secured":true,"writable":true,"roles":["ADMINS"]}`
-	noH                    map[string]string
+	newApp  = "{\"id\":4,\"host\":\"test\",\"isProxy\":false,\"forwardTo\":\"\",\"serve\":\"test\"}"
+	newUser = `{"id":"3","login":"new_user","memberOf":["USERS"],"password":"test"}`
+	newDav  = `{"id": 5,"host":"writableadmindav.vestibule.io","root":"./testdata/data","secured":true,"writable":true,"roles":["ADMINS"]}`
+	noH     map[string]string
 )
 
 func init() {
-	tokens.Init("../../configs/tokenskey.json", true)
+	tokens.Init("testdata/tokenskey.json", true)
 }
 
 func TestAll(t *testing.T) {
 	// Set the users file
-	auth.UsersFile = "../../configs/users.json"
+	auth.UsersFile = "testdata/users.json"
 	// Create the mock OAuth2 server
 	oAuth2Server := httptest.NewServer(mocks.CreateMockOAuth2())
 	defer oAuth2Server.Close()

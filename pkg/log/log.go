@@ -7,6 +7,7 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -71,7 +72,7 @@ func GetCityAndCountryFromRequest(req *http.Request) string {
 	}
 
 	// Get ip from remote address
-	address := strings.Split(req.RemoteAddr, ":")[0]
+	address := regexp.MustCompile(`\[?([^\[\]]*)\]?:.*$`).FindStringSubmatch(req.RemoteAddr)[1]
 
 	// First check if the ip is in memory cache
 	locFromCache, ok := ipcache.content[address]
@@ -82,7 +83,7 @@ func GetCityAndCountryFromRequest(req *http.Request) string {
 	// If not open the maxmind database, search the ip and update the cache
 	db, err := maxminddb.Open(ipDbLocation)
 	if err != nil {
-		Logger.Fatal(err)
+		return "no ip location database"
 	}
 	defer db.Close()
 
@@ -103,7 +104,7 @@ func GetCityAndCountryFromRequest(req *http.Request) string {
 
 	err = db.Lookup(ip, &record)
 	if err != nil {
-		Logger.Fatal(err)
+		return err.Error()
 	}
 	if record.Country.Names["fr"] == "" {
 		return "ip not found"
