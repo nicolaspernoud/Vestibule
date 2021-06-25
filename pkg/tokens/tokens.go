@@ -22,8 +22,8 @@ import (
 
 var (
 	now = time.Now
-	// Manager is the current token manager
-	Manager manager
+	// m is the current token manager
+	m manager
 )
 
 // manager manages tokens
@@ -34,7 +34,7 @@ type manager struct {
 
 // Init inits the main token manager
 func Init(keyfile string, debug bool) {
-	Manager = newManager(keyfile, debug)
+	m = newManager(keyfile, debug)
 }
 
 // newManager creates a manager
@@ -67,10 +67,10 @@ type Token struct {
 	Data      []byte
 }
 
-// StoreData creates a token with the given data and returns it in a cookie
-func (m manager) StoreData(data interface{}, hostName string, cookieName string, duration time.Duration, w http.ResponseWriter) {
+// CreateCookie creates a token with the given data and returns it in a cookie
+func CreateCookie(data interface{}, hostName string, cookieName string, duration time.Duration, w http.ResponseWriter) {
 	expiration := now().Add(duration)
-	value, err := m.CreateToken(data, expiration)
+	value, err := CreateToken(data, expiration)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -80,7 +80,7 @@ func (m manager) StoreData(data interface{}, hostName string, cookieName string,
 }
 
 // CreateToken creates a token with the given data
-func (m manager) CreateToken(data interface{}, expiration time.Time) (string, error) {
+func CreateToken(data interface{}, expiration time.Time) (string, error) {
 	// Marshall the data
 	d, err := json.Marshal(data)
 	if err != nil {
@@ -98,7 +98,10 @@ func (m manager) CreateToken(data interface{}, expiration time.Time) (string, er
 	}
 	// Compress with deflate
 	var csToken bytes.Buffer
-	c, err := flate.NewWriter(&csToken, flate.BestCompression)
+	var c *flate.Writer
+	if c, err = flate.NewWriter(&csToken, flate.BestCompression); err != nil {
+		return "", err
+	}
 	if _, err := c.Write(sToken); err != nil {
 		return "", err
 	}
@@ -113,7 +116,7 @@ func (m manager) CreateToken(data interface{}, expiration time.Time) (string, er
 }
 
 // ExtractAndValidateToken extracts the token from the request, validates it, and return the data n the value pointed to by v
-func (m manager) ExtractAndValidateToken(r *http.Request, cookieName string, v interface{}, checkXSRF bool) (bool, error) {
+func ExtractAndValidateToken(r *http.Request, cookieName string, v interface{}, checkXSRF bool) (bool, error) {
 	becsToken, checkXSRF, err := func(r *http.Request, checkXSRF bool) (string, bool, error) {
 		// Try to extract from the query
 		query := r.URL.Query().Get("token")
@@ -142,13 +145,13 @@ func (m manager) ExtractAndValidateToken(r *http.Request, cookieName string, v i
 	}(r, checkXSRF)
 
 	if err == nil {
-		return checkXSRF, m.unstoreData(becsToken, v)
+		return checkXSRF, unstoreData(becsToken, v)
 	}
 	return false, err
 }
 
 // unstoreData decrypt, uncompress, unserialize the token, and returns the data n the value pointed to by v
-func (m manager) unstoreData(becsToken string, v interface{}) error {
+func unstoreData(becsToken string, v interface{}) error {
 	// Decrypt the token
 	ecsToken, err := base64.StdEncoding.DecodeString(becsToken)
 	if err != nil {
@@ -181,6 +184,10 @@ func (m manager) unstoreData(becsToken string, v interface{}) error {
 	}
 	// Update the data
 	err = json.Unmarshal(token.Data, v)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshall data")
+
+	}
 	// Return no error if everything is fine
 	return nil
 }

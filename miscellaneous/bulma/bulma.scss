@@ -30,7 +30,7 @@ $navbar-item-active-background-color: $very-light-grey;
 $progress-border-radius: 0px;
 $progress-indeterminate-duration: 1s;
 $modal-card-head-padding: 15px;
-$modal-card-head-background-color: $very-light-grey;
+$modal-card-head-background-color: $light-grey;
 $modal-card-head-radius: $radius-small;
 
 // Bulma imports
@@ -100,7 +100,7 @@ img {
 }
 
 .dropdown-content {
-  width: 12rem;
+  width: 11.8rem;
   word-wrap: break-word;
 }
 
@@ -164,16 +164,19 @@ a.navbar-item.is-active {
   margin: 1rem;
   width: 12rem;
   transition: 0.3s;
+  border: 0.1rem solid $light-grey;
+  border-radius: $radius-large;
+  box-shadow: none;
+  background-color: $very-light-grey;
+}
+
+.icon-card:hover {
+  border-color: $deep-blue;
+  box-shadow: 0 0 0.5rem $light-grey;
 }
 
 .card {
   border-radius: $radius-small;
-}
-
-.icon-card:hover {
-  z-index: 10;
-  transform: translateY(-2px);
-  box-shadow: 0 1em 2em -0.25em rgba(10, 10, 10, 0.2), 0 0px 0 2px rgba(10, 10, 10, 0.04);
 }
 
 .modal-content {
@@ -206,4 +209,8 @@ a.navbar-item.is-active {
 .textarea {
   line-height: 1;
   font-family: "Lucida Console", monospace;
+}
+
+.shadow-icon {
+  filter: drop-shadow(0.1rem 0.1rem 0.1rem grey);
 }

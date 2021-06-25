@@ -97,8 +97,7 @@ export class Login {
       if (response.status !== 200) {
         throw new Error(`Login error (status ${response.status})`);
       }
-      const newUser = await Auth.GetUser();
-      Object.assign(this.user, newUser);
+      await Auth.GetUser();
       location.hash = "#davs";
       this.navbar.CreateMenu();
     } catch (e) {

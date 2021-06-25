@@ -57,7 +57,7 @@ type TokenData struct {
 func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF bool) http.Handler {
 	roleChecker := func(w http.ResponseWriter, r *http.Request) {
 		user := TokenData{}
-		checkXSRF, err := tokens.Manager.ExtractAndValidateToken(r, authTokenKey, &user, checkXSRF)
+		checkXSRF, err := tokens.ExtractAndValidateToken(r, authTokenKey, &user, checkXSRF)
 		// Handle WebDav authentication
 		if err != nil && isWebdav(r.UserAgent()) {
 			// Test if the user password is directly given in the request, if so populate the user
@@ -80,8 +80,8 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 				redirectTo += ":" + port
 			}
 			// Write the requested url in a cookie
-			if r.Host != redirectTo {
-				cookie := http.Cookie{Name: "redirectAfterLogin", Domain: hostname, Value: r.Host + r.URL.Path, MaxAge: 30, Secure: true, HttpOnly: false, SameSite: http.SameSiteLaxMode}
+			if r.Host != redirectTo && r.URL.Path != "/favicon.ico" {
+				cookie := http.Cookie{Name: "redirectAfterLogin", Path: "/", Domain: hostname, Value: r.Host + r.URL.Path + "?" + r.URL.RawQuery, MaxAge: 30, Secure: true, HttpOnly: false, SameSite: http.SameSiteLaxMode}
 				http.SetCookie(w, &cookie)
 			}
 			w.Header().Set("Content-Type", "text/html")
@@ -195,7 +195,7 @@ func GetShareToken(w http.ResponseWriter, r *http.Request) {
 	user.URL = wantedToken.URL
 	user.ReadOnly = wantedToken.ReadOnly
 	user.SharingUserLogin = wantedToken.Sharedfor
-	token, err := tokens.Manager.CreateToken(user, time.Now().Add(time.Hour*time.Duration(24*wantedToken.Lifespan)))
+	token, err := tokens.CreateToken(user, time.Now().Add(time.Hour*time.Duration(24*wantedToken.Lifespan)))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

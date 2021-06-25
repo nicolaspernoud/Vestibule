@@ -16,7 +16,7 @@ export class Navbar {
     window.document.title = brand.windowTitle;
     where.innerHTML = /* HTML */ `
       <div class="navbar-brand">
-        <a class="navbar-item is-size-4" href="/"><img src="assets/brand/logo.svg" alt="logo" />${brand.navTitle}</a>
+        <a class="navbar-item is-size-4" href="/"><img class="shadow-icon" src="assets/brand/logo.svg" alt="logo" />${brand.navTitle}</a>
         <a role="button" id="navbar-burger" class="navbar-burger burger" aria-label="menu" aria-expanded="false">
           <span aria-hidden="true"></span>
           <span aria-hidden="true"></span>
@@ -52,20 +52,20 @@ export class Navbar {
         ${IsEmpty(this.user)
           ? ``
           : /* HTML */ `
-              <a id="navbar-apps" class="navbar-item" href="#apps"><i class="navbar-menu-icon fas fa-home"></i>Apps</a>
-              <a id="navbar-davs" class="navbar-item" href="#davs"><i class="navbar-menu-icon fas fa-folder-open"></i>Files</a>
+              <a id="navbar-apps" class="navbar-item" href="#apps"><i class="navbar-menu-icon fas shadow-icon fa-home"></i>Apps</a>
+              <a id="navbar-davs" class="navbar-item" href="#davs"><i class="navbar-menu-icon fas shadow-icon fa-folder-open"></i>Files</a>
               ${this.user.isAdmin
                 ? /* HTML */ `
-                    <a id="navbar-users" class="navbar-item" href="#users"><i class="navbar-menu-icon fas fa-users"></i>Users</a>
-                    <a id="navbar-sysinfo" class="navbar-item" href="#sysinfo"><i class="navbar-menu-icon fas fa-stethoscope"></i>System information</a>
+                    <a id="navbar-users" class="navbar-item" href="#users"><i class="navbar-menu-icon fas shadow-icon fa-users"></i>Users</a>
+                    <a id="navbar-sysinfo" class="navbar-item" href="#sysinfo"><i class="navbar-menu-icon fas shadow-icon fa-stethoscope"></i>System information</a>
                   `
                 : ""}
             `}
       </div>
       <div class="navbar-end">
         ${IsEmpty(this.user)
-          ? /* HTML */ ` <a class="navbar-item" href="#login"><i class="navbar-menu-icon fas fa-sign-in-alt"></i>Log in</a> `
-          : /* HTML */ ` <a class="navbar-item" href="/Logout"><i class="navbar-menu-icon fas fa-sign-out-alt"></i>Log out</a> `}
+          ? /* HTML */ ` <a class="navbar-item" href="#login"><i class="navbar-menu-icon fas shadow-icon fa-sign-in-alt"></i>Log in</a> `
+          : /* HTML */ ` <a class="navbar-item" href="/Logout"><i class="navbar-menu-icon fas shadow-icon fa-sign-out-alt"></i>Log out</a> `}
       </div>
     `;
     this.SetActiveItem();

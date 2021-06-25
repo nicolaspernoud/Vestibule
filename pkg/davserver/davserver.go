@@ -200,6 +200,10 @@ func (wdaug WebdavAug) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// Work out if trying to serve a directory
 		ressource := strings.TrimPrefix(r.URL.Path, wdaug.prefix)
 		fPath := filepath.Join(wdaug.directory, filepath.FromSlash(path.Clean("/"+ressource)))
+		// If method is PUT, wrap with modification time writer
+		if r.Method == "PUT" {
+			h = setModTime(h, fPath)
+		}
 		if wdaug.isEncrypted { // Zip download disabled if wdaug is encrypted
 			if r.Method == "GET" {
 				setContentDisposition(w, r)
@@ -240,8 +244,8 @@ func setContentDisposition(w http.ResponseWriter, r *http.Request) {
 }
 
 func webdavLogger(r *http.Request, err error) {
-	user, err := auth.GetTokenData(r)
-	if err != nil && !common.Contains([]string{"PROPFIND", "OPTIONS", "LOCK", "UNLOCK", "GET"}, r.Method) || strings.Contains(user.Login, "_share_") {
+	user, _ := auth.GetTokenData(r)
+	if !common.Contains([]string{"PROPFIND", "OPTIONS", "LOCK", "UNLOCK", "GET"}, r.Method) || strings.Contains(user.Login, "_share_") {
 		if err != nil {
 			log.Logger.Printf("| %v | Webdav access error : [%s] %s, %s | %v | %v", user.Login, r.Method, r.URL, err, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 		} else {
@@ -502,6 +506,23 @@ func rewritePropfindSizes(next http.Handler, key []byte) http.Handler {
 			}
 			return parts[1] + strconv.FormatInt(size, 10) + parts[3]
 		}))
+	})
+}
+
+// setModTime use X-OC-Mtime header to alter modtime on PUT requests (nextcloud/owncloud style)
+func setModTime(next http.Handler, fp string) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Put the file to the disk (native webdav method)
+		next.ServeHTTP(w, r)
+		// Get the modification time
+		mth := r.Header.Get("X-OC-Mtime")
+		mti, err := strconv.ParseInt(mth, 10, 64)
+		if err != nil { // On error, just return
+			return
+		}
+		mt := time.Unix(mti, 0)
+		// Alter the file on disk (do nothing on error)
+		os.Chtimes(fp, time.Now(), mt)
 	})
 }
 

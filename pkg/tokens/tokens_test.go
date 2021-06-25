@@ -43,14 +43,14 @@ func TestManagerCreateTokenUnStoreData(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			m := manager{
+			m = manager{
 				key:       tt.fields.encryptKey,
 				debugMode: tt.fields.debugMode,
 			}
-			token, _ := m.CreateToken(tt.args.data, tt.args.expiration)
+			token, _ := CreateToken(tt.args.data, tt.args.expiration)
 			m.key = tt.fields.decryptKey
 			v := user{}
-			err := m.unstoreData(token, &v)
+			err := unstoreData(token, &v)
 			got := tt.args.data == v
 			if (err != nil) != tt.wantErr {
 				t.Errorf("manager.(un)storeData() error = %v, wantErr %v", err, tt.wantErr)

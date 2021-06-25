@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+type DoFn func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string
+
 // DoRequestOnHandler does a request on a router (or handler) and check the response
 func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
 	req, err := http.NewRequest(method, route, strings.NewReader(payload))
@@ -83,7 +85,7 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 }
 
 // CreateServerTester wraps DoRequestOnServer to factorize t, port and jar
-func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar) func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
+func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar) DoFn {
 	return func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
 		return DoRequestOnServer(t, port, hostname, jar, method, url, headers, payload, expectedStatus, expectedBody)
 	}

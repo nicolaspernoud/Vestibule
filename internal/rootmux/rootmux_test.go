@@ -344,7 +344,7 @@ func createDirectWebdavTests(t *testing.T) func(wg *sync.WaitGroup) {
 	}
 }
 
-func createTester(t *testing.T) (*httptest.Server, func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string, func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string) {
+func createTester(t *testing.T) (*httptest.Server, tester.DoFn, tester.DoFn) {
 	// Create the server
 	mux := CreateRootMux(os.Getenv("HOSTNAME"), 1443, "./testdata/apps.json", "./testdata/davs.json", "../../web")
 	ts := httptest.NewServer(mux.Mux)

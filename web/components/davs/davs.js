@@ -153,19 +153,19 @@ class Davs {
     const du = dav.usedgb / dav.totalgb;
     const free = dav.totalgb - dav.usedgb;
     return /* HTML */ `
-      <div id="davs-dav-${dav.id}" class="card icon-card">
+      <div id="davs-dav-${dav.id}" class="icon-card">
         <div id="davs-dav-open-${dav.id}" class="card-content has-text-centered">
           <span class="icon is-medium" style="color:${dav.color};">
-            <i class="fas fa-3x fa-${dav.icon ? dav.icon : "file"}"></i>
+            <i class="fas fa-3x shadow-icon fa-${dav.icon ? dav.icon : "file"}"></i>
           </span>
         </div>
         <p class="has-text-centered"><strong>${dav.name ? dav.name : dav.id}</strong></p>
         <div class="card-footer">
           <div class="dropdown is-hoverable" style="margin-top: 1px;">
             <div class="dropdown-trigger">
-              <button class="button is-white">
+              <button class="button is-small m-1 is-light" style="background-color: transparent">
                 <span class="icon is-small">
-                  <i class="fas fa-angle-down"></i>
+                  <i class="fas fa-ellipsis-v"></i>
                 </span>
               </button>
             </div>

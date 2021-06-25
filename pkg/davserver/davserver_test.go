@@ -4,8 +4,10 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/nicolaspernoud/vestibule/pkg/tester"
 )
@@ -36,4 +38,50 @@ func TestEncryption(t *testing.T) {
 	if body != "" { // Check that the body is really empty
 		t.Errorf("body must be empty")
 	}
+}
+
+func TestSetModTime(t *testing.T) {
+	test := func(do tester.DoFn) {
+		// Time is now
+		now := time.Now()
+		time.Sleep(1 * time.Second)
+		// No X-OC-Mtime header
+		var noH map[string]string
+		// Try to put a file without the Mtime header (must pass)
+		do("PUT", "/test-modtime.txt", noH, "no Mtime", 201, "")
+		// Check that the modified time of the file is greater than now
+		fi, _ := os.Stat("./testdata/test-modtime.txt")
+		mtime := fi.ModTime()
+		if mtime.Before(now) {
+			t.Errorf("modification time must be greater than reference time")
+		}
+		// Try to put a file with a Mtime header ()
+		mtH := map[string]string{
+			"X-OC-Mtime": "405659700",
+		}
+		do("PUT", "/test-modtime.txt", mtH, "Mtime is my birthday", 201, "")
+		// Check that the modifier time of the file matches the header
+		fi, _ = os.Stat("./testdata/test-modtime.txt")
+		mtime = fi.ModTime()
+		myBD := time.Unix(405659700, 0)
+		if !mtime.Equal(myBD) {
+			t.Errorf("modification time must be lesser than reference time")
+		}
+	}
+
+	// Test with unencrypted webdav
+	davAug := NewWebDavAug("", "./testdata", true, "")
+	ts := httptest.NewServer(&davAug)
+	url, _ := url.Parse(ts.URL)
+	port := url.Port()
+	doPlain := tester.CreateServerTester(t, port, "vestibule.io", nil)
+	test(doPlain)
+
+	// Test with encrypted webdav
+	davAugEnc := NewWebDavAug("", "./testdata", true, "this is encrypted")
+	tsEnc := httptest.NewServer(&davAugEnc)
+	urlEnc, _ := url.Parse(tsEnc.URL)
+	portEnc := urlEnc.Port()
+	doEnc := tester.CreateServerTester(t, portEnc, "vestibule.io", nil)
+	test(doEnc)
 }

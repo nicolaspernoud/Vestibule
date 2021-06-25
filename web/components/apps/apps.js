@@ -174,19 +174,19 @@ class Apps {
   appTemplate(app) {
     this.cleanApp(app);
     return /* HTML */ `
-      <div id="apps-app-${app.id}" class="card icon-card">
+      <div id="apps-app-${app.id}" class="icon-card">
         <div class="card-content has-text-centered" id="apps-app-open-${app.id}">
           <span class="icon is-medium" style="color:${app.color};">
-            <i class="fas fa-3x fa-${app.icon ? app.icon : "file"}"></i>
+            <i class="fas fa-3x shadow-icon fa-${app.icon ? app.icon : "file"}"></i>
           </span>
         </div>
         <p class="has-text-centered"><strong>${app.name ? app.name : app.id}</strong></p>
         <div class="card-footer">
           <div class="dropdown is-hoverable" style="margin-top: 1px;">
             <div class="dropdown-trigger">
-              <button class="button is-white">
+              <button class="button is-small m-1 is-light" style="background-color: transparent">
                 <span class="icon is-small">
-                  <i class="fas fa-angle-down"></i>
+                  <i class="fas fa-ellipsis-v"></i>
                 </span>
               </button>
             </div>

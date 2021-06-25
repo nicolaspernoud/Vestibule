@@ -14,13 +14,13 @@ export async function GetUser() {
     if (response.status !== 200) {
       throw new Error(`Not authenticated (status ${response.status})`);
     }
-    user = await response.json();
+    Object.assign(user, await response.json());
     // Redirect to original subdomain if login was displayed after an authentication error on the original subdomain
     try {
       const redirectAfterLogin = document.cookie
         .split("; ")
         .find((row) => row.startsWith("redirectAfterLogin="))
-        .split("=")[1];
+        .split(/=(.+)/)[1];
 
       if (redirectAfterLogin != "" && redirectAfterLogin != null) {
         window.location.replace("https://" + redirectAfterLogin);
@@ -33,5 +33,7 @@ export async function GetUser() {
 }
 
 export function DeleteUser() {
-  user = {};
+  Object.keys(user).forEach((key) => {
+    delete user[key];
+  });
 }

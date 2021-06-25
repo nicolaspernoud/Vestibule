@@ -50,7 +50,7 @@ func (m Manager) HandleOAuth2Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Logger.Fatalf("Error generating OAuth2 strate string :%v\n", err)
 	}
-	tokens.Manager.StoreData(oauthStateString, m.Hostname, oAuth2StateKey, 30*time.Second, w)
+	tokens.CreateCookie(oauthStateString, m.Hostname, oAuth2StateKey, 30*time.Second, w)
 	url := m.Config.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
@@ -60,7 +60,7 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 	oauth2Handler := func(w http.ResponseWriter, r *http.Request) {
 		// Recover state from tokens
 		var oauthState string
-		_, err := tokens.Manager.ExtractAndValidateToken(r, oAuth2StateKey, &oauthState, false)
+		_, err := tokens.ExtractAndValidateToken(r, oAuth2StateKey, &oauthState, false)
 		if err != nil {
 			fmt.Println("Code exchange failed with ", err)
 			http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
@@ -133,7 +133,7 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 			return
 		}
 		tokenData := TokenData{User: user, XSRFToken: xsrfToken}
-		tokens.Manager.StoreData(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
+		tokens.CreateCookie(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
 		// Log the connexion
 		log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, req.RemoteAddr, log.GetCityAndCountryFromRequest(req))
 		// Redirect

@@ -20,7 +20,7 @@ func Cors(next http.Handler, allowedDomain string, port int) http.Handler {
 			if GetFullHostname(allowedDomain, port) == origin || parentDomain(allowedDomain, port) == origin || glob.Glob(subDomainsGlob(allowedDomain, port), origin) {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, PROPFIND, MKCOL, MOVE, COPY")
-				w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, XSRF-TOKEN, Authorization, Depth, Destination")
+				w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, XSRF-TOKEN, Authorization, Depth, Destination, X-OC-Mtime")
 				w.Header().Set("Access-Control-Allow-Credentials", "true")
 			}
 		}

@@ -376,7 +376,7 @@ export class Explorer {
 
   async newFolder() {
     const newFolderName = "New Folder";
-    const folder = { name: newFolderName, isDir: true, type: "dir", size: 0, lastModified: new Date(), path: path(this.path, newFolderName) + "/", id: this.files.length + 1 };
+    const folder = { name: newFolderName, isDir: true, type: "dir", size: 0, lastModified: new Date(), path: path(this.path, newFolderName) + "/", id: this.nextID() };
     try {
       const response = await fetch(this.fullHostname + folder.path, {
         method: "MKCOL",
@@ -388,8 +388,7 @@ export class Explorer {
       if (response.status !== 201) {
         throw new Error(`Folder could not be created (status ${response.status})`);
       }
-      this.files.push(folder);
-      this.displayFiles();
+      this.addFileToView(folder);
     } catch (e) {
       HandleError(e);
     }
@@ -397,7 +396,7 @@ export class Explorer {
 
   async newTxt() {
     const newTxtName = "New Text.txt";
-    const txt = { name: newTxtName, isDir: false, type: "text", size: 0, lastModified: new Date(), path: path(this.path, newTxtName), id: this.files.length + 1 };
+    const txt = { name: newTxtName, isDir: false, type: "text", size: 0, lastModified: new Date(), path: path(this.path, newTxtName), id: this.nextID() };
     try {
       if (this.files.some((file) => file.name === newTxtName)) {
         throw new Error(`Text document already exists`);
@@ -412,8 +411,7 @@ export class Explorer {
       if (response.status !== 201) {
         throw new Error(`Text document could not be created (status ${response.status})`);
       }
-      this.files.push(txt);
-      this.displayFiles();
+      this.addFileToView(txt);
     } catch (e) {
       HandleError(e);
     }
@@ -433,7 +431,7 @@ export class Explorer {
           throw new Error(`File could not be deleted (status ${response.status})`);
         }
         this.files = this.files.filter((el) => el.name !== file.name);
-        this.displayFiles();
+        document.getElementById(`file-${file.id}-content`).outerHTML = "";
       } catch (e) {
         HandleError(e);
       }
@@ -442,7 +440,6 @@ export class Explorer {
 
   async upload(files) {
     const onStartPath = this.path;
-    let id = this.files.length;
     let fileIdx = 0;
     for (const file of files) {
       // Check for overwrite
@@ -450,7 +447,6 @@ export class Explorer {
         Messages.Show("is-warning", `A file with the name "${file.name}" already exists, please remove the old file before upload.`);
         continue;
       }
-      id++;
       fileIdx++;
       file.path = path(onStartPath, file.name);
       // Create a message to allow progress tracking and cancellation
@@ -489,16 +485,8 @@ export class Explorer {
       try {
         await this.uploadFile(xhr, file);
         if (this.path === onStartPath) {
-          this.files.push({
-            name: file.name,
-            path: file.path,
-            isDir: file.isDir,
-            type: file.type,
-            size: file.size,
-            lastModified: file.lastModified,
-            id: id,
-          });
-          this.displayFiles();
+          const newFile = { name: file.name, path: file.path, isDir: file.isDir, type: file.type, size: file.size, lastModified: file.lastModified, id: this.nextID() };
+          this.addFileToView(newFile);
         }
       } catch (e) {
         console.error(e.statusText);
@@ -507,6 +495,17 @@ export class Explorer {
       await AnimateCSS(msg, "fadeOutDown");
       msg.parentNode.removeChild(msg);
     }
+  }
+
+  addFileToView(file) {
+    this.files.push(file);
+    const markup = this.fileTemplate(file);
+    try {
+      document.getElementById(`file-${file.id - 1}-content`).insertAdjacentHTML("afterend", markup);
+    } catch {
+      document.getElementById(`explorer-modal-content`).innerHTML = markup;
+    }
+    this.registerEvents(file);
   }
 
   uploadFile(xhr, file) {
@@ -536,6 +535,7 @@ export class Explorer {
       };
       xhr.open("PUT", this.fullHostname + file.path);
       xhr.setRequestHeader("XSRF-Token", this.user.xsrftoken);
+      xhr.setRequestHeader("X-OC-Mtime", Math.round(file.lastModified / 1000));
       xhr.send(file);
     });
   }
@@ -566,6 +566,13 @@ export class Explorer {
     } catch (e) {
       HandleError(e);
     }
+  }
+
+  nextID() {
+    if (!this.files.length) {
+      return 1;
+    }
+    return this.files.reduce((a, b) => (a.id > b.id ? a : b)).id + 1;
   }
 }
 
