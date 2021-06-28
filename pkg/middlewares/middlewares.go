@@ -58,7 +58,7 @@ type webSecurityWriter struct {
 }
 
 func (s webSecurityWriter) WriteHeader(code int) {
-	if s.wroteHeader == false {
+	if !s.wroteHeader {
 		s.w.Header().Set("Strict-Transport-Security", "max-age=63072000")
 		var inline string
 		if s.allowEvalInlineScript {
@@ -81,6 +81,7 @@ func (s webSecurityWriter) WriteHeader(code int) {
 		s.w.Header().Set("X-XSS-Protection", "1; mode=block")
 		s.w.Header().Set("Referrer-Policy", "strict-origin")
 		s.w.Header().Set("X-Content-Type-Options", "nosniff")
+		//lint:ignore SA4005 we need to assign true so that when the WriteHeader method will be used again, we won't rewrite security headers
 		s.wroteHeader = true
 	}
 	s.w.WriteHeader(code)
