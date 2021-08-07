@@ -7,9 +7,10 @@ require (
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/oschwald/maxminddb-golang v1.8.0
 	github.com/secure-io/sio-go v0.3.1
-	golang.org/x/crypto v0.0.0-20210513164829-c07d793c2f9a
-	golang.org/x/net v0.0.0-20210525063256-abc453219eb5
-	golang.org/x/oauth2 v0.0.0-20210514164344-f6687ab2804c
-	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139
+	golang.org/x/crypto v0.0.0-20210711020723-a769d52b0f97
+	golang.org/x/net v0.0.0-20210726213435-c6fcb2dbf985
+	golang.org/x/oauth2 v0.0.0-20210628180205-a41e5a781914
+	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c
 	google.golang.org/appengine v1.6.7 // indirect
+	google.golang.org/protobuf v1.27.1 // indirect
 )

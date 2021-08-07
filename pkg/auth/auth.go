@@ -81,7 +81,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 			}
 			// Write the requested url in a cookie
 			if r.Host != redirectTo && r.URL.Path != "/favicon.ico" {
-				cookie := http.Cookie{Name: "redirectAfterLogin", Path: "/", Domain: hostname, Value: r.Host + r.URL.Path + "?" + r.URL.RawQuery, MaxAge: 30, Secure: true, HttpOnly: false, SameSite: http.SameSiteLaxMode}
+				cookie := http.Cookie{Name: "redirectAfterLogin", Path: "/", Domain: hostname, Value: r.Host + r.URL.Path + "?" + r.URL.RawQuery, MaxAge: 60, Secure: true, HttpOnly: false, SameSite: http.SameSiteLaxMode}
 				http.SetCookie(w, &cookie)
 			}
 			w.Header().Set("Content-Type", "text/html")

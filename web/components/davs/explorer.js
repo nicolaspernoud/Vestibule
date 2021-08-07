@@ -35,6 +35,11 @@ export class Explorer {
               <i class="fas fa-arrow-circle-left"></i>
             </span>
           </button>
+          <button id="explorer-modal-refresh" class="button">
+            <span class="icon is-small">
+              <i class="fas fa-sync-alt"></i>
+            </span>
+          </button>
           ${this.dav.writable
             ? /* HTML */ `
                 <button id="explorer-modal-newfolder" class="button">
@@ -67,6 +72,9 @@ export class Explorer {
     });
     document.getElementById(`explorer-modal-back`).addEventListener("click", () => {
       this.navigate(goUp(this.path));
+    });
+    document.getElementById(`explorer-modal-refresh`).addEventListener("click", () => {
+      this.navigate(this.path);
     });
     if (this.dav.writable) {
       document.getElementById(`explorer-modal-newfolder`).addEventListener("click", () => {

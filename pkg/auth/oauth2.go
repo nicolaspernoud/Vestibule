@@ -50,7 +50,7 @@ func (m Manager) HandleOAuth2Login(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Logger.Fatalf("Error generating OAuth2 strate string :%v\n", err)
 	}
-	tokens.CreateCookie(oauthStateString, m.Hostname, oAuth2StateKey, 30*time.Second, w)
+	tokens.CreateCookie(oauthStateString, m.Hostname, oAuth2StateKey, 60*time.Second, w)
 	url := m.Config.AuthCodeURL(oauthStateString)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
