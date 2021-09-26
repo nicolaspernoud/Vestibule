@@ -28,7 +28,7 @@ export function RandomString(length) {
 }
 
 export function GetType(file) {
-  if (/(txt|md|csv|sh|nfo|log|json|yml|srt)$/.test(file.name.toLowerCase())) {
+  if (/(txt|md|csv|sh|nfo|log|json|yml|srt|py)$/.test(file.name.toLowerCase())) {
     return "text";
   }
   if (/(docx|doc|odt|xlsx|xls|ods|pptx|ppt|opd)$/.test(file.name.toLowerCase())) {

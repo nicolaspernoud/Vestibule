@@ -10,8 +10,6 @@
       "request": "launch",
       "mode": "debug",
       "remotePath": "",
-      "port": 2345,
-      "host": "127.0.0.1",
       "program": "${workspaceFolder}/main.go",
       "env": {
         "REDIRECT_URL": "https://vestibule.127.0.0.1.nip.io:1443/OAuth2Callback",
@@ -37,8 +35,6 @@
       "request": "launch",
       "mode": "debug",
       "remotePath": "",
-      "port": 2345,
-      "host": "127.0.0.1",
       "program": "${workspaceFolder}/main.go",
       "env": {
         "REDIRECT_URL": "https://vestibule.127.0.0.1.nip.io:1443/OAuth2Callback",
