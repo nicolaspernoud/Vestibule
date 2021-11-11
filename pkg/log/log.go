@@ -56,9 +56,14 @@ func CloseFile() {
 // GetCityAndCountryFromRequest returns a string containing the city and the contry where the request is from
 // If the city is fetched from the built-in memory cache, it is NOT suffixed by a dot (.)
 func GetCityAndCountryFromRequest(req *http.Request) string {
-	// If the request remote adress is local return "localhost"
+	// If the request remote adress is the host itself return "localhost"
 	if req.RemoteAddr == "" || strings.HasPrefix(req.RemoteAddr, "[::1]") || strings.HasPrefix(req.RemoteAddr, "127.0.0.1") {
 		return "localhost"
+	}
+
+	// If the request remote adress is from local network return "local network"
+	if strings.HasPrefix(req.RemoteAddr, "192.168.") {
+		return "local network"
 	}
 
 	// Lock the cache

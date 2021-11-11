@@ -10,8 +10,14 @@ import (
 func TestGetCityAndCountryFromRequest(t *testing.T) {
 
 	// Request types
-	requestFromLocalHost := httptest.NewRequest("GET", "/test", strings.NewReader(""))
-	requestFromLocalHost.RemoteAddr = "[::1]:1234"
+	requestFromLocalHostV6 := httptest.NewRequest("GET", "/test", strings.NewReader(""))
+	requestFromLocalHostV6.RemoteAddr = "[::1]:1234"
+
+	requestFromLocalHostV4 := httptest.NewRequest("GET", "/test", strings.NewReader(""))
+	requestFromLocalHostV4.RemoteAddr = "127.0.0.1:1234"
+
+	requestFromLocalNetworkV4 := httptest.NewRequest("GET", "/test", strings.NewReader(""))
+	requestFromLocalNetworkV4.RemoteAddr = "192.168.1.1:1234"
 
 	requestFromLondon := httptest.NewRequest("GET", "/test", strings.NewReader(""))
 	requestFromLondon.RemoteAddr = "81.2.69.142:1234"
@@ -61,11 +67,25 @@ func TestGetCityAndCountryFromRequest(t *testing.T) {
 		want string
 	}{
 		{
-			name: "Request from localhost",
+			name: "Request from localhost ipv4",
 			args: args{
-				req: requestFromLocalHost,
+				req: requestFromLocalHostV4,
 			},
 			want: "localhost",
+		},
+		{
+			name: "Request from localhost ipv6",
+			args: args{
+				req: requestFromLocalHostV6,
+			},
+			want: "localhost",
+		},
+		{
+			name: "Request from local network",
+			args: args{
+				req: requestFromLocalNetworkV4,
+			},
+			want: "local network",
 		},
 		{
 			name: "Request from london",
