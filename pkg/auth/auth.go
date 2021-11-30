@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/nicolaspernoud/vestibule/pkg/common"
+	"github.com/nicolaspernoud/vestibule/pkg/log"
 	"github.com/nicolaspernoud/vestibule/pkg/tokens"
 )
 
@@ -23,6 +24,43 @@ const (
 	// ContextData is the user
 	ContextData key = 0
 )
+
+type OpenIDConfiguration struct {
+	ResponseTypesSupported           []string `json:"response_types_supported"`
+	RequestParameterSupported        bool     `json:"request_parameter_supported"`
+	RequestURIParameterSupported     bool     `json:"request_uri_parameter_supported"`
+	JwksURI                          string   `json:"jwks_uri"`
+	SubjectTypesSupported            []string `json:"subject_types_supported"`
+	IDTokenSigningAlgValuesSupported []string `json:"id_token_signing_alg_values_supported"`
+	RegistrationEndpoint             string   `json:"registration_endpoint"`
+	Issuer                           string   `json:"issuer"`
+	AuthorizationEndpoint            string   `json:"authorization_endpoint"`
+	TokenEndpoint                    string   `json:"token_endpoint"`
+	UserinfoEndpoint                 string   `json:"userinfo_endpoint"`
+}
+
+// InitEnv will initialize environment variables from the issuer environment variable
+func InitIdPEnv(idpUrl string) {
+	// Perform a request on the .well-known/oidc-configuration endpoint
+	r, err := http.Get(idpUrl + "/.well-known/openid-configuration")
+	if err != nil {
+		log.Logger.Fatalf("Could not read IdP configuration, exiting...")
+	}
+	defer r.Body.Close()
+	// Unmarshall the response into a struct
+	var o = OpenIDConfiguration{}
+	json.NewDecoder(r.Body).Decode(&o)
+	// Init the other env variables from this struct
+	if _, e := os.LookupEnv("AUTH_URL"); !e {
+		os.Setenv("AUTH_URL", o.AuthorizationEndpoint)
+	}
+	if _, e := os.LookupEnv("TOKEN_URL"); !e {
+		os.Setenv("TOKEN_URL", o.TokenEndpoint)
+	}
+	if _, e := os.LookupEnv("USERINFO_URL"); !e {
+		os.Setenv("USERINFO_URL", o.UserinfoEndpoint)
+	}
+}
 
 var (
 	// AdminRole represents the role reserved for admins
@@ -214,7 +252,7 @@ func GetTokenData(r *http.Request) (TokenData, error) {
 
 // isWebdav works out if an user agent is a webdav user agent
 func isWebdav(ua string) bool {
-	for _, a := range []string{"vfs", "Microsoft-WebDAV", "Konqueror", "LibreOffice", "Rei.Fs.WebDAV"} {
+	for _, a := range []string{"vfs", "Microsoft-WebDAV", "Konqueror", "LibreOffice", "Rei.Fs.WebDAV", "Documents"} {
 		if strings.Contains(ua, a) {
 			return true
 		}

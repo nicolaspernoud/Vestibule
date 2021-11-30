@@ -36,7 +36,7 @@ func DoRequestOnHandler(t *testing.T, router http.Handler, method string, route 
 }
 
 // DoRequestOnServer does a request on listening server
-func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookiejar.Jar, method string, testURL string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
+func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookiejar.Jar, method string, testURL string, headers map[string]string, payload string, expectedStatus int, expectedBody string, followRedirects bool) string {
 	dialer := &net.Dialer{
 		Timeout:   30 * time.Second,
 		KeepAlive: 30 * time.Second,
@@ -63,11 +63,14 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 	for i, v := range headers {
 		req.Header.Set(i, v)
 	}
-	var client *http.Client
+	client := &http.Client{}
+	if !followRedirects {
+		client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+	}
 	if jar != nil {
-		client = &http.Client{Jar: jar}
-	} else {
-		client = &http.Client{}
+		client.Jar = jar
 	}
 	res, err := client.Do(req)
 	if err != nil {
@@ -85,8 +88,8 @@ func DoRequestOnServer(t *testing.T, hostname string, port string, jar *cookieja
 }
 
 // CreateServerTester wraps DoRequestOnServer to factorize t, port and jar
-func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar) DoFn {
+func CreateServerTester(t *testing.T, hostname string, port string, jar *cookiejar.Jar, followRedirects bool) DoFn {
 	return func(method string, url string, headers map[string]string, payload string, expectedStatus int, expectedBody string) string {
-		return DoRequestOnServer(t, port, hostname, jar, method, url, headers, payload, expectedStatus, expectedBody)
+		return DoRequestOnServer(t, port, hostname, jar, method, url, headers, payload, expectedStatus, expectedBody, followRedirects)
 	}
 }

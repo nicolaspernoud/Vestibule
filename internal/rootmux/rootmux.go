@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/nicolaspernoud/vestibule/pkg/appserver"
@@ -45,6 +46,9 @@ func CreateRootMux(hostname string, port int, appsFile string, davsFile string, 
 	mainMux := http.NewServeMux()
 	// ALL USERS API ENDPOINTS
 	// Authentication endpoints
+	if i, e := os.LookupEnv("ISSUER"); e {
+		auth.InitIdPEnv(i)
+	}
 	m := auth.NewManager()
 	mainMux.HandleFunc("/OAuth2Login", m.HandleOAuth2Login)
 	mainMux.Handle("/OAuth2Callback", m.HandleOAuth2Callback())
@@ -78,8 +82,11 @@ func CreateRootMux(hostname string, port int, appsFile string, davsFile string, 
 	adminMux.HandleFunc("/users/", auth.ProcessUsers)
 	adminMux.HandleFunc("/sysinfo/", sysinfo.GetInfo)
 	mainMux.Handle("/api/admin/", http.StripPrefix("/api/admin", auth.ValidateAuthMiddleware(adminMux, []string{auth.AdminRole}, true)))
-	// Serve static files falling back to serving index.html
-	mainMux.Handle("/", middlewares.NoCache(http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)})))
+	// Serve assets with cache enabled
+	static := http.FileServer(&common.FallBackWrapper{Assets: http.Dir(staticDir)})
+	mainMux.Handle("/assets/", static)
+	// Serve static files falling back to serving index.html with cache disabled
+	mainMux.Handle("/", middlewares.NoCache(static))
 	// Put it together into the main handler
 	mux := http.NewServeMux()
 	mux.Handle(hostname+"/", middlewares.WebSecurity(mainMux, "*."+hostname+":*", false))

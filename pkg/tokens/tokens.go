@@ -37,6 +37,11 @@ func Init(keyfile string, debug bool) {
 	m = newManager(keyfile, debug)
 }
 
+// InitFromString inits the main token manager from a given string
+func InitFromString(key string, debug bool) {
+	m = manager{key: []byte(key), debugMode: debug}
+}
+
 // newManager creates a manager
 func newManager(keyfile string, debug bool) manager {
 	var keyConfig struct {

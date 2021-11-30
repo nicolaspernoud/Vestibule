@@ -49,9 +49,9 @@ func TestAll(t *testing.T) {
 	os.Setenv("USERINFO_URL", oAuth2Server.URL+"/userinfo")
 	os.Setenv("LOGOUT_URL", oAuth2Server.URL+"/logout")
 	// Set up testers
-	os.Setenv("AUTH_URL", oAuth2Server.URL+"/auth-wrong-state") // Set the server to access failing OAuth2 endpoints
+	os.Setenv("AUTH_URL", oAuth2Server.URL+"/authorize-wrong-state") // Set the server to access failing OAuth2 endpoints
 	oauth2Tests := createOauth2Tests(t)
-	os.Setenv("AUTH_URL", oAuth2Server.URL+"/auth") // Set the server to access the correct OAuth2Endpoint
+	os.Setenv("AUTH_URL", oAuth2Server.URL+"/authorize") // Set the server to access the correct OAuth2Endpoint
 	unloggedTests := createUnLoggedTests(t)
 	userTests := createUserTests(t)
 	os.Setenv("USERINFO_URL", oAuth2Server.URL+"/admininfo")
@@ -355,5 +355,5 @@ func createTester(t *testing.T) (*httptest.Server, tester.DoFn, tester.DoFn) {
 	// Create the cookie jar
 	jar, _ := cookiejar.New(nil)
 	// wrap the testing function
-	return ts, tester.CreateServerTester(t, port, os.Getenv("HOSTNAME"), jar), tester.CreateServerTester(t, port, os.Getenv("HOSTNAME"), nil)
+	return ts, tester.CreateServerTester(t, port, os.Getenv("HOSTNAME"), jar, true), tester.CreateServerTester(t, port, os.Getenv("HOSTNAME"), nil, true)
 }

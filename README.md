@@ -83,6 +83,7 @@ Configuration is done through environment variables. The meaning of the differen
 | AUTH_URL                 | IdP's authentication URL                                                                                                                 |                                     |
 | TOKEN_URL                | IdP's token URL                                                                                                                          |                                     |
 | USERINFO_URL             | IdP's userinfo URL                                                                                                                       |                                     |
+| ISSUER                   | IdP's issuer for autoconfiguration of AUTH_URL, TOKEN_URL, USERINFO_URL if they are not already set                                      |
 | LOGOUT_URL               | IdP's logout URL                                                                                                                         |                                     |
 | ONLYOFFICE_TITLE         | Title used on the OnlyOffice document editor window                                                                                      | VestibuleOffice                     |
 | ONLYOFFICE_SERVER        | Url of the OnlyOffice document server used to edit documents                                                                             |                                     |
@@ -109,7 +110,7 @@ Every branding asset is in `web/assets/brand` directory. They can be altered acc
 ### Update dependencies
 
 ```bash
-go get -u
+go get -u -t ./...
 go mod tidy
 ```
 

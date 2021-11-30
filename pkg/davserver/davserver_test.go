@@ -19,7 +19,7 @@ func TestEncryption(t *testing.T) {
 	url, _ := url.Parse(ts.URL)
 	port := url.Port()
 	// wrap the testing function
-	do := tester.CreateServerTester(t, port, "vestibule.io", nil)
+	do := tester.CreateServerTester(t, port, "vestibule.io", nil, true)
 	var noH map[string]string
 	// Try to access a crypted file on a encrypted unsecured dav (must pass)
 	do("PUT", "/test-ciphered.txt", noH, "content is encrypted !", 201, "")
@@ -74,7 +74,7 @@ func TestSetModTime(t *testing.T) {
 	ts := httptest.NewServer(&davAug)
 	url, _ := url.Parse(ts.URL)
 	port := url.Port()
-	doPlain := tester.CreateServerTester(t, port, "vestibule.io", nil)
+	doPlain := tester.CreateServerTester(t, port, "vestibule.io", nil, true)
 	test(doPlain)
 
 	// Test with encrypted webdav
@@ -82,6 +82,6 @@ func TestSetModTime(t *testing.T) {
 	tsEnc := httptest.NewServer(&davAugEnc)
 	urlEnc, _ := url.Parse(tsEnc.URL)
 	portEnc := urlEnc.Port()
-	doEnc := tester.CreateServerTester(t, portEnc, "vestibule.io", nil)
+	doEnc := tester.CreateServerTester(t, portEnc, "vestibule.io", nil, true)
 	test(doEnc)
 }

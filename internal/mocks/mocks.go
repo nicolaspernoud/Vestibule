@@ -23,13 +23,44 @@ func Init(portFromMain int) {
 func CreateMockOAuth2() *http.ServeMux {
 	mux := http.NewServeMux()
 	// Returns authorization code back to the user
-	mux.HandleFunc("/auth", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/.well-known/openid-configuration", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(`
+		  {
+			"response_types_supported": [
+			  "code",
+			  "id_token",
+			  "token",
+			  "code id_token",
+			  "code token",
+			  "token id_token",
+			  "code id_token token"
+			],
+			"request_parameter_supported": true,
+			"request_uri_parameter_supported": false,
+			"jwks_uri": "http://127.0.0.1:8090/jwk",
+			"subject_types_supported": [
+			  "public"
+			],
+			"id_token_signing_alg_values_supported": [
+			  "RS512"
+			],
+			"registration_endpoint": "http://127.0.0.1:8090/register",
+			"issuer": "http://127.0.0.1:8090",
+			"authorization_endpoint": "http://127.0.0.1:8090/authorize",
+			"token_endpoint": "http://127.0.0.1:8090/token",
+			"userinfo_endpoint": "http://127.0.0.1:8090/userinfo"
+		  }
+		`))
+	})
+	// Returns authorization code back to the user
+	mux.HandleFunc("/authorize", func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		redir := query.Get("redirect_uri") + "?state=" + query.Get("state") + "&code=mock_code"
 		http.Redirect(w, r, redir, http.StatusFound)
 	})
 	// Returns authorization code back to the user, but without the provided state
-	mux.HandleFunc("/auth-wrong-state", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/authorize-wrong-state", func(w http.ResponseWriter, r *http.Request) {
 		query := r.URL.Query()
 		redir := query.Get("redirect_uri") + "?state=" + "a-random-state" + "&code=mock_code"
 		http.Redirect(w, r, redir, http.StatusFound)
@@ -83,10 +114,7 @@ func CreateMockAPI() *http.ServeMux {
 			w.Header().Set("Content-Type", "application/json")
 			w.Header().Set("X-XSS-Protection", "1; mode=block")
 			w.Header().Set("Content-Security-Policy", "default-src 'self'; frame-ancestors http://www.example.com")
-			w.Write([]byte(`{
-				"foo": "bar",
-				"bar": "foo"
-			}`))
+			w.Write([]byte(`{"foo": "bar","bar": "foo"}`))
 		})
 	}(), hostname, port))
 	return mux
