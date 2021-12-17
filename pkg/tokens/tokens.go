@@ -39,7 +39,15 @@ func Init(keyfile string, debug bool) {
 
 // InitFromString inits the main token manager from a given string
 func InitFromString(key string, debug bool) {
-	m = manager{key: []byte(key), debugMode: debug}
+	mKey := []byte(key)
+	if len(mKey) == 0 {
+		var err error
+		mKey, err = common.GenerateRandomBytes(32)
+		if err != nil {
+			log.Logger.Fatal(err)
+		}
+	}
+	m = manager{key: mKey, debugMode: debug}
 }
 
 // newManager creates a manager
