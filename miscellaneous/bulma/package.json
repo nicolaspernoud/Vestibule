@@ -15,8 +15,8 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "bulma": "^0.9.3",
-    "clean-css-cli": "^5.3.0",
-    "node-sass": "^6.0.0",
+    "clean-css-cli": "^5.5.0",
+    "node-sass": "^7.0.1",
     "rimraf": "^3.0.2"
   }
 }
