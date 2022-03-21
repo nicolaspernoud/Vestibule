@@ -185,8 +185,10 @@ class Davs {
                   </p>
                   <hr class="dropdown-divider" />
                   <p><strong>${dav.host}</strong></p>
-                  <p>Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"} access</p>
-                  <p>${dav.secured ? "Restricted access to users with roles <strong>" + dav.roles + "</strong>" : "Unrestricted access"}</p>
+                  <p>
+                    Serves ${dav.root} directory, with ${dav.writable ? "read/write" : "read only"}
+                    ${dav.secured ? "access to users with roles <strong>" + dav.roles + "</strong>" : "unrestricted access"}.
+                  </p>
                   <p class="has-text-centered"><strong>-${dav.id}-</strong></p>
                 </div>
               </div>

@@ -200,10 +200,10 @@ class Apps {
                 <hr class="dropdown-divider" />
                 <div class="dropdown-item">
                   <p><strong>${app.host}</strong></p>
-                  <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}</p>
-                  <p>${app.secured ? "Restricted access to users with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}</p>
-                  ${app.login ? "<p>Automatically log in with basic auth as <strong>" + app.login + "</strong></p>" : ""}
-                  ${app.cacheduration > 0 ? `<p>Server cache GET requests for <strong>${app.cachepattern}</strong> for <strong>${app.cacheduration}</strong> seconds</p>` : ""}
+                  <p>${app.isProxy ? "Proxies to <strong>" + app.forwardTo + "</strong>" : "Serves <strong>" + app.serve + "</strong>"}.</p>
+                  <p>${app.secured ? "Restricted access to users with roles <strong>" + app.roles + "</strong>" : "Unrestricted access"}.</p>
+                  ${app.login ? "<p>Automatically logs in with basic auth as <strong>" + app.login + "</strong>.</p>" : ""}
+                  ${app.cacheduration > 0 ? `<p>Server caches GET requests for <strong>${app.cachepattern}</strong> for <strong>${app.cacheduration}</strong> seconds.</p>` : ""}
                   <p class="has-text-centered"><strong>-${app.id}-</strong></p>
                 </div>
               </div>

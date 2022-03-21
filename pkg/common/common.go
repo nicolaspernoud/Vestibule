@@ -103,8 +103,8 @@ func (i *FallBackWrapper) Open(name string) (http.File, error) {
 	return i.Assets.Open("index.html")
 }
 
-// Contains works out if a string slice contains a given string element
-func Contains(a []string, x string) bool {
+// Contains works out if a slice contains a given element
+func Contains[K comparable](a []K, x K) bool {
 	for _, n := range a {
 		if x == n {
 			return true

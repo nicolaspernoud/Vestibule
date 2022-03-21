@@ -128,6 +128,16 @@ git remote set-url --add --push origin https://github.com/nicolaspernoud/Vestibu
 git fetch --all
 ```
 
+## Update master from development and set development to follow master
+
+```bash
+git checkout master
+git merge development --squash
+# Alter commit message and commit
+git checkout development
+git reset --hard master
+```
+
 ## Credits
 
 Loosely based on Webfront (https://github.com/nf/webfront), by Andrew Gerrand, Google (Apache License, Version 2.0).
