@@ -32,7 +32,7 @@ class Davs {
   async mount(mountpoint) {
     document.getElementById(mountpoint).innerHTML = /* HTML */ `
       <div id="davs-list" class="flex-container"></div>
-      <button id="davs-new" class="button is-primary is-hidden">
+      <button id="davs-new" class="button is-primary is-hidden has-card-shadow">
         <span class="icon is-small">
           <i class="fas fa-plus"></i>
         </span>
@@ -179,7 +179,7 @@ class Davs {
                 <hr class="dropdown-divider" />
                 <div class="dropdown-item">
                   <p>
-                    <progress class="progress is-${GetColor(du)} is-small" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${dav.usedgb !== undefined
+                    <progress class="progress is-${GetColor(du)} is-small small-radius" value="${dav.usedgb}" max="${dav.totalgb}"></progress>${dav.usedgb !== undefined
                       ? free + " GB free"
                       : ""}
                   </p>

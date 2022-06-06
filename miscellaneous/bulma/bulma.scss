@@ -10,13 +10,13 @@
 $deep-blue: #3f51b5;
 $grey: #78909c;
 $light-grey: #b0bec5;
-$very-light-grey: #eceff1;
+$very-light-grey: #fafafa;
 
 // Bulma's global variables
 $primary: $deep-blue;
 $dark: $grey;
 $light: $light-grey;
-$radius-small: 4px;
+$radius-small: 5px;
 
 // Bulma's component variables
 $body-background-color: $very-light-grey;
@@ -160,23 +160,28 @@ a.navbar-item.is-active {
   max-width: 300px;
 }
 
+$card-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+
 .icon-card {
   margin: 1rem;
   width: 12rem;
-  transition: 0.3s;
-  border: 0.1rem solid $light-grey;
   border-radius: $radius-large;
-  box-shadow: none;
-  background-color: $very-light-grey;
+  box-shadow: $card-shadow;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+  background-color: white;
 }
 
 .icon-card:hover {
-  border-color: $deep-blue;
-  box-shadow: 0 0 0.5rem $light-grey;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
 .card {
   border-radius: $radius-small;
+  box-shadow: $card-shadow;
+}
+
+.card-footer {
+  border-top: none;
 }
 
 .modal-content {
@@ -213,4 +218,12 @@ a.navbar-item.is-active {
 
 .shadow-icon {
   filter: drop-shadow(0.1rem 0.1rem 0.1rem grey);
+}
+
+.has-card-shadow {
+  box-shadow: $card-shadow;
+}
+
+.small-radius {
+  border-radius: $radius-small;
 }

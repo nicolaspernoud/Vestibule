@@ -20,16 +20,16 @@ export function Show(bulmaClass, message) {
     offset = offset + height;
     messages.push(message);
     const timer = setTimeout(function () {
-      removeMsg(msg, message, height);
+      removeMsg(msg, message);
     }, 5000);
     delBtn.addEventListener("click", function () {
-      removeMsg(msg, message, height);
+      removeMsg(msg, message);
       clearTimeout(timer);
     });
   }
 }
 
-async function removeMsg(msg, message, height) {
+async function removeMsg(msg, message) {
   const index = messages.indexOf(message);
   if (index > -1) {
     messages.splice(index, 1);

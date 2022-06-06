@@ -461,7 +461,7 @@ export class Explorer {
       let msg = document.createElement("div");
       msg.innerHTML = /* HTML */ `
         <div class="content"><p>${file.name} (file: ${fileIdx}/${files.length})</p></div>
-        <progress class="progress is-primary is-small" value="0" max="100" style="margin-bottom: 0px;"></progress>
+        <progress class="progress is-primary is-small small-radius" value="0" max="100" style="margin-bottom: 0px;"></progress>
       `;
       msg.classList.add("is-info", "notification", "uploader", "animate__animated", "animate__fadeInUp");
       const delBtn = document.createElement("button");
@@ -535,7 +535,7 @@ export class Explorer {
           });
         }
       };
-      xhr.onerror = function (e) {
+      xhr.onerror = function (_e) {
         reject({
           status: this.status,
           statusText: `Error uploading ${file.name} (status ${xhr.status})`,

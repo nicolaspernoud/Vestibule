@@ -59,7 +59,7 @@ func TestGetCityAndCountryFromRequest(t *testing.T) {
 
 	// Test case of existing ip location database
 
-	ipDbLocation = "../../configs/ipgeodatabase/GeoLite2-City.mmdb"
+	ipDbLocation = "../../ipgeodatabase/GeoLite2-City.mmdb"
 
 	tests = []struct {
 		name string

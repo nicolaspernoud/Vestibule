@@ -1,6 +1,6 @@
 export const AnimateCSS = (element, animation, prefix = "animate__") =>
   // We create a Promise and return it
-  new Promise((resolve, reject) => {
+  new Promise((resolve, _reject) => {
     const animationName = `${prefix}${animation}`;
 
     element.classList.add(`${prefix}animated`, animationName);
@@ -51,7 +51,7 @@ export function GetType(file) {
 export const Truncate = (input) => (input.length > 12 ? `${input.substring(0, 12)}...` : input);
 
 export function EncodeURIWithSpecialsCharacters(str) {
-  return encodeURI(str).replace(/[!'()*]/g, escape);
+  return encodeURI(str).replace(/[!'()*]/g, encodeURIComponent);
 }
 
 export function IsEmpty(obj) {

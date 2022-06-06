@@ -57,7 +57,7 @@ class Sysinfo {
           ? /* HTML */ `
               <h1>CPU usage</h1>
               <p>
-                <progress class="progress is-small is-${GetColor(info.load)}" value="${info.load}" max="1"></progress>
+                <progress class="progress small-radius is-small is-${GetColor(info.load)}" value="${info.load}" max="1"></progress>
                 ${(info.load * 100).toFixed(0)} %
               </p>
             `
@@ -66,7 +66,7 @@ class Sysinfo {
           ? /* HTML */ `
               <h1>Memory usage</h1>
               <p>
-                <progress class="progress is-small is-${GetColor(mu)}" value="${info.totalram - info.freeram}" max="${info.totalram}"></progress>
+                <progress class="progress small-radius is-small is-${GetColor(mu)}" value="${info.totalram - info.freeram}" max="${info.totalram}"></progress>
                 ${(info.freeram / Math.pow(2, 20)).toFixed(2)} GB free
               </p>
             `
@@ -75,7 +75,7 @@ class Sysinfo {
           ? /* HTML */ `
               <h1>Disk usage</h1>
               <p>
-                <progress class="progress is-small is-${GetColor(du)}" value="${info.usedgb}" max="${info.totalgb}"></progress>
+                <progress class="progress small-radius is-small is-${GetColor(du)}" value="${info.usedgb}" max="${info.totalgb}"></progress>
                 ${dfree} GB free
               </p>
             `

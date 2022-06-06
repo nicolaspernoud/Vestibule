@@ -42,7 +42,7 @@ class Apps {
   async mount(mountpoint) {
     document.getElementById(mountpoint).innerHTML = /* HTML */ `
       <div id="apps-list" class="flex-container"></div>
-      <button id="apps-new" class="button is-primary is-hidden">
+      <button id="apps-new" class="button is-primary is-hidden has-card-shadow">
         <span class="icon is-small">
           <i class="fas fa-plus"></i>
         </span>
