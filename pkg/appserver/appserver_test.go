@@ -3,7 +3,6 @@ package appserver
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net"
 	"net/http"
@@ -124,7 +123,7 @@ func testAbsoluteRedirectHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func writeApps(apps []*app) (name string) {
-	f, err := ioutil.TempFile("", "vestibule-apps")
+	f, err := os.CreateTemp("", "vestibule-apps")
 	if err != nil {
 		panic(err)
 	}

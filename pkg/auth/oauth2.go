@@ -133,7 +133,7 @@ func (m Manager) HandleOAuth2Callback() http.Handler {
 			return
 		}
 		tokenData := TokenData{User: user, XSRFToken: xsrfToken}
-		tokens.CreateCookie(tokenData, m.Hostname, authTokenKey, 24*time.Hour, w)
+		tokens.CreateCookie(tokenData, m.Hostname, AuthTokenKey, 24*time.Hour, w)
 		// Log the connexion
 		log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, req.RemoteAddr, log.GetCityAndCountryFromRequest(req))
 		// Redirect

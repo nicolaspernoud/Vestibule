@@ -1,5 +1,7 @@
 # Vestibule
 
+** VESTIBULE IS BEING DEPRECATED AND SOON WILL NO LONGER BE MAINTAINED - PLEASE MIGRATE TO ATRIUM (https://github.com/nicolaspernoud/atrium) **
+
 Alternate URL (on the Grand Lyon software forge) : https://forge.grandlyon.com/NPERNOUD/vestibule .
 
 Vestibule is an HTTP server, reverse proxy and webdav server, with OIDC/OAuth2 and local users file authentication, and a _Single Page Application_ GUI to configure everything.

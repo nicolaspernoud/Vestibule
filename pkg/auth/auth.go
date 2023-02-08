@@ -20,7 +20,7 @@ import (
 type key int
 
 const (
-	authTokenKey string = "auth_token"
+	AuthTokenKey string = "auth_token"
 	// ContextData is the user
 	ContextData key = 0
 )
@@ -95,7 +95,7 @@ type TokenData struct {
 func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF bool) http.Handler {
 	roleChecker := func(w http.ResponseWriter, r *http.Request) {
 		user := TokenData{}
-		checkXSRF, err := tokens.ExtractAndValidateToken(r, authTokenKey, &user, checkXSRF)
+		checkXSRF, err := tokens.ExtractAndValidateToken(r, AuthTokenKey, &user, checkXSRF)
 		// Handle WebDav authentication
 		if err != nil && isWebdav(r.UserAgent()) {
 			// Test if the user password is directly given in the request, if so populate the user
@@ -166,7 +166,7 @@ func ValidateAuthMiddleware(next http.Handler, allowedRoles []string, checkXSRF 
 func (m Manager) HandleLogout(w http.ResponseWriter, r *http.Request) {
 	// Delete the auth cookie
 	c := http.Cookie{
-		Name:   authTokenKey,
+		Name:   AuthTokenKey,
 		Domain: m.Hostname,
 		MaxAge: -1,
 	}
@@ -202,7 +202,7 @@ func checkUserHasRole(user TokenData, allowedRoles []string) error {
 	return fmt.Errorf("no user role among %v is in allowed roles (%v)", user.Roles, allowedRoles)
 }
 
-//GetShareToken gets a share token for a given ressource
+// GetShareToken gets a share token for a given ressource
 func GetShareToken(w http.ResponseWriter, r *http.Request) {
 	user, err := GetTokenData(r)
 	if err != nil {

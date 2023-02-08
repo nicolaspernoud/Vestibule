@@ -71,7 +71,7 @@ func (m Manager) HandleInMemoryLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	tokenData := TokenData{User: User{ID: user.ID, Login: user.Login, Email: user.Email, Roles: user.Roles}, XSRFToken: xsrfToken}
-	tokens.CreateCookie(tokenData, m.Hostname, authTokenKey, tokenLifetime, w)
+	tokens.CreateCookie(tokenData, m.Hostname, AuthTokenKey, tokenLifetime, w)
 	// Log the connexion
 	log.Logger.Printf("| %v (%v %v) | Login success | %v | %v", user.Login, user.Name, user.Surname, r.RemoteAddr, log.GetCityAndCountryFromRequest(r))
 }

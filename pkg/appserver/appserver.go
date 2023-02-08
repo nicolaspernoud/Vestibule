@@ -20,6 +20,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/nicolaspernoud/vestibule/pkg/auth"
 	cache "github.com/nicolaspernoud/vestibule/pkg/cache"
 	"github.com/nicolaspernoud/vestibule/pkg/cache/memory"
 	"github.com/nicolaspernoud/vestibule/pkg/log"
@@ -169,6 +170,7 @@ func makeHandler(app *app, authz authzFunc) http.Handler {
 				if app.Login != "" && app.Password != "" {
 					req.Header.Set("Authorization", "Basic "+base64.StdEncoding.EncodeToString([]byte(app.Login+":"+app.Password)))
 				}
+				req.Header.Del(auth.AuthTokenKey)
 			},
 			ModifyResponse: func(res *http.Response) error {
 				u, err := res.Location()
